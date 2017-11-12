@@ -38,6 +38,26 @@ private:
     // Data.
     double *B; ///< buffer
     int N;     ///< doubles count
+
+public:
+
+    /// \brief Words buffer.
+    ///
+    /// \return
+    /// Words buffers.
+    double *BufferDoubles()
+    {
+        return B;
+    }
+
+    /// \brief Words count in buffer.
+    ///
+    /// \return
+    /// Words count in buffer.
+    double BufferDoublesCount()
+    {
+        return N;
+    }
 };
 
 }

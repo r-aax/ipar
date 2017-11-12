@@ -1,5 +1,12 @@
 #!/bin/sh
 
-COMP="g++"
+COMP="mpic++"
+EXE="MPIExchangeNtoN.out"
 
-$COMP *.cpp ../../Utils/*.cpp -o MPIExchangeNtoN.out -lm -fopenmp
+rm -f $EXE
+
+$COMP \
+    -DDEBUG -DUSEMPI \
+    *.cpp ../../Utils/*.cpp \
+    -o $EXE \
+    -lm -fopenmp
