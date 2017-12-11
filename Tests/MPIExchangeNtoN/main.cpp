@@ -100,10 +100,20 @@ int main(int argc, char **argv)
 {
     MPI::Init(&argc, &argv);
 
+    // Exchanges count.
+    int exchanges_count = 1;
+
+    // Parse only correct parameters string.
+    if (argc == 2)
+    {
+        exchanges_count = atoi(argv[1]);
+    }
+
     // Hi.
     if (MPI::IsRank0())
     {
         cout << "MPIExchangeNtoN : test begin, "
+             << exchanges_count << " exchanges, "
              << MPI::Ranks() << " ranks are in use" << endl;
     }
     MPI::Barrier();
@@ -111,7 +121,10 @@ int main(int argc, char **argv)
     MPI::Barrier();
 
     // Body.
-    PerformExchanges();
+    for (int ex = 0; ex < exchanges_count; ex++)
+    {
+        PerformExchanges();
+    }
 
     // Bye.
     MPI::Barrier();
