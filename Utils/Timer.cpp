@@ -2,7 +2,7 @@
 /// \brief Timer implementation.
 
 #include "Timer.h"
-#include "MPI.h"
+#include "FMPI.h"
 #include "OMP.h"
 #include <stdlib.h>
 #include <sys/time.h>
@@ -94,7 +94,7 @@ double Timer::GTime()
     {
         case MPI:
 
-            gtime = MPI::GTime();
+            gtime = FMPI::GTime();
 
             break;
 

@@ -2,7 +2,7 @@
 /// \brief MPI statuses array.
 
 #include "MPIRequestsArray.h"
-#include "MPI.h"
+#include "FMPI.h"
 #include "Debug.h"
 
 namespace Utils {
@@ -12,7 +12,7 @@ namespace Utils {
 /// \param n - count
 MPIRequestsArray::MPIRequestsArray(int n)
 {
-    int rs = MPI::RequestSize();
+    int rs = FMPI::RequestSize();
 
     DEBUG_CHECK((rs % 4) == 0, "request size is not divisible on 4");
 
@@ -33,7 +33,7 @@ MPIRequestsArray::~MPIRequestsArray()
 /// Pointer.
 char *MPIRequestsArray::ReqP(int i)
 {
-    return &Arr[i * MPI::RequestSize()];
+    return &Arr[i * FMPI::RequestSize()];
 }
 
 }

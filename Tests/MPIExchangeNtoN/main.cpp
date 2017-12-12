@@ -1,7 +1,7 @@
 /// \file
 /// \brief N to N exchange test realization.
 
-#include "../../Utils/MPI.h"
+#include "../../Utils/FMPI.h"
 #include "../../Utils/IO.h"
 #include "../../Utils/ExchangeBuffer.h"
 #include "../../Utils/Timer.h"
@@ -20,8 +20,8 @@ using namespace Utils;
 void PerformExchanges(int power)
 {
     int array_size = 1 << power;
-    int rank = MPI::Rank();
-    int ranks = MPI::Ranks();
+    int rank = FMPI::Rank();
+    int ranks = FMPI::Ranks();
     int ranksm1 = ranks - 1;
     ExchangeBuffer *buffers_snd[ranksm1];
     ExchangeBuffer *buffers_rcv[ranksm1];
@@ -41,7 +41,7 @@ void PerformExchanges(int power)
 
     // Start timer.
     Timer *timer = new Timer(Timer::MPI);
-    MPI::Barrier();
+    FMPI::Barrier();
     timer->Start();
 
     // Initialize asynchronous sends and receives.
@@ -49,21 +49,21 @@ void PerformExchanges(int power)
     for (int i = 0; i < ranksm1; i++)
     {
         int from_rank = (ranks + rank - i - 1) % ranks;
-        MPI::IRecvDoubles(buffers_rcv[i]->BufferDoubles(), buffers_rcv[i]->BufferDoublesCount(),
-                          from_rank, from_rank, reqs->ReqP(i));
+        FMPI::IRecvDoubles(buffers_rcv[i]->BufferDoubles(), buffers_rcv[i]->BufferDoublesCount(),
+                           from_rank, from_rank, reqs->ReqP(i));
     }
     for (int i = 0; i < ranksm1; i++)
     {
         int to_rank = (rank + i + 1) % ranks;
-        MPI::ISendDoubles(buffers_snd[i]->BufferDoubles(), buffers_snd[i]->BufferDoublesCount(),
-                          to_rank, rank, reqs->ReqP(ranksm1 + i));
+        FMPI::ISendDoubles(buffers_snd[i]->BufferDoubles(), buffers_snd[i]->BufferDoublesCount(),
+                           to_rank, rank, reqs->ReqP(ranksm1 + i));
     }
-    MPI::WaitAll(2 * ranksm1, reqs, stats);
-    MPI::Barrier();
+    FMPI::WaitAll(2 * ranksm1, reqs, stats);
+    FMPI::Barrier();
 
     // Stop timer.
     double t = timer->Stop();
-    if (MPI::IsRank0())
+    if (FMPI::IsRank0())
     {
         cout << "MPIExchangeNtoN : power " << power
              << ", time " << t << endl;
@@ -96,9 +96,14 @@ void PerformExchanges()
 ///
 /// \param argc - arguments count
 /// \param argv - arguments
+///
+/// Usage:
+///   ./MPIExchangeNtoN <repeats>
+/// where
+///   <repeats> - count of exchanges repeats.
 int main(int argc, char **argv)
 {
-    MPI::Init(&argc, &argv);
+    FMPI::Init(&argc, &argv);
 
     // Exchanges count.
     int exchanges_count = 1;
@@ -110,15 +115,15 @@ int main(int argc, char **argv)
     }
 
     // Hi.
-    if (MPI::IsRank0())
+    if (FMPI::IsRank0())
     {
         cout << "MPIExchangeNtoN : test begin, "
              << exchanges_count << " exchanges, "
-             << MPI::Ranks() << " ranks are in use" << endl;
+             << FMPI::Ranks() << " ranks are in use" << endl;
     }
-    MPI::Barrier();
-    cout << "MPIExchangeNtoN : proc " << MPI::Rank() << endl; 
-    MPI::Barrier();
+    FMPI::Barrier();
+    cout << "MPIExchangeNtoN : proc " << FMPI::Rank() << endl; 
+    FMPI::Barrier();
 
     // Body.
     for (int ex = 0; ex < exchanges_count; ex++)
@@ -127,13 +132,13 @@ int main(int argc, char **argv)
     }
 
     // Bye.
-    MPI::Barrier();
-    if (MPI::IsRank0())
+    FMPI::Barrier();
+    if (FMPI::IsRank0())
     {
         cout << "MPIExchangeNtoN : test end" << endl;
     }
 
-    MPI::Finalize();
+    FMPI::Finalize();
 
     return 0;
 }

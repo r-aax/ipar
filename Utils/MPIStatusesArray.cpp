@@ -2,7 +2,7 @@
 /// \brief MPI statuses array implementation.
 
 #include "MPIStatusesArray.h"
-#include "MPI.h"
+#include "FMPI.h"
 #include "Debug.h"
 
 namespace Utils {
@@ -12,7 +12,7 @@ namespace Utils {
 /// \param n - count
 MPIStatusesArray::MPIStatusesArray(int n)
 {
-    int ss = MPI::StatusSize();
+    int ss = FMPI::StatusSize();
 
     DEBUG_CHECK((ss % 4) == 0, "request status is not divisible on 4");
 
