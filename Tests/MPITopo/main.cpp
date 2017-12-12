@@ -84,11 +84,22 @@ void Exchanges()
 /// \brief Collect times.
 void CollectTimes()
 {
-    // TODO:
-    for (int i = 0; i < FMPI::Ranks(); i++)
+    int ranks = FMPI::Ranks();
+
+    for (int r = 0; r < ranks; r++)
     {
-        cout << FMPI::Rank() << ": " << i << ": " << Timers[i]->Time() << endl;
-    }
+        if (FMPI::Rank() == r)
+        {
+            for (int i = 0; i < ranks; i++)
+            {
+                cout << "[ " << setw(3) << setfill('0') << i
+                     << "_" << setw(3) << setfill('0') << FMPI::Rank()
+                     << " ] " << setw(12) << setfill(' ') << Timers[i]->Time() << endl;
+            }
+        }
+
+        FMPI::Barrier();
+    }    
 }
 
 /// \brief Main function.
