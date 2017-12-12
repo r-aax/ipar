@@ -12,7 +12,7 @@
 using namespace Utils;
 
 /// \brief Maximum power of 2 for array size for MPI reduces.
-#define MAX_2_POWER_FOR_ARRAY_SIZE 20
+#define MAX_2_POWER_FOR_ARRAY_SIZE 25
 
 /// \brief Pair of values - double value with its index.
 typedef struct
