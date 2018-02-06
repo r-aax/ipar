@@ -5,7 +5,7 @@
 #include <mpi.h>
 #endif
 
-#include "MPI.h"
+#include "FMPI.h"
 #include "IO.h"
 #include "Timer.h"
 
@@ -15,7 +15,7 @@ namespace Utils {
 ///
 /// \param argc - arguments count
 /// \param argv - arguments
-void MPI::Init(int *argc, char ***argv)
+void FMPI::Init(int *argc, char ***argv)
 {
 
 #ifdef USEMPI
@@ -27,7 +27,7 @@ void MPI::Init(int *argc, char ***argv)
 }
 
 /// \brief Finalization.
-void MPI::Finalize()
+void FMPI::Finalize()
 {
 
 #ifdef USEMPI
@@ -42,7 +42,7 @@ void MPI::Finalize()
 ///
 /// \return
 /// MPI process number.
-int MPI::Rank()
+int FMPI::Rank()
 {
     static int r = 0;
     static int is_r = false;
@@ -70,7 +70,7 @@ int MPI::Rank()
 ///
 /// \return
 /// MPI processes count.
-int MPI::Ranks()
+int FMPI::Ranks()
 {
     static int r = 0;
     static int is_r = false;
@@ -98,7 +98,7 @@ int MPI::Ranks()
 ///
 /// \return
 /// Request size.
-int MPI::RequestSize()
+int FMPI::RequestSize()
 {
 
 #ifdef USEMPI
@@ -118,7 +118,7 @@ int MPI::RequestSize()
 ///
 /// \return
 /// Status size.
-int MPI::StatusSize()
+int FMPI::StatusSize()
 {
 
 #ifdef USEMPI
@@ -135,7 +135,7 @@ int MPI::StatusSize()
 }
 
 /// \brief Barrier.
-void MPI::Barrier()
+void FMPI::Barrier()
 {
 
 #ifdef USEMPI
@@ -150,7 +150,7 @@ void MPI::Barrier()
 ///
 /// \return
 /// Time.
-double MPI::GTime()
+double FMPI::GTime()
 {
 
 #ifdef USEMPI
@@ -174,7 +174,7 @@ double MPI::GTime()
 /// \param dst - destination identifier
 /// \param tag - send tag
 /// \param req_p - request pointer
-void MPI::ISendDoubles(double *buf, int count, int dst, int tag, char *req_p)
+void FMPI::ISendDoubles(double *buf, int count, int dst, int tag, char *req_p)
 {
 
 #ifdef USEMPI
@@ -194,7 +194,7 @@ void MPI::ISendDoubles(double *buf, int count, int dst, int tag, char *req_p)
 /// \param src - source identifier
 /// \param tag - send tag
 /// \param req - request pointer
-void MPI::IRecvDoubles(double *buf, int count, int src, int tag, char *req_p)
+void FMPI::IRecvDoubles(double *buf, int count, int src, int tag, char *req_p)
 {
 
 #ifdef USEMPI
@@ -212,7 +212,7 @@ void MPI::IRecvDoubles(double *buf, int count, int src, int tag, char *req_p)
 /// \param count - requests count
 /// \param reqs - requests array
 /// \param stats - statuses array
-void MPI::WaitAll(int count, MPIRequestsArray *reqs, MPIStatusesArray *stats)
+void FMPI::WaitAll(int count, MPIRequestsArray *reqs, MPIStatusesArray *stats)
 {
 
 #ifdef USEMPI

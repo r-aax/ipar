@@ -1,7 +1,7 @@
 /// \file
 /// \brief MPI Init and Finalization test.
 
-#include "../../Utils/MPI.h"
+#include "../../Utils/FMPI.h"
 #include "../../Utils/IO.h"
 
 using namespace Utils;
@@ -12,25 +12,25 @@ using namespace Utils;
 /// \param argv - arguments
 int main(int argc, char **argv)
 {
-    MPI::Init(&argc, &argv);
+    FMPI::Init(&argc, &argv);
 
     // Hi.
-    if (MPI::IsRank0())
+    if (FMPI::IsRank0())
     {
         cout << "MPIInit : test begin, "
-             << MPI::Ranks() << " ranks are in use" << endl;
+             << FMPI::Ranks() << " ranks are in use" << endl;
     }
-    MPI::Barrier();
-    cout << "MPIInit : proc " << MPI::Rank() << endl; 
+    FMPI::Barrier();
+    cout << "MPIInit : proc " << FMPI::Rank() << endl; 
 
     // Bye.
-    MPI::Barrier();
-    if (MPI::IsRank0())
+    FMPI::Barrier();
+    if (FMPI::IsRank0())
     {
         cout << "MPIInit : test end" << endl;
     }
 
-    MPI::Finalize();
+    FMPI::Finalize();
 
     return 0;
 }

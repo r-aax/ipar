@@ -1,8 +1,8 @@
 /// \file
 /// \brief MPI library description.
 
-#ifndef UTILS_MPI_H
-#define UTILS_MPI_H
+#ifndef UTILS_FMPI_H
+#define UTILS_FMPI_H
 
 #include "MPIRequestsArray.h"
 #include "MPIStatusesArray.h"
@@ -10,7 +10,7 @@
 namespace Utils {
 
 /// \brief MPI class.
-class MPI
+class FMPI
 {
 
 public:
