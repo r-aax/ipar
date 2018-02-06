@@ -7,12 +7,12 @@ then
     COMP="mpicxx"
 fi
 
-EXE="MPITopo.out"
+EXE="VECMatrices.out"
 
 rm -f $EXE
 
 $COMP \
-    -DDEBUG -DUSEMPI \
+    -DDEBUG \
     *.cpp ../../Utils/*.cpp \
     -o $EXE \
     -lm -fopenmp
