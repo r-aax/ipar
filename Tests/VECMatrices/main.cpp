@@ -9,9 +9,6 @@
 #include "matrices.h"
 #include <stdlib.h>
 
-/// \brief Repeats count.
-#define REPEAT 100
-
 /// \brief matvec8 test cases count.
 #define MATVEC8_COUNT 120000
 
@@ -31,58 +28,58 @@
 #define INVMAT16_COUNT 2000
 
 /// \brief Matrices for matvec8 test.
-float matvec8_matr[MATVEC8_COUNT * V64];
+__declspec(align(64)) float matvec8_matr[MATVEC8_COUNT * V64];
 
 /// \brief Vectors for matvec8 test.
-float matvec8_vect[MATVEC8_COUNT * V8];
+__declspec(align(64)) float matvec8_vect[MATVEC8_COUNT * V8];
 
 /// \brief Matrices for matvec8 results.
-float matvec8_matv[MATVEC8_COUNT * V8];
+__declspec(align(64)) float matvec8_matv[MATVEC8_COUNT * V8];
 
 /// \brief Matrices for matvec16 test.
-float matvec16_matr[MATVEC16_COUNT * V256];
+__declspec(align(64)) float matvec16_matr[MATVEC16_COUNT * V256];
 
 /// \brief Vectors for matvec16 test.
-float matvec16_vect[MATVEC16_COUNT * V16];
+__declspec(align(64)) float matvec16_vect[MATVEC16_COUNT * V16];
 
 /// \brief Matrices for matvec16 results.
-float matvec16_matv[MATVEC16_COUNT * V16];
+__declspec(align(64)) float matvec16_matv[MATVEC16_COUNT * V16];
 
 /// \brief Matrices a for matmat8 test.
-float matmat8_a[MATMAT8_COUNT * V64];
+__declspec(align(64)) float matmat8_a[MATMAT8_COUNT * V64];
 
 /// \brief Matrices b for matmat8 test.
-float matmat8_b[MATMAT8_COUNT * V64];
+__declspec(align(64)) float matmat8_b[MATMAT8_COUNT * V64];
 
 /// \brief Matrices r for matmat8 test.
-float matmat8_r[MATMAT8_COUNT * V64];
+__declspec(align(64)) float matmat8_r[MATMAT8_COUNT * V64];
 
 /// \brief Matrices a for matmat16 test.
-float matmat16_a[MATMAT16_COUNT * V256];
+__declspec(align(64)) float matmat16_a[MATMAT16_COUNT * V256];
 
 /// \brief Matrices b for matmat16 test.
-float matmat16_b[MATMAT16_COUNT * V256];
+__declspec(align(64)) float matmat16_b[MATMAT16_COUNT * V256];
 
 /// \brief Matrices r for matmat16 test.
-float matmat16_r[MATMAT16_COUNT * V256];
+__declspec(align(64)) float matmat16_r[MATMAT16_COUNT * V256];
 
 /// \brief Matrices m for invmat8 test.
-float invmat8_m[INVMAT8_COUNT * V64];
+__declspec(align(64)) float invmat8_m[INVMAT8_COUNT * V64];
 
 /// \brief Tmp matrices m for invmat8 test.
-float invmat8_tm[INVMAT8_COUNT * V64];
+__declspec(align(64)) float invmat8_tm[INVMAT8_COUNT * V64];
 
 /// \brief Matrices r for invmat8 test.
-float invmat8_r[INVMAT8_COUNT * V64];
+__declspec(align(64)) float invmat8_r[INVMAT8_COUNT * V64];
 
 /// \brief Matrices m for invmat16 test.
-float invmat16_m[INVMAT16_COUNT * V256];
+__declspec(align(64)) float invmat16_m[INVMAT16_COUNT * V256];
 
 /// \brief Tmp matrices m for invmat16 test.
-float invmat16_tm[INVMAT16_COUNT * V256];
+__declspec(align(64)) float invmat16_tm[INVMAT16_COUNT * V256];
 
 /// \brief Matrices r for invmat16 test.
-float invmat16_r[INVMAT16_COUNT * V256];
+__declspec(align(64)) float invmat16_r[INVMAT16_COUNT * V256];
 
 using namespace Utils;
 
@@ -188,6 +185,14 @@ static double invmat16_r_sum()
 /// \param argv - arguments
 int main(int argc, char **argv)
 {
+    int repeats_count = 1;
+
+    // Parse repeats count if given.
+    if (argc == 2)
+    {
+	repeats_count = atoi(argv[1]);
+    }
+
     cout << "VECMatrices : test begin" << endl;
 
     Timer *timer = new Timer(Timer::OMP);
@@ -250,7 +255,7 @@ int main(int argc, char **argv)
 
     // Original.
     timer->Init();
-    for (int r = 0; r < REPEAT; r++)
+    for (int r = 0; r < repeats_count; r++)
     {
         for (int i = 0; i < MATVEC8_COUNT; i++)
         {
@@ -260,7 +265,7 @@ int main(int argc, char **argv)
         }
     }
     timer->Start();
-    for (int r = 0; r < REPEAT; r++)
+    for (int r = 0; r < repeats_count; r++)
     {
         for (int i = 0; i < MATVEC8_COUNT; i++)
         {
@@ -275,7 +280,7 @@ int main(int argc, char **argv)
 
     // Optimized.
     timer->Init();
-    for (int r = 0; r < REPEAT; r++)
+    for (int r = 0; r < repeats_count; r++)
     {
         for (int i = 0; i < MATVEC8_COUNT; i++)
         {
@@ -285,7 +290,7 @@ int main(int argc, char **argv)
         }
     }
     timer->Start();
-    for (int r = 0; r < REPEAT; r++)
+    for (int r = 0; r < repeats_count; r++)
     {
         for (int i = 0; i < MATVEC8_COUNT; i++)
         {
@@ -310,7 +315,7 @@ int main(int argc, char **argv)
 
     // Original.
     timer->Init();
-    for (int r = 0; r < REPEAT; r++)
+    for (int r = 0; r < repeats_count; r++)
     {
         for (int i = 0; i < MATVEC16_COUNT; i++)
         {
@@ -320,7 +325,7 @@ int main(int argc, char **argv)
         }
     }
     timer->Start();
-    for (int r = 0; r < REPEAT; r++)
+    for (int r = 0; r < repeats_count; r++)
     {
         for (int i = 0; i < MATVEC16_COUNT; i++)
         {
@@ -335,7 +340,7 @@ int main(int argc, char **argv)
 
     // Optimized.
     timer->Init();
-    for (int r = 0; r < REPEAT; r++)
+    for (int r = 0; r < repeats_count; r++)
     {
         for (int i = 0; i < MATVEC16_COUNT; i++)
         {
@@ -345,7 +350,7 @@ int main(int argc, char **argv)
         }
     }
     timer->Start();
-    for (int r = 0; r < REPEAT; r++)
+    for (int r = 0; r < repeats_count; r++)
     {
         for (int i = 0; i < MATVEC16_COUNT; i++)
         {
@@ -370,7 +375,7 @@ int main(int argc, char **argv)
 
     // Original.
     timer->Init();
-    for (int r = 0; r < REPEAT; r++)
+    for (int r = 0; r < repeats_count; r++)
     {
         for (int i = 0; i < MATMAT8_COUNT; i++)
         {
@@ -380,7 +385,7 @@ int main(int argc, char **argv)
         }
     }
     timer->Start();
-    for (int r = 0; r < REPEAT; r++)
+    for (int r = 0; r < repeats_count; r++)
     {
         for (int i = 0; i < MATMAT8_COUNT; i++)
         {
@@ -395,7 +400,7 @@ int main(int argc, char **argv)
 
     // Optimized.
     timer->Init();
-    for (int r = 0; r < REPEAT; r++)
+    for (int r = 0; r < repeats_count; r++)
     {
         for (int i = 0; i < MATMAT8_COUNT; i++)
         {
@@ -405,7 +410,7 @@ int main(int argc, char **argv)
         }
     }
     timer->Start();
-    for (int r = 0; r < REPEAT; r++)
+    for (int r = 0; r < repeats_count; r++)
     {
         for (int i = 0; i < MATMAT8_COUNT; i++)
         {
@@ -430,7 +435,7 @@ int main(int argc, char **argv)
 
     // Original.
     timer->Init();
-    for (int r = 0; r < REPEAT; r++)
+    for (int r = 0; r < repeats_count; r++)
     {
         for (int i = 0; i < MATMAT16_COUNT; i++)
         {
@@ -440,7 +445,7 @@ int main(int argc, char **argv)
         }
     }
     timer->Start();
-    for (int r = 0; r < REPEAT; r++)
+    for (int r = 0; r < repeats_count; r++)
     {
         for (int i = 0; i < MATMAT16_COUNT; i++)
         {
@@ -455,7 +460,7 @@ int main(int argc, char **argv)
 
     // Optimized.
     timer->Init();
-    for (int r = 0; r < REPEAT; r++)
+    for (int r = 0; r < repeats_count; r++)
     {
         for (int i = 0; i < MATMAT16_COUNT; i++)
         {
@@ -465,7 +470,7 @@ int main(int argc, char **argv)
         }
     }
     timer->Start();
-    for (int r = 0; r < REPEAT; r++)
+    for (int r = 0; r < repeats_count; r++)
     {
         for (int i = 0; i < MATMAT16_COUNT; i++)
         {
@@ -490,7 +495,7 @@ int main(int argc, char **argv)
 
     // Original.
     timer->Init();
-    for (int r = 0; r < REPEAT; r++)
+    for (int r = 0; r < repeats_count; r++)
     {
         for (int i = 0; i < INVMAT8_COUNT * V64; i++)
         {
@@ -502,7 +507,7 @@ int main(int argc, char **argv)
                          &invmat8_r[i * V64]);
         }
     }
-    for (int r = 0; r < REPEAT; r++)
+    for (int r = 0; r < repeats_count; r++)
     {
         for (int i = 0; i < INVMAT8_COUNT * V64; i++)
         {
@@ -521,7 +526,7 @@ int main(int argc, char **argv)
 
     // Optimized.
     timer->Init();
-    for (int r = 0; r < REPEAT; r++)
+    for (int r = 0; r < repeats_count; r++)
     {
         for (int i = 0; i < INVMAT8_COUNT * V64; i++)
         {
@@ -533,7 +538,7 @@ int main(int argc, char **argv)
                         &invmat8_r[i * V64]);
         }
     }
-    for (int r = 0; r < REPEAT; r++)
+    for (int r = 0; r < repeats_count; r++)
     {
         for (int i = 0; i < INVMAT8_COUNT * V64; i++)
         {
@@ -562,7 +567,7 @@ int main(int argc, char **argv)
 
     // Original.
     timer->Init();
-    for (int r = 0; r < REPEAT; r++)
+    for (int r = 0; r < repeats_count; r++)
     {
         for (int i = 0; i < INVMAT16_COUNT * V256; i++)
         {
@@ -574,7 +579,7 @@ int main(int argc, char **argv)
                           &invmat16_r[i * V256]);
         }
     }
-    for (int r = 0; r < REPEAT; r++)
+    for (int r = 0; r < repeats_count; r++)
     {
         for (int i = 0; i < INVMAT16_COUNT * V256; i++)
         {
@@ -593,7 +598,7 @@ int main(int argc, char **argv)
 
     // Optimized.
     timer->Init();
-    for (int r = 0; r < REPEAT; r++)
+    for (int r = 0; r < repeats_count; r++)
     {
         for (int i = 0; i < INVMAT16_COUNT * V256; i++)
         {
@@ -605,7 +610,7 @@ int main(int argc, char **argv)
                          &invmat16_r[i * V256]);
         }
     }
-    for (int r = 0; r < REPEAT; r++)
+    for (int r = 0; r < repeats_count; r++)
     {
         for (int i = 0; i < INVMAT16_COUNT * V256; i++)
         {
