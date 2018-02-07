@@ -7,7 +7,7 @@ then
     COMP="mpiicc"
 fi
 
-#FLAGS="-xmic-avx512"
+FLAGS="-xmic-avx512"
 INFO_FLAGS="-qopt-report=5"
 EXE="VECMatrices.out"
 

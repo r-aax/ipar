@@ -40,44 +40,78 @@ void matvec8_opt(float *matr, float *vect, float *matv)
     __assume_aligned(&vect[0], 64);
     __assume_aligned(&matv[0], 64);
 
-    for (int i = 0; i < V8; i++)
-    {
-	printf("%f ", vect[i]);
-    }
-    printf("\n");
+#if 0
 
     // Hint for loading two copies of vector vect.
     __m512 v1 = _mm512_setzero_ps();
     __m512 v2 = _mm512_setzero_ps();
-    //v1 = _mm512_mask_extload_ps(v1, 0xF0F, &vect[0],
-    //                            _MM_UPCONV_PS_NONE,
-    //                            _MM_BROADCAST_4X16,
-    //                            _MM_HINT_NONE);
-    //v2 = _mm512_mask_extload_ps(v2, 0xF0F0, &vect[4],
-    ///                            _MM_UPCONV_PS_NONE,
-    //                            _MM_BROADCAST_4X16,
-    //                            _MM_HINT_NONE);
+    v1 = _mm512_mask_extload_ps(v1, 0xF0F, &vect[0],
+                                _MM_UPCONV_PS_NONE,
+                                _MM_BROADCAST_4X16,
+                                _MM_HINT_NONE);
+    v2 = _mm512_mask_extload_ps(v2, 0xF0F0, &vect[4],
+                                _MM_UPCONV_PS_NONE,
+                                _MM_BROADCAST_4X16,
+                                _MM_HINT_NONE);
     __m512 v = _mm512_add_ps(v1, v2);
-    _mm512_store_ps(&vect[0], v);
 
-    for (int i = 0; i < V8; i++)
+    for (int i = 0; i < V8; i += 2)
     {
-	printf("%f ", vect[i]);
+        int ii = i * V8;
+
+        __m512 m = _mm512_load_ps(&matr[ii]);
+        __m512 mv = _mm512_mul_ps(m, v);
+
+        matv[i] = _mm512_mask_reduce_add_ps(0xFF, mv);
+        matv[i + 1] = _mm512_mask_reduce_add_ps(0xFF00, mv);
     }
-    printf("\n");
 
-    //for (int i = 0; i < V8 / 2; i += 2)
-    //{
-    //    int ii = i * V8;
-//
-//        __m512 m = _mm512_load_ps(&matr[ii]);
-///        __m512 mv = _mm512_mul_ps(m, v);
-//
-///        matv[i] = _mm512_mask_reduce_add_ps(0xFF, mv);
-//        matv[i + 1] = _mm512_mask_reduce_add_ps(0xFF00, mv);
-//    }
+#else
 
-exit(0);
+    __declspec(align(64)) float tmp[V64];
+    __assume_aligned(&tmp[0], 64);
+
+    // Hint for loading two copies of vector vect.
+    __m512 v1 = _mm512_setzero_ps();
+    __m512 v2 = _mm512_setzero_ps();
+    v1 = _mm512_mask_extload_ps(v1, 0xF0F, &vect[0],
+                                _MM_UPCONV_PS_NONE,
+                                _MM_BROADCAST_4X16,
+                                _MM_HINT_NONE);
+    v2 = _mm512_mask_extload_ps(v2, 0xF0F0, &vect[4],
+                                _MM_UPCONV_PS_NONE,
+                                _MM_BROADCAST_4X16,
+                                _MM_HINT_NONE);
+    __m512 v = _mm512_add_ps(v1, v2);
+
+    for (int i = 0; i < V8; i += 2)
+    {
+        int ii = i * V8;
+
+        __m512 m = _mm512_load_ps(&matr[ii]);
+        __m512 mv = _mm512_mul_ps(m, v);
+
+        _mm512_store_ps(&tmp[ii], mv);
+    }
+
+    __m512i ind = _mm512_set_epi32(     0,      0,      0,      0,
+                                        0,      0,      0,      0,
+                                   7 * V8, 6 * V8, 5 * V8, 4 * V8,
+                                   3 * V8, 2 * V8,     V8,      0);
+    __m512 r = _mm512_setzero_ps();
+    __m512 ri = _mm512_setzero_ps();
+    r = _mm512_mask_i32gather_ps(r, 0xFF, ind, &tmp[0], _MM_SCALE_1);
+
+    for (int i = 1; i < V8; i++)
+    {
+	ri = _mm512_mask_i32gather_ps(ri, 0xFF, ind, &tmp[i], _MM_SCALE_1);
+	r = _mm512_mask_add_ps(r, 0xFF, r, ri);
+    }
+
+    _mm512_mask_store_ps(&matv[0], 0xFF, r);
+
+#endif
+
 }
 
 /// \brief Multiplication 16*16-matrix on 16-vector.
