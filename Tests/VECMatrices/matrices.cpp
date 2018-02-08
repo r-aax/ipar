@@ -2,7 +2,10 @@
 #include "../../Utils/Maths.h"
 #include <stdlib.h>
 #include <math.h>
+
+#ifdef INTEL
 #include <immintrin.h>
+#endif
 
 /// \brief Multiplication 8*8-matrix on 8-vector.
 ///
@@ -36,6 +39,13 @@ void matvec8_orig(float *matr, float *vect, float *matv)
 /// \param matv - result 
 void matvec8_opt(float *matr, float *vect, float *matv)
 {
+
+#ifndef INTEL
+
+    matvec8_orig(matr, vect, matv);
+
+#else
+
     __assume_aligned(&matr[0], 64);
     __assume_aligned(&vect[0], 64);
     __assume_aligned(&matv[0], 64);
@@ -109,6 +119,8 @@ void matvec8_opt(float *matr, float *vect, float *matv)
     }
 
     _mm512_mask_store_ps(&matv[0], 0xFF, r);
+
+#endif
 
 #endif
 

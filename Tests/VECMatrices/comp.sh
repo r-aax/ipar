@@ -17,7 +17,7 @@ rm -f $EXE
 #    -DDEBUG \
 #    *.cpp ../../Utils/*.cpp \
 #    -O2 -unroll=0 \
-#    $FLAGS \
+#    $FLAGS $INFO_FLAGS \
 #    -lm -fopenmp \
 #    -S
 $COMP \

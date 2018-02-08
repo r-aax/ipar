@@ -10,173 +10,225 @@
 #include <stdlib.h>
 
 /// \brief matvec8 test cases count.
-#define MATVEC8_COUNT 1//120000
+#define MATVEC8_COUNT 120000
 
 /// \brief matvec16 test cases count.
-#define MATVEC16_COUNT 0//60000
+#define MATVEC16_COUNT 60000
 
 /// \brief matmat8 test cases count.
-#define MATMAT8_COUNT 0//15000
+#define MATMAT8_COUNT 15000
 
 /// \brief matmat16 test cases cout.
-#define MATMAT16_COUNT 0//15000
+#define MATMAT16_COUNT 15000
 
 /// \brief invmat8 test cases count.
-#define INVMAT8_COUNT 0//10000
+#define INVMAT8_COUNT 10000
 
 /// \brief invmat16 test cases count.
-#define INVMAT16_COUNT 0//2000
+#define INVMAT16_COUNT 2000
 
 /// \brief Matrices for matvec8 test.
+#ifdef INTEL
 __declspec(align(64)) float matvec8_matr[MATVEC8_COUNT * V64];
+#else
+float matvec8_matr[MATVEC8_COUNT * V64];
+#endif
 
 /// \brief Vectors for matvec8 test.
+#ifdef INTEL
 __declspec(align(64)) float matvec8_vect[MATVEC8_COUNT * V8];
+#else
+float matvec8_vect[MATVEC8_COUNT * V8];
+#endif
 
 /// \brief Matrices for matvec8 results.
+#ifdef INTEL
 __declspec(align(64)) float matvec8_matv[MATVEC8_COUNT * V8];
+#else
+float matvec8_matv[MATVEC8_COUNT * V8];
+#endif
 
 /// \brief Matrices for matvec16 test.
+#ifdef INTEL
 __declspec(align(64)) float matvec16_matr[MATVEC16_COUNT * V256];
+#else
+float matvec16_matr[MATVEC16_COUNT * V256];
+#endif
 
 /// \brief Vectors for matvec16 test.
+#ifdef INTEL
 __declspec(align(64)) float matvec16_vect[MATVEC16_COUNT * V16];
+#else
+float matvec16_vect[MATVEC16_COUNT * V16];
+#endif
 
 /// \brief Matrices for matvec16 results.
+#ifdef INTEL
 __declspec(align(64)) float matvec16_matv[MATVEC16_COUNT * V16];
+#else
+float matvec16_matv[MATVEC16_COUNT * V16];
+#endif
 
 /// \brief Matrices a for matmat8 test.
+#ifdef INTEL
 __declspec(align(64)) float matmat8_a[MATMAT8_COUNT * V64];
+#else
+float matmat8_a[MATMAT8_COUNT * V64];
+#endif
 
 /// \brief Matrices b for matmat8 test.
+#ifdef INTEL
 __declspec(align(64)) float matmat8_b[MATMAT8_COUNT * V64];
+#else
+float matmat8_b[MATMAT8_COUNT * V64];
+#endif
 
 /// \brief Matrices r for matmat8 test.
+#ifdef INTEL
 __declspec(align(64)) float matmat8_r[MATMAT8_COUNT * V64];
+#else
+float matmat8_r[MATMAT8_COUNT * V64];
+#endif
 
 /// \brief Matrices a for matmat16 test.
+#ifdef INTEL
 __declspec(align(64)) float matmat16_a[MATMAT16_COUNT * V256];
+#else
+float matmat16_a[MATMAT16_COUNT * V256];
+#endif
 
 /// \brief Matrices b for matmat16 test.
+#ifdef INTEL
 __declspec(align(64)) float matmat16_b[MATMAT16_COUNT * V256];
+#else
+float matmat16_b[MATMAT16_COUNT * V256];
+#endif
 
 /// \brief Matrices r for matmat16 test.
+#ifdef INTEL
 __declspec(align(64)) float matmat16_r[MATMAT16_COUNT * V256];
+#else
+float matmat16_r[MATMAT16_COUNT * V256];
+#endif
 
 /// \brief Matrices m for invmat8 test.
+#ifdef INTEL
 __declspec(align(64)) float invmat8_m[INVMAT8_COUNT * V64];
+#else
+float invmat8_m[INVMAT8_COUNT * V64];
+#endif
 
 /// \brief Tmp matrices m for invmat8 test.
+#ifdef INTEL
 __declspec(align(64)) float invmat8_tm[INVMAT8_COUNT * V64];
+#else
+float invmat8_tm[INVMAT8_COUNT * V64];
+#endif
 
 /// \brief Matrices r for invmat8 test.
+#ifdef INTEL
 __declspec(align(64)) float invmat8_r[INVMAT8_COUNT * V64];
+#else
+float invmat8_r[INVMAT8_COUNT * V64];
+#endif
 
 /// \brief Matrices m for invmat16 test.
+#ifdef INTEL
 __declspec(align(64)) float invmat16_m[INVMAT16_COUNT * V256];
+#else
+float invmat16_m[INVMAT16_COUNT * V256];
+#endif
 
 /// \brief Tmp matrices m for invmat16 test.
+#ifdef INTEL
 __declspec(align(64)) float invmat16_tm[INVMAT16_COUNT * V256];
+#else
+float invmat16_tm[INVMAT16_COUNT * V256];
+#endif
 
 /// \brief Matrices r for invmat16 test.
+#ifdef INTEL
 __declspec(align(64)) float invmat16_r[INVMAT16_COUNT * V256];
+#else
+float invmat16_r[INVMAT16_COUNT * V256];
+#endif
 
 using namespace Utils;
 
-/// \brief Sum of matvec8_matv array.
+/// \brief Sum of float array elements.
+///
+/// \param a - array
+/// \param c - elements count
 ///
 /// \return
-/// Sum of matvec8_matv array.
-static double matvec8_matv_sum()
+/// Sum of elements.
+static double array_sum(float *a, int c)
 {
-    double res = 0.0;
+    double s = 0.0;
 
-    for (int i = 0; i < MATVEC8_COUNT * V8; i++)
+    for (int i = 0; i < c; i++)
     {
-        res += (double)matvec8_matv[i];
+        s += a[i];
     }
 
-    return res;
+    return s;
 }
 
-/// \brief Sum of matvec16_matv array.
+/// \brief Copy one array to another.
 ///
-/// \return
-/// Sum of matvec16_matv array.
-static double matvec16_matv_sum()
+/// \param from - first array (src)
+/// \param to - second array (dst)
+/// \param c - elements count
+static void arrays_copy(float *from, float *to, int c)
 {
-    double res = 0.0;
-
-    for (int i = 0; i < MATVEC16_COUNT * V16; i++)
+    for (int i = 0; i < c; i++)
     {
-        res += (double)matvec16_matv[i];
+        to[i] = from[i];
     }
-
-    return res;
 }
 
-/// \brief Sum of matmat8_r array.
+/// \brief Run 2-arguments function in cycle.
 ///
-/// \return
-/// Sum of matmat8_r array.
-static double matmat8_r_sum()
+/// \param c - iterations count
+/// \param f - function
+/// \param arr1 - first data array
+/// \param arr2 - second data array
+/// \param sc1 - first scale factor
+/// \param sc2 - second scale factor
+static void run2(int c,
+                 int (*f)(float *, float *),
+                 float *arr1, float *arr2,
+                 int sc1, int sc2)
 {
-    double res = 0.0;
-
-    for (int i = 0; i < MATMAT8_COUNT * V64; i++)
+    for (int i = 0; i < c; i++)
     {
-        res += (double)matmat8_r[i];
+        f(&arr1[i * sc1], &arr2[i * sc2]);
     }
-
-    return res;
 }
 
-/// \brief Sum of matmat16_r array.
+/// \brief Run 3-arguments function in cycle.
 ///
-/// \return
-/// Sum of matmat16_r array.
-static double matmat16_r_sum()
+/// \param r - repeats count
+/// \param c - iterations count
+/// \param f - function
+/// \param arr1 - first data array
+/// \param arr2 - second data array
+/// \param arr3 - third data array
+/// \param sc1 - first scale factor
+/// \param sc2 - second scale factor
+/// \param sc3 - third scale factor
+static void run3(int r, int c,
+                 void (*f)(float *, float *, float *),
+                 float *arr1, float *arr2, float *arr3,
+                 int sc1, int sc2, int sc3)
 {
-    double res = 0.0;
-
-    for (int i = 0; i < MATMAT16_COUNT * V256; i++)
+    for (int j = 0; j < r; j++)
     {
-        res += (double)matmat16_r[i];
+        for (int i = 0; i < c; i++)
+        {
+            f(&arr1[i * sc1], &arr2[i * sc2], &arr3[i * sc3]);
+        }
     }
-
-    return res;
-}
-
-/// \brief Sum of invmat8_r array.
-///
-/// \return
-/// Sum of invmat8_r array.
-static double invmat8_r_sum()
-{
-    double res = 0.0;
-
-    for (int i = 0; i < INVMAT8_COUNT * V64; i++)
-    {
-        res += (double)invmat8_r[i];
-    }
-
-    return res;
-}
-
-/// \brief Sum of invmat16_r array.
-///
-/// \return
-/// Sum of invmat16_r array.
-static double invmat16_r_sum()
-{
-    double res = 0.0;
-
-    for (int i = 0; i < INVMAT16_COUNT * V256; i++)
-    {
-        res += (double)invmat16_r[i];
-    }
-
-    return res;
 }
 
 /// \brief Main function.
@@ -255,53 +307,21 @@ int main(int argc, char **argv)
 
     // Original.
     timer->Init();
-    for (int r = 0; r < repeats_count; r++)
-    {
-        for (int i = 0; i < MATVEC8_COUNT; i++)
-        {
-            matvec8_orig(&matvec8_matr[i * V64],
-                         &matvec8_vect[i * V8],
-                         &matvec8_matv[i * V8]);
-        }
-    }
+    run3(repeats_count, MATVEC8_COUNT, matvec8_orig, matvec8_matr, matvec8_vect, matvec8_matv, V64, V8, V8);
     timer->Start();
-    for (int r = 0; r < repeats_count; r++)
-    {
-        for (int i = 0; i < MATVEC8_COUNT; i++)
-        {
-            matvec8_orig(&matvec8_matr[i * V64],
-                         &matvec8_vect[i * V8],
-                         &matvec8_matv[i * V8]);
-        }
-    }
+    run3(repeats_count, MATVEC8_COUNT, matvec8_orig, matvec8_matr, matvec8_vect, matvec8_matv, V64, V8, V8);
     timer->Stop();
     time_orig = timer->Time();
-    check_orig = matvec8_matv_sum();
+    check_orig = array_sum(matvec8_matv, MATVEC8_COUNT * V8);
 
     // Optimized.
     timer->Init();
-    for (int r = 0; r < repeats_count; r++)
-    {
-        for (int i = 0; i < MATVEC8_COUNT; i++)
-        {
-            matvec8_opt(&matvec8_matr[i * V64],
-                        &matvec8_vect[i * V8],
-                        &matvec8_matv[i * V8]);
-        }
-    }
+    run3(repeats_count, MATVEC8_COUNT, matvec8_opt, matvec8_matr, matvec8_vect, matvec8_matv, V64, V8, V8);
     timer->Start();
-    for (int r = 0; r < repeats_count; r++)
-    {
-        for (int i = 0; i < MATVEC8_COUNT; i++)
-        {
-            matvec8_opt(&matvec8_matr[i * V64],
-                        &matvec8_vect[i * V8],
-                        &matvec8_matv[i * V8]);
-        }
-    }
+    run3(repeats_count, MATVEC8_COUNT, matvec8_opt, matvec8_matr, matvec8_vect, matvec8_matv, V64, V8, V8);
     timer->Stop();
     time_opt = timer->Time();
-    check_opt = matvec8_matv_sum();
+    check_opt = array_sum(matvec8_matv, MATVEC8_COUNT * V8);
 
     cout << "VECMatrices : matvec8 : orig = " << time_orig
          << ", opt = " << time_opt << endl;
@@ -315,58 +335,26 @@ int main(int argc, char **argv)
 
     // Original.
     timer->Init();
-    for (int r = 0; r < repeats_count; r++)
-    {
-        for (int i = 0; i < MATVEC16_COUNT; i++)
-        {
-            matvec8_orig(&matvec16_matr[i * V256],
-                         &matvec16_vect[i * V16],
-                         &matvec16_matv[i * V16]);
-        }
-    }
+    run3(repeats_count, MATVEC16_COUNT, matvec16_orig, matvec16_matr, matvec16_vect, matvec16_matv, V256, V16, V16);
     timer->Start();
-    for (int r = 0; r < repeats_count; r++)
-    {
-        for (int i = 0; i < MATVEC16_COUNT; i++)
-        {
-            matvec8_orig(&matvec16_matr[i * V256],
-                         &matvec16_vect[i * V16],
-                         &matvec16_matv[i * V16]);
-        }
-    }
+    run3(repeats_count, MATVEC16_COUNT, matvec16_orig, matvec16_matr, matvec16_vect, matvec16_matv, V256, V16, V16);
     timer->Stop();
     time_orig = timer->Time();
-    check_orig = matvec16_matv_sum();
+    check_orig = array_sum(matvec16_matv, MATVEC16_COUNT * V16);
 
     // Optimized.
     timer->Init();
-    for (int r = 0; r < repeats_count; r++)
-    {
-        for (int i = 0; i < MATVEC16_COUNT; i++)
-        {
-            matvec8_opt(&matvec16_matr[i * V256],
-                        &matvec16_vect[i * V16],
-                        &matvec16_matv[i * V16]);
-        }
-    }
+    run3(repeats_count, MATVEC16_COUNT, matvec16_opt, matvec16_matr, matvec16_vect, matvec16_matv, V256, V16, V16);
     timer->Start();
-    for (int r = 0; r < repeats_count; r++)
-    {
-        for (int i = 0; i < MATVEC16_COUNT; i++)
-        {
-            matvec8_opt(&matvec16_matr[i * V256],
-                        &matvec16_vect[i * V16],
-                        &matvec16_matv[i * V16]);
-        }
-    }
+    run3(repeats_count, MATVEC16_COUNT, matvec16_opt, matvec16_matr, matvec16_vect, matvec16_matv, V256, V16, V16);
     timer->Stop();
     time_opt = timer->Time();
-    check_opt = matvec16_matv_sum();
+    check_opt = array_sum(matvec16_matv, MATVEC16_COUNT * V16);
 
     cout << "VECMatrices : matvec16 : orig = " << time_orig
          << ", opt = " << time_opt << endl;
-    //cout << "VECMatrices : matvec16 check : orig = " << check_orig
-    //     << ", opt = " << check_opt << endl;
+    cout << "VECMatrices : matvec16 check : orig = " << check_orig
+         << ", opt = " << check_opt << endl;
     DEBUG_CHECK(MATHS_IS_NEAR(check_orig, check_opt, 0.01), "matvec16 check failed");
 
     // *---------*
@@ -375,58 +363,26 @@ int main(int argc, char **argv)
 
     // Original.
     timer->Init();
-    for (int r = 0; r < repeats_count; r++)
-    {
-        for (int i = 0; i < MATMAT8_COUNT; i++)
-        {
-            matmat8_orig(&matmat8_a[i * V64],
-                         &matmat8_b[i * V64],
-                         &matmat8_r[i * V64]);
-        }
-    }
+    run3(repeats_count, MATMAT8_COUNT, matmat8_orig, matmat8_a, matmat8_b, matmat8_r, V64, V64, V64);
     timer->Start();
-    for (int r = 0; r < repeats_count; r++)
-    {
-        for (int i = 0; i < MATMAT8_COUNT; i++)
-        {
-            matmat8_orig(&matmat8_a[i * V64],
-                         &matmat8_b[i * V64],
-                         &matmat8_r[i * V64]);
-        }
-    }
+    run3(repeats_count, MATMAT8_COUNT, matmat8_orig, matmat8_a, matmat8_b, matmat8_r, V64, V64, V64);
     timer->Stop();
     time_orig = timer->Time();
-    check_orig = matmat8_r_sum();
+    check_orig = array_sum(matmat8_r, MATMAT8_COUNT * V64);
 
     // Optimized.
     timer->Init();
-    for (int r = 0; r < repeats_count; r++)
-    {
-        for (int i = 0; i < MATMAT8_COUNT; i++)
-        {
-            matmat8_opt(&matmat8_a[i * V64],
-                        &matmat8_b[i * V64],
-                        &matmat8_r[i * V64]);
-        }
-    }
+    run3(repeats_count, MATMAT8_COUNT, matmat8_opt, matmat8_a, matmat8_b, matmat8_r, V64, V64, V64);
     timer->Start();
-    for (int r = 0; r < repeats_count; r++)
-    {
-        for (int i = 0; i < MATMAT8_COUNT; i++)
-        {
-            matmat8_opt(&matmat8_a[i * V64],
-                        &matmat8_b[i * V64],
-                        &matmat8_r[i * V64]);
-        }
-    }
+    run3(repeats_count, MATMAT8_COUNT, matmat8_opt, matmat8_a, matmat8_b, matmat8_r, V64, V64, V64);
     timer->Stop();
     time_opt = timer->Time();
-    check_opt = matmat8_r_sum();
+    check_opt = array_sum(matmat8_r, MATMAT8_COUNT * V64);
 
     cout << "VECMatrices : matmat8 : orig = " << time_orig
          << ", opt = " << time_opt << endl;
-    //cout << "VECMatrices : matmat8 check : orig = " << check_orig
-    //     << ", opt = " << check_opt << endl;
+    cout << "VECMatrices : matmat8 check : orig = " << check_orig
+         << ", opt = " << check_opt << endl;
     DEBUG_CHECK(MATHS_IS_NEAR(check_orig, check_opt, 0.01), "matmat8 check failed");
 
     // *----------*
@@ -435,58 +391,26 @@ int main(int argc, char **argv)
 
     // Original.
     timer->Init();
-    for (int r = 0; r < repeats_count; r++)
-    {
-        for (int i = 0; i < MATMAT16_COUNT; i++)
-        {
-            matmat8_orig(&matmat16_a[i * V256],
-                         &matmat16_b[i * V256],
-                         &matmat16_r[i * V256]);
-        }
-    }
+    run3(repeats_count, MATMAT16_COUNT, matmat16_orig, matmat16_a, matmat16_b, matmat16_r, V256, V256, V256);
     timer->Start();
-    for (int r = 0; r < repeats_count; r++)
-    {
-        for (int i = 0; i < MATMAT16_COUNT; i++)
-        {
-            matmat8_orig(&matmat16_a[i * V256],
-                         &matmat16_b[i * V256],
-                         &matmat16_r[i * V256]);
-        }
-    }
+    run3(repeats_count, MATMAT16_COUNT, matmat16_orig, matmat16_a, matmat16_b, matmat16_r, V256, V256, V256);
     timer->Stop();
     time_orig = timer->Time();
-    check_orig = matmat16_r_sum();
+    check_orig = array_sum(matmat16_r, MATMAT16_COUNT * V256);
 
     // Optimized.
     timer->Init();
-    for (int r = 0; r < repeats_count; r++)
-    {
-        for (int i = 0; i < MATMAT16_COUNT; i++)
-        {
-            matmat8_opt(&matmat16_a[i * V256],
-                        &matmat16_b[i * V256],
-                        &matmat16_r[i * V256]);
-        }
-    }
+    run3(repeats_count, MATMAT16_COUNT, matmat16_opt, matmat16_a, matmat16_b, matmat16_r, V256, V256, V256);
     timer->Start();
-    for (int r = 0; r < repeats_count; r++)
-    {
-        for (int i = 0; i < MATMAT16_COUNT; i++)
-        {
-            matmat8_opt(&matmat16_a[i * V256],
-                        &matmat16_b[i * V256],
-                        &matmat16_r[i * V256]);
-        }
-    }
+    run3(repeats_count, MATMAT16_COUNT, matmat16_opt, matmat16_a, matmat16_b, matmat16_r, V256, V256, V256);
     timer->Stop();
     time_opt = timer->Time();
-    check_opt = matmat16_r_sum();
+    check_opt = array_sum(matmat16_r, MATMAT16_COUNT * V256);
 
     cout << "VECMatrices : matmat16 : orig = " << time_orig
          << ", opt = " << time_opt << endl;
-    //cout << "VECMatrices : matmat16 check : orig = " << check_orig
-    //     << ", opt = " << check_opt << endl;
+    cout << "VECMatrices : matmat16 check : orig = " << check_orig
+         << ", opt = " << check_opt << endl;
     DEBUG_CHECK(MATHS_IS_NEAR(check_orig, check_opt, 0.01), "matmat16 check failed");
 
     // *---------*
@@ -497,68 +421,40 @@ int main(int argc, char **argv)
     timer->Init();
     for (int r = 0; r < repeats_count; r++)
     {
-        for (int i = 0; i < INVMAT8_COUNT * V64; i++)
-        {
-            invmat8_tm[i] = invmat8_m[i];
-        }
-        for (int i = 0; i < INVMAT8_COUNT; i++)
-        {
-            invmat8_orig(&invmat8_tm[i * V64],
-                         &invmat8_r[i * V64]);
-        }
+        arrays_copy(invmat8_m, invmat8_tm, INVMAT8_COUNT * V64);
+        run2(INVMAT8_COUNT, invmat8_orig, invmat8_tm, invmat8_r, V64, V64);
     }
     for (int r = 0; r < repeats_count; r++)
     {
-        for (int i = 0; i < INVMAT8_COUNT * V64; i++)
-        {
-            invmat8_tm[i] = invmat8_m[i];
-        }
+        arrays_copy(invmat8_m, invmat8_tm, INVMAT8_COUNT * V64);
         timer->Start();
-        for (int i = 0; i < INVMAT8_COUNT; i++)
-        {
-            invmat8_orig(&invmat8_tm[i * V64],
-                         &invmat8_r[i * V64]);
-        }
+        run2(INVMAT8_COUNT, invmat8_orig, invmat8_tm, invmat8_r, V64, V64);
         timer->Stop();
     }
     time_orig = timer->Time();
-    check_orig = invmat8_r_sum();
+    check_orig = array_sum(invmat8_r, INVMAT8_COUNT * V64);
 
     // Optimized.
     timer->Init();
     for (int r = 0; r < repeats_count; r++)
     {
-        for (int i = 0; i < INVMAT8_COUNT * V64; i++)
-        {
-            invmat8_tm[i] = invmat8_m[i];
-        }
-        for (int i = 0; i < INVMAT8_COUNT; i++)
-        {
-            invmat8_opt(&invmat8_tm[i * V64],
-                        &invmat8_r[i * V64]);
-        }
+        arrays_copy(invmat8_m, invmat8_tm, INVMAT8_COUNT * V64);
+        run2(INVMAT8_COUNT, invmat8_opt, invmat8_tm, invmat8_r, V64, V64);
     }
     for (int r = 0; r < repeats_count; r++)
     {
-        for (int i = 0; i < INVMAT8_COUNT * V64; i++)
-        {
-            invmat8_tm[i] = invmat8_m[i];
-        }
+        arrays_copy(invmat8_m, invmat8_tm, INVMAT8_COUNT * V64);
         timer->Start();
-        for (int i = 0; i < INVMAT8_COUNT; i++)
-        {
-            invmat8_opt(&invmat8_tm[i * V64],
-                        &invmat8_r[i * V64]);
-        }
+        run2(INVMAT8_COUNT, invmat8_opt, invmat8_tm, invmat8_r, V64, V64);
         timer->Stop();
     }
     time_opt = timer->Time();
-    check_opt = invmat8_r_sum();
+    check_opt = array_sum(invmat8_r, INVMAT8_COUNT * V64);
 
     cout << "VECMatrices : invmat8 : orig = " << time_orig
          << ", opt = " << time_opt << endl;
-    //cout << "VECMatrices : invmat8 check : orig = " << check_orig
-    //     << ", opt = " << check_opt << endl;
+    cout << "VECMatrices : invmat8 check : orig = " << check_orig
+         << ", opt = " << check_opt << endl;
     DEBUG_CHECK(MATHS_IS_NEAR(check_orig, check_opt, 0.01), "invmat8 check failed");
 
     // *----------*
@@ -569,68 +465,40 @@ int main(int argc, char **argv)
     timer->Init();
     for (int r = 0; r < repeats_count; r++)
     {
-        for (int i = 0; i < INVMAT16_COUNT * V256; i++)
-        {
-            invmat16_tm[i] = invmat16_m[i];
-        }
-        for (int i = 0; i < INVMAT16_COUNT; i++)
-        {
-            invmat16_orig(&invmat16_tm[i * V256],
-                          &invmat16_r[i * V256]);
-        }
+        arrays_copy(invmat16_m, invmat16_tm, INVMAT16_COUNT * V256);
+        run2(INVMAT16_COUNT, invmat16_orig, invmat16_tm, invmat16_r, V256, V256);
     }
     for (int r = 0; r < repeats_count; r++)
     {
-        for (int i = 0; i < INVMAT16_COUNT * V256; i++)
-        {
-            invmat16_tm[i] = invmat16_m[i];
-        }
+        arrays_copy(invmat16_m, invmat16_tm, INVMAT16_COUNT * V256);
         timer->Start();
-        for (int i = 0; i < INVMAT16_COUNT; i++)
-        {
-            invmat16_orig(&invmat16_tm[i * V256],
-                          &invmat16_r[i * V256]);
-        }
+        run2(INVMAT16_COUNT, invmat16_orig, invmat16_tm, invmat16_r, V256, V256);
         timer->Stop();
     }
     time_orig = timer->Time();
-    check_orig = invmat16_r_sum();
+    check_orig = array_sum(invmat16_r, INVMAT16_COUNT * V256);
 
     // Optimized.
     timer->Init();
     for (int r = 0; r < repeats_count; r++)
     {
-        for (int i = 0; i < INVMAT16_COUNT * V256; i++)
-        {
-            invmat16_tm[i] = invmat16_m[i];
-        }
-        for (int i = 0; i < INVMAT16_COUNT; i++)
-        {
-            invmat16_opt(&invmat16_tm[i * V256],
-                         &invmat16_r[i * V256]);
-        }
+        arrays_copy(invmat16_m, invmat16_tm, INVMAT16_COUNT * V256);
+        run2(INVMAT16_COUNT, invmat16_opt, invmat16_tm, invmat16_r, V256, V256);
     }
     for (int r = 0; r < repeats_count; r++)
     {
-        for (int i = 0; i < INVMAT16_COUNT * V256; i++)
-        {
-            invmat16_tm[i] = invmat16_m[i];
-        }
+        arrays_copy(invmat16_m, invmat16_tm, INVMAT16_COUNT * V256);
         timer->Start();
-        for (int i = 0; i < INVMAT16_COUNT; i++)
-        {
-            invmat16_opt(&invmat16_tm[i * V256],
-                         &invmat16_r[i * V256]);
-        }
+        run2(INVMAT16_COUNT, invmat16_opt, invmat16_tm, invmat16_r, V256, V256);
         timer->Stop();
     }
     time_opt = timer->Time();
-    check_opt = invmat16_r_sum();
+    check_opt = array_sum(invmat16_r, INVMAT16_COUNT * V256);
 
     cout << "VECMatrices : invmat16 : orig = " << time_orig
          << ", opt = " << time_opt << endl;
-    //cout << "VECMatrices : invmat16 check : orig = " << check_orig
-    //     << ", opt = " << check_opt << endl;
+    cout << "VECMatrices : invmat16 check : orig = " << check_orig
+         << ", opt = " << check_opt << endl;
     DEBUG_CHECK(MATHS_IS_NEAR(check_orig, check_opt, 0.01), "invmat16 check failed");
 
     delete timer;

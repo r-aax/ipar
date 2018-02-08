@@ -27,6 +27,16 @@
 /// false - otherwise.
 #define MATHS_IS_EQ(X, Y) (MATHS_ABS((X) - (Y)) < MATHS_EPS)
 
+/// \brief Check if two values are near each other.
+///
+/// \param X - first value
+/// \param Y - second value
+///
+/// \return
+/// true - if values are near each other,
+/// false - otherwise.
+#define MATHS_IS_NEAR(X, Y, E) (MATHS_ABS((X) - (Y)) < (E))
+
 /// \brief Check for first value is greater than the second.
 ///
 /// \param X - first value
