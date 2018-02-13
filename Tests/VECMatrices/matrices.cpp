@@ -483,7 +483,7 @@ int invmat8_orig(float * __restrict m, float * __restrict r)
 
         // Scale i-th line.
         float d = m[i * V8 + i];
-        for (int j = i; j < V8; j++)
+        for (int j = 0; j < V8; j++)
         {
             m[i * V8 + j] /= d;
             r[i * V8 + j] /= d;
@@ -499,6 +499,7 @@ int invmat8_orig(float * __restrict m, float * __restrict r)
                 for (int k = i; k < V8; k++)
                 {
                     m[j * V8 + k] -= m[i * V8 + k] * t;
+                    r[j * V8 + k] -= r[i * V8 + k] * t;
                 }
             }
         }
@@ -519,74 +520,17 @@ int invmat8_orig(float * __restrict m, float * __restrict r)
 /// 1 - if error has occured.
 int invmat8_opt(float * __restrict m, float * __restrict r)
 {
-    // Set E-matrix to r.
-    for (int i = 0; i < V8; i++)
-    {
-        for (int j = 0; j < V8; j++)
-        {
-            r[i * V8 + j] = (i == j) ? 1.0 : 0.0;
-        }
-    }
 
-    for (int i = 0; i < V8; i++)
-    {
-        // For q < i, w < i we have
-        // r[q, w] = 0, if q != w,
-        // r[q, w] = 1, if q == w.
+#ifndef INTEL
 
-        // Find lead line from i to V8 - 1.
-        int lead_i = i;
-        for (int j = i + 1; j < V8; j++)
-        {
-            if (fabs(m[j * V8 + j]) > fabs(m[lead_i * V8 + lead_i]))
-            {
-                lead_i = j;
-            }
-        }
-        if (fabs(m[lead_i * V8 + lead_i]) < MATHS_EPS)
-        {
-            return 1;
-        }
+    return invmat8_orig(m, r);
 
-        // Interchange i-th and lead_i-th lines.
-        if (lead_i != i)
-        {
-            for (int j = 0; j < V8; j++)
-            {
-                float tmp_m = m[lead_i * V8 + j];
-                m[lead_i * V8 + j] = m[i * V8 + j];
-                m[i * V8 + j] = tmp_m;
+#else
 
-                float tmp_r = r[lead_i * V8 + j];
-                r[lead_i * V8 + j] = r[i * V8 + j];
-                r[i * V8 + j] = tmp_r;
-            }
-        }
+    return invmat8_orig(m, r);
 
-        // Scale i-th line.
-        float d = m[i * V8 + i];
-        for (int j = i; j < V8; j++)
-        {
-            m[i * V8 + j] /= d;
-            r[i * V8 + j] /= d;
-        }
+#endif
 
-        // Zero all other lines.
-        for (int j = 0; j < V8; j++)
-        {
-            if (j != i)
-            {
-                float t = m[j * V8 + i];
-
-                for (int k = i; k < V8; k++)
-                {
-                    m[j * V8 + k] -= m[i * V8 + k] * t;
-                }
-            }
-        }
-    }
-
-    return 0;
 }
 
 /// \brief Invert 16*16 matrix.
@@ -646,11 +590,11 @@ int invmat16_orig(float * __restrict m, float * __restrict r)
         }
 
         // Scale i-th line.
-        float d = m[i * V16 + i];
-        for (int j = i; j < V16; j++)
+        float d = 1.0 / m[i * V16 + i];
+        for (int j = 0; j < V16; j++)
         {
-            m[i * V16 + j] /= d;
-            r[i * V16 + j] /= d;
+            m[i * V16 + j] *= d;
+            r[i * V16 + j] *= d;
         }
 
         // Zero all other lines.
@@ -660,9 +604,10 @@ int invmat16_orig(float * __restrict m, float * __restrict r)
             {
                 float t = m[j * V16 + i];
 
-                for (int k = i; k < V16; k++)
+                for (int k = 0; k < V16; k++)
                 {
                     m[j * V16 + k] -= m[i * V16 + k] * t;
+                    r[j * V16 + k] -= r[i * V16 + k] * t;
                 }
             }
         }
@@ -683,20 +628,46 @@ int invmat16_orig(float * __restrict m, float * __restrict r)
 /// 1 - if error has occured.
 int invmat16_opt(float * __restrict m, float * __restrict r)
 {
+
+#ifndef INTEL
+
+    return invmat16_orig(m, r);
+
+#else
+
+    __assume_aligned(m, 64);
+    __assume_aligned(r, 64);
+
     // Set E-matrix to r.
-    for (int i = 0; i < V16; i++)
-    {
-        for (int j = 0; j < V16; j++)
-        {
-            r[i * V16 + j] = (i == j) ? 1.0 : 0.0;
-        }
-    }
+    // First we zero all elements of matrix,
+    // then set diagonal elements to 1.0.
+
+    __m512 vd, vi, vj, vl;
+
+    vd = _mm512_setzero_ps();
 
     for (int i = 0; i < V16; i++)
     {
+        int ii = i * V16;
+
+        _mm512_store_ps(&r[ii], vd);
+    }
+
+    int d = V16 + 1;
+    __m512i ind = _mm512_set_epi32(15 * d, 14 * d, 13 * d, 12 * d,
+                                   11 * d, 10 * d,  9 * d,  8 * d,
+                                    7 * d,  6 * d,  5 * d,  4 * d,
+                                    3 * d,  2 * d,      d,      0);
+
+    _mm512_i32scatter_ps(r, ind, _mm512_set1_ps(1.0), _MM_SCALE_4);
+
+    for (int i = 0; i < V16; i++)
+    {
+        int ii = i * V16;
+
         // For q < i, w < i we have
-        // r[q, w] = 0, if q != w,
-        // r[q, w] = 1, if q == w.
+        // m[q, w] = 0, if q != w,
+        // m[q, w] = 1, if q == w.
 
         // Find lead line from i to V8 - 1.
         int lead_i = i;
@@ -715,40 +686,48 @@ int invmat16_opt(float * __restrict m, float * __restrict r)
         // Interchange i-th and lead_i-th lines.
         if (lead_i != i)
         {
-            for (int j = 0; j < V16; j++)
-            {
-                float tmp_m = m[lead_i * V16 + j];
-                m[lead_i * V16 + j] = m[i * V16 + j];
-                m[i * V16 + j] = tmp_m;
+            int ll = lead_i * V16;
 
-                float tmp_r = r[lead_i * V16 + j];
-                r[lead_i * V16 + j] = r[i * V16 + j];
-                r[i * V16 + j] = tmp_r;
-            }
+            vi = _mm512_load_ps(&m[ii]);
+            vl = _mm512_load_ps(&m[ll]);
+            _mm512_store_ps(&m[ll], vi);
+            _mm512_store_ps(&m[ii], vl);
+
+            vi = _mm512_load_ps(&r[ii]);
+            vl = _mm512_load_ps(&r[ll]);
+            _mm512_store_ps(&r[ll], vi);
+            _mm512_store_ps(&r[ii], vl);
         }
 
         // Scale i-th line.
-        float d = m[i * V16 + i];
-        for (int j = i; j < V16; j++)
-        {
-            m[i * V16 + j] /= d;
-            r[i * V16 + j] /= d;
-        }
+        vd = _mm512_set1_ps(1.0 / m[ii + i]);
+        vi = _mm512_load_ps(&m[ii]);
+        vi = _mm512_mul_ps(vi, vd);
+        _mm512_store_ps(&m[ii], vi);
+        vi = _mm512_load_ps(&r[ii]);
+        vi = _mm512_mul_ps(vi, vd);
+        _mm512_store_ps(&r[ii], vi);
 
         // Zero all other lines.
         for (int j = 0; j < V16; j++)
         {
             if (j != i)
             {
-                float t = m[j * V16 + i];
-
-                for (int k = i; k < V16; k++)
-                {
-                    m[j * V16 + k] -= m[i * V16 + k] * t;
-                }
+                vd = _mm512_set1_ps(-m[j * V16 + i]);
+                vj = _mm512_load_ps(&m[j * V16]);
+                vi = _mm512_load_ps(&m[ii]);
+                vj = _mm512_fmadd_ps(vi, vd, vj);
+                _mm512_store_ps(&m[j * V16], vj);
+                vj = _mm512_load_ps(&r[j * V16]);
+                vi = _mm512_load_ps(&r[ii]);
+                vj = _mm512_fmadd_ps(vi, vd, vj);
+                _mm512_store_ps(&r[j * V16], vj);
             }
         }
     }
 
     return 0;
+
+#endif
+
 }
