@@ -1,3 +1,6 @@
+/// \file
+/// \brief Matrix operations declarations.
+
 #ifndef MATRICES_H
 #define MATRICES_H
 

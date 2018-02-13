@@ -1,7 +1,11 @@
+/// \file
+/// \brief Matrix operations implementations.
+
 #include "matrices.h"
 #include "../../Utils/Maths.h"
 #include <stdlib.h>
 #include <math.h>
+#include "avx512debug.h"
 
 #ifdef INTEL
 #include <immintrin.h>
@@ -128,14 +132,14 @@ void matvec8_opt2(float *matr, float *vect, float *matv)
                                         0,      0,      0,      0,
                                    7 * V8, 6 * V8, 5 * V8, 4 * V8,
                                    3 * V8, 2 * V8,     V8,      0);
-    __m512 r = _mm512_setzero_ps();
-    __m512 ri = _mm512_setzero_ps();
-    r = _mm512_mask_i32gather_ps(r, 0xFF, ind, &tmp[0], _MM_SCALE_1);
+
+    __m512 r, ri;
+    r = _mm512_mask_i32gather_ps(r, 0xFF, ind, &tmp[0], _MM_SCALE_4);
 
     for (int i = 1; i < V8; i++)
     {
-    ri = _mm512_mask_i32gather_ps(ri, 0xFF, ind, &tmp[i], _MM_SCALE_1);
-    r = _mm512_mask_add_ps(r, 0xFF, r, ri);
+        ri = _mm512_mask_i32gather_ps(ri, 0xFF, ind, &tmp[i], _MM_SCALE_4);
+        r = _mm512_mask_add_ps(r, 0xFF, r, ri);
     }
 
     _mm512_mask_store_ps(&matv[0], 0xFF, r);
