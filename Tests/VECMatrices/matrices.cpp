@@ -482,12 +482,12 @@ int invmat8_orig(float * __restrict m, float * __restrict r)
         }
 
         // Scale i-th line.
-        float d = m[i * V8 + i];
+        float d = 1.0 / m[i * V8 + i];
         for (int j = 0; j < V8; j++)
         {
-            m[i * V8 + j] /= d;
-            r[i * V8 + j] /= d;
-        }       
+            m[i * V8 + j] *= d;
+            r[i * V8 + j] *= d;
+        }
 
         // Zero all other lines.
         for (int j = 0; j < V8; j++)
@@ -527,17 +527,45 @@ int invmat8_opt(float * __restrict m, float * __restrict r)
 
 #else
 
-    // Set E-matrix to r.
-    for (int i = 0; i < V8; i++)
+    __declspec(align(64)) float tmp[2 * V64];
+
+    __assume_aligned(m, 64);
+    __assume_aligned(r, 64);
+    __assume_aligned(&tmp[0], 64);
+
+    __m512 vd, vi, vj, vl;
+
+    __m512i ind = _mm512_set_epi32(V16 + 7, V16 + 6, V16 + 5, V16 + 4,
+                                   V16 + 3, V16 + 2, V16 + 1,     V16,
+                                         7,       6,       5,       4,
+                                         3,       2,       1,       0);
+
+    // Copy m to tmp.
+
+    vd = _mm512_setzero_ps();
+
+    for (int i = 0; i < V8; i += 2)
     {
-        for (int j = 0; j < V8; j++)
-        {
-            r[i * V8 + j] = (i == j) ? 1.0 : 0.0;
-        }
+        vi = _mm512_load_ps(&m[i * V8]);
+        _mm512_i32scatter_ps(&tmp[i * V16], ind, vi, _MM_SCALE_4);
+        _mm512_i32scatter_ps(&tmp[i * V16 + V8], ind, vd, _MM_SCALE_4);
     }
+
+    __m512i ind1 = _mm512_set_epi32(0, 0, 0, 0, 0, 0, 0, 0,
+                                    7 * V16 + 7,
+                                    6 * V16 + 6,
+                                    5 * V16 + 5,
+                                    4 * V16 + 4,
+                                    3 * V16 + 3,
+                                    2 * V16 + 2,
+                                        V16 + 1,
+                                              0);
+    _mm512_mask_i32scatter_ps(&tmp[V8], 0xFF, ind1, _mm512_set1_ps(1.0), _MM_SCALE_4);
 
     for (int i = 0; i < V8; i++)
     {
+        int ii = i * V16;
+
         // For q < i, w < i we have
         // r[q, w] = 0, if q != w,
         // r[q, w] = 1, if q == w.
@@ -546,12 +574,12 @@ int invmat8_opt(float * __restrict m, float * __restrict r)
         int lead_i = i;
         for (int j = i + 1; j < V8; j++)
         {
-            if (fabs(m[j * V8 + i]) > fabs(m[lead_i * V8 + i]))
+            if (fabs(tmp[j * V16 + i]) > fabs(tmp[lead_i * V16 + i]))
             {
                 lead_i = j;
             }
         }
-        if (fabs(m[lead_i * V8 + i]) < MATHS_EPS)
+        if (fabs(tmp[lead_i * V16 + i]) < MATHS_EPS)
         {
             return 1;
         }
@@ -559,40 +587,42 @@ int invmat8_opt(float * __restrict m, float * __restrict r)
         // Interchange i-th and lead_i-th lines.
         if (lead_i != i)
         {
-            for (int j = 0; j < V8; j++)
-            {
-                float tmp_m = m[lead_i * V8 + j];
-                m[lead_i * V8 + j] = m[i * V8 + j];
-                m[i * V8 + j] = tmp_m;
+            int ll = lead_i * V16;
 
-                float tmp_r = r[lead_i * V8 + j];
-                r[lead_i * V8 + j] = r[i * V8 + j];
-                r[i * V8 + j] = tmp_r;
-            }
+            vi = _mm512_load_ps(&tmp[ii]);
+            vl = _mm512_load_ps(&tmp[ll]);
+            _mm512_store_ps(&tmp[ll], vi);
+            _mm512_store_ps(&tmp[ii], vl);
         }
 
         // Scale i-th line.
-        float d = m[i * V8 + i];
-        for (int j = 0; j < V8; j++)
-        {
-            m[i * V8 + j] /= d;
-            r[i * V8 + j] /= d;
-        }       
+        vd = _mm512_set1_ps(1.0 / tmp[ii + i]);
+        vi = _mm512_load_ps(&tmp[ii]);
+        vi = _mm512_mul_ps(vi, vd);
+        _mm512_store_ps(&tmp[ii], vi);
 
         // Zero all other lines.
         for (int j = 0; j < V8; j++)
         {
+            int jj = j * V16;
+
             if (j != i)
             {
-                float t = m[j * V8 + i];
-
-                for (int k = 0; k < V8; k++)
-                {
-                    m[j * V8 + k] -= m[i * V8 + k] * t;
-                    r[j * V8 + k] -= r[i * V8 + k] * t;
-                }
+                vd = _mm512_set1_ps(-tmp[jj + i]);
+                vj = _mm512_load_ps(&tmp[jj]);
+                vi = _mm512_load_ps(&tmp[ii]);
+                vj = _mm512_fmadd_ps(vi, vd, vj);
+                _mm512_store_ps(&tmp[jj], vj);
             }
         }
+    }
+
+
+    // Copy to r.
+    for (int i = 0; i < V8; i += 2)
+    {
+        vi = _mm512_i32gather_ps(ind, &tmp[i * V16 + V8], _MM_SCALE_4);
+        _mm512_store_ps(&r[i * V8], vi);
     }
 
     return 0;
