@@ -50,8 +50,6 @@ void matvec8_opt(float *matr, float *vect, float *matv)
     __assume_aligned(&vect[0], 64);
     __assume_aligned(&matv[0], 64);
 
-#if 0
-
     // Hint for loading two copies of vector vect.
     __m512 v1 = _mm512_setzero_ps();
     __m512 v2 = _mm512_setzero_ps();
@@ -76,9 +74,31 @@ void matvec8_opt(float *matr, float *vect, float *matv)
         matv[i + 1] = _mm512_mask_reduce_add_ps(0xFF00, mv);
     }
 
+#endif
+
+}
+
+/// \brief Multiplication 8*8-matrix on 8-vector.
+///
+/// Optimized version.
+///
+/// \param matr - matrix
+/// \param vect - vector
+/// \param matv - result 
+void matvec8_opt2(float *matr, float *vect, float *matv)
+{
+
+#ifndef INTEL
+
+    matvec8_orig(matr, vect, matv);
+
 #else
 
     __declspec(align(64)) float tmp[V64];
+
+    __assume_aligned(&matr[0], 64);
+    __assume_aligned(&vect[0], 64);
+    __assume_aligned(&matv[0], 64);
     __assume_aligned(&tmp[0], 64);
 
     // Hint for loading two copies of vector vect.
@@ -114,13 +134,11 @@ void matvec8_opt(float *matr, float *vect, float *matv)
 
     for (int i = 1; i < V8; i++)
     {
-	ri = _mm512_mask_i32gather_ps(ri, 0xFF, ind, &tmp[i], _MM_SCALE_1);
-	r = _mm512_mask_add_ps(r, 0xFF, r, ri);
+    ri = _mm512_mask_i32gather_ps(ri, 0xFF, ind, &tmp[i], _MM_SCALE_1);
+    r = _mm512_mask_add_ps(r, 0xFF, r, ri);
     }
 
     _mm512_mask_store_ps(&matv[0], 0xFF, r);
-
-#endif
 
 #endif
 
