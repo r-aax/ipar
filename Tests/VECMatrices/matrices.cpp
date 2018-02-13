@@ -395,7 +395,31 @@ void matmat16_opt(float * __restrict a, float * __restrict b, float * __restrict
 
 #else
 
-    matmat16_orig(a, b, r);
+    __assume_aligned(a, 64);
+    __assume_aligned(b, 64);
+    __assume_aligned(r, 64);
+
+    __m512 bs, as, mul;
+    __m512i ind = _mm512_set_epi32(15 * V16, 14 * V16, 13 * V16, 12 * V16,
+                                   11 * V16, 10 * V16,  9 * V16,  8 * V16,
+                                    7 * V16,  6 * V16,  5 * V16,  4 * V16,
+                                    3 * V16,  2 * V16,      V16,        0);
+
+    // Loop for b matrix.
+    for (int j = 0; j < V16; j++)
+    {
+        bs = _mm512_i32gather_ps(ind, &b[j], _MM_SCALE_4);
+
+        // Loop for a matrix.
+        for (int i = 0; i < V16; i++)
+        {
+            int ii = i * V16;
+
+            as = _mm512_load_ps(&a[ii]);
+            mul = _mm512_mul_ps(as, bs);
+            r[ii + j] = _mm512_reduce_add_ps(mul);
+        }
+    }
 
 #endif
 
