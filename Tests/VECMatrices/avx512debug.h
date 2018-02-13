@@ -9,8 +9,9 @@
 #include <immintrin.h>
 
 void print_m512(__m512 v);
-void print_matrix8x8(float *m);
 
 #endif
+
+void print_matrix8x8(float *m);
 
 #endif

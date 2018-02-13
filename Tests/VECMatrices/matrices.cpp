@@ -456,12 +456,12 @@ int invmat8_orig(float * __restrict m, float * __restrict r)
         int lead_i = i;
         for (int j = i + 1; j < V8; j++)
         {
-            if (fabs(m[j * V8 + j]) > fabs(m[lead_i * V8 + lead_i]))
+            if (fabs(m[j * V8 + i]) > fabs(m[lead_i * V8 + i]))
             {
                 lead_i = j;
             }
         }
-        if (fabs(m[lead_i * V8 + lead_i]) < MATHS_EPS)
+        if (fabs(m[lead_i * V8 + i]) < MATHS_EPS)
         {
             return 1;
         }
@@ -487,7 +487,7 @@ int invmat8_orig(float * __restrict m, float * __restrict r)
         {
             m[i * V8 + j] /= d;
             r[i * V8 + j] /= d;
-        }
+        }       
 
         // Zero all other lines.
         for (int j = 0; j < V8; j++)
@@ -496,7 +496,7 @@ int invmat8_orig(float * __restrict m, float * __restrict r)
             {
                 float t = m[j * V8 + i];
 
-                for (int k = i; k < V8; k++)
+                for (int k = 0; k < V8; k++)
                 {
                     m[j * V8 + k] -= m[i * V8 + k] * t;
                     r[j * V8 + k] -= r[i * V8 + k] * t;
@@ -546,12 +546,12 @@ int invmat8_opt(float * __restrict m, float * __restrict r)
         int lead_i = i;
         for (int j = i + 1; j < V8; j++)
         {
-            if (fabs(m[j * V8 + j]) > fabs(m[lead_i * V8 + lead_i]))
+            if (fabs(m[j * V8 + i]) > fabs(m[lead_i * V8 + i]))
             {
                 lead_i = j;
             }
         }
-        if (fabs(m[lead_i * V8 + lead_i]) < MATHS_EPS)
+        if (fabs(m[lead_i * V8 + i]) < MATHS_EPS)
         {
             return 1;
         }
@@ -577,7 +577,7 @@ int invmat8_opt(float * __restrict m, float * __restrict r)
         {
             m[i * V8 + j] /= d;
             r[i * V8 + j] /= d;
-        }
+        }       
 
         // Zero all other lines.
         for (int j = 0; j < V8; j++)
@@ -586,7 +586,7 @@ int invmat8_opt(float * __restrict m, float * __restrict r)
             {
                 float t = m[j * V8 + i];
 
-                for (int k = i; k < V8; k++)
+                for (int k = 0; k < V8; k++)
                 {
                     m[j * V8 + k] -= m[i * V8 + k] * t;
                     r[j * V8 + k] -= r[i * V8 + k] * t;
@@ -632,12 +632,12 @@ int invmat16_orig(float * __restrict m, float * __restrict r)
         int lead_i = i;
         for (int j = i + 1; j < V16; j++)
         {
-            if (fabs(m[j * V16 + j]) > fabs(m[lead_i * V16 + lead_i]))
+            if (fabs(m[j * V16 + i]) > fabs(m[lead_i * V16 + i]))
             {
                 lead_i = j;
             }
         }
-        if (fabs(m[lead_i * V16 + lead_i]) < MATHS_EPS)
+        if (fabs(m[lead_i * V16 + i]) < MATHS_EPS)
         {
             return 1;
         }
@@ -741,12 +741,12 @@ int invmat16_opt(float * __restrict m, float * __restrict r)
         int lead_i = i;
         for (int j = i + 1; j < V16; j++)
         {
-            if (fabs(m[j * V16 + j]) > fabs(m[lead_i * V16 + lead_i]))
+            if (fabs(m[j * V16 + i]) > fabs(m[lead_i * V16 + i]))
             {
                 lead_i = j;
             }
         }
-        if (fabs(m[lead_i * V16 + lead_i]) < MATHS_EPS)
+        if (fabs(m[lead_i * V16 + i]) < MATHS_EPS)
         {
             return 1;
         }

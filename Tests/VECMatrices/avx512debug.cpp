@@ -29,6 +29,8 @@ void print_m512(__m512 v)
     cout << "]" << endl;
 }
 
+#endif
+
 /// \brief Print matrix 8x8.
 ///
 /// \param Matrix pointer.
@@ -50,5 +52,3 @@ void print_matrix8x8(float *m)
         cout << endl;
     }
 }
-
-#endif

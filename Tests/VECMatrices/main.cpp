@@ -7,6 +7,7 @@
 #include "../../Utils/Maths.h"
 #include "../../Utils/Debug.h"
 #include "matrices.h"
+#include "avx512debug.h"
 #include <stdlib.h>
 
 /// \brief matvec8 test cases count.
