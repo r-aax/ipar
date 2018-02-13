@@ -10,22 +10,22 @@
 #include <stdlib.h>
 
 /// \brief matvec8 test cases count.
-#define MATVEC8_COUNT 1//120000
+#define MATVEC8_COUNT 0//120000
 
 /// \brief matvec16 test cases count.
-#define MATVEC16_COUNT 1//60000
+#define MATVEC16_COUNT 0//60000
 
 /// \brief matmat8 test cases count.
 #define MATMAT8_COUNT 1//15000
 
 /// \brief matmat16 test cases cout.
-#define MATMAT16_COUNT 1//15000
+#define MATMAT16_COUNT 0//15000
 
 /// \brief invmat8 test cases count.
-#define INVMAT8_COUNT 1//10000
+#define INVMAT8_COUNT 0//10000
 
 /// \brief invmat16 test cases count.
-#define INVMAT16_COUNT 1//2000
+#define INVMAT16_COUNT 0//2000
 
 /// \brief Matrices for matvec8 test.
 #ifdef INTEL

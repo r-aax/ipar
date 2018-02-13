@@ -18,7 +18,7 @@
 /// \param matr - matrix
 /// \param vect - vector
 /// \param matv - result
-void matvec8_orig(float *matr, float *vect, float *matv)
+void matvec8_orig(float * __restrict matr, float * __restrict vect, float * __restrict matv)
 {
     for (int i = 0; i < V8; i++)
     {
@@ -41,7 +41,7 @@ void matvec8_orig(float *matr, float *vect, float *matv)
 /// \param matr - matrix
 /// \param vect - vector
 /// \param matv - result 
-void matvec8_opt(float *matr, float *vect, float *matv)
+void matvec8_opt(float * __restrict matr, float * __restrict vect, float * __restrict matv)
 {
 
 #ifndef INTEL
@@ -89,7 +89,7 @@ void matvec8_opt(float *matr, float *vect, float *matv)
 /// \param matr - matrix
 /// \param vect - vector
 /// \param matv - result 
-void matvec8_opt2(float *matr, float *vect, float *matv)
+void matvec8_opt2(float * __restrict matr, float * __restrict vect, float * __restrict matv)
 {
 
 #ifndef INTEL
@@ -155,7 +155,7 @@ void matvec8_opt2(float *matr, float *vect, float *matv)
 /// \param matr - matrix
 /// \param vect - vector
 /// \param matv - result
-void matvec16_orig(float *matr, float *vect, float *matv)
+void matvec16_orig(float * __restrict matr, float * __restrict vect, float * __restrict matv)
 {
     for (int i = 0; i < V16; i++)
     {
@@ -178,20 +178,33 @@ void matvec16_orig(float *matr, float *vect, float *matv)
 /// \param matr - matrix
 /// \param vect - vector
 /// \param matv - result
-void matvec16_opt(float *matr, float *vect, float *matv)
+void matvec16_opt(float * __restrict matr, float * __restrict vect, float * __restrict matv)
 {
+
+#ifndef INTEL
+
+    matvec16_orig(matr, vect, matv);
+
+#else
+
+    __assume_aligned(&matr[0], 64);
+    __assume_aligned(&vect[0], 64);
+    __assume_aligned(&matv[0], 64);
+
+    __m512 v = _mm512_load_ps(vect);
+
     for (int i = 0; i < V16; i++)
     {
-        float sum = 0.0;
         int ii = i * V16;
 
-        for (int j = 0; j < V16; j++)
-        {
-            sum = sum + matr[ii + j] * vect[j];
-        }
+        __m512 m = _mm512_load_ps(&matr[ii]);
+        __m512 mv = _mm512_mul_ps(m, v);
 
-        matv[i] = sum;
+        matv[i] = _mm512_reduce_add_ps(mv);
     }
+
+#endif
+
 }
 
 /// \brief Multiplication of two 8*8 matrices.
@@ -201,7 +214,7 @@ void matvec16_opt(float *matr, float *vect, float *matv)
 /// \param a - first matrix
 /// \param b - second matrix
 /// \param r - result matrix
-void matmat8_orig(float *a, float *b, float *r)
+void matmat8_orig(float * __restrict a, float * __restrict b, float * __restrict r)
 {
     for (int i = 0; i < V8; i++)
     {
@@ -230,7 +243,7 @@ void matmat8_orig(float *a, float *b, float *r)
 /// \param a - first matrix
 /// \param b - second matrix
 /// \param r - result matrix
-void matmat8_opt(float *a, float *b, float *r)
+void matmat8_opt(float * __restrict a, float * __restrict b, float * __restrict r)
 {
     for (int i = 0; i < V8; i++)
     {
@@ -259,7 +272,7 @@ void matmat8_opt(float *a, float *b, float *r)
 /// \param a - first matrix
 /// \param b - second matrix
 /// \param r - result matrix
-void matmat16_orig(float *a, float *b, float *r)
+void matmat16_orig(float * __restrict a, float * __restrict b, float * __restrict r)
 {
     for (int i = 0; i < V16; i++)
     {
@@ -288,7 +301,7 @@ void matmat16_orig(float *a, float *b, float *r)
 /// \param a - first matrix
 /// \param b - second matrix
 /// \param r - result matrix
-void matmat16_opt(float *a, float *b, float *r)
+void matmat16_opt(float * __restrict a, float * __restrict b, float * __restrict r)
 {
     for (int i = 0; i < V16; i++)
     {
@@ -320,7 +333,7 @@ void matmat16_opt(float *a, float *b, float *r)
 /// \return
 /// 0 - if the matrix is successfully inverted,
 /// 1 - if error has occured.
-int invmat8_orig(float *m, float *r)
+int invmat8_orig(float * __restrict m, float * __restrict r)
 {
     // Set E-matrix to r.
     for (int i = 0; i < V8; i++)
@@ -362,7 +375,7 @@ int invmat8_orig(float *m, float *r)
 
                 float tmp_r = r[lead_i * V8 + j];
                 r[lead_i * V8 + j] = r[i * V8 + j];
-                r[i * V8 + j] = tmp_r;                
+                r[i * V8 + j] = tmp_r;
             }
         }
 
@@ -402,7 +415,7 @@ int invmat8_orig(float *m, float *r)
 /// \return
 /// 0 - if the matrix is successfully inverted,
 /// 1 - if error has occured.
-int invmat8_opt(float *m, float *r)
+int invmat8_opt(float * __restrict m, float * __restrict r)
 {
     // Set E-matrix to r.
     for (int i = 0; i < V8; i++)
@@ -444,7 +457,7 @@ int invmat8_opt(float *m, float *r)
 
                 float tmp_r = r[lead_i * V8 + j];
                 r[lead_i * V8 + j] = r[i * V8 + j];
-                r[i * V8 + j] = tmp_r;                
+                r[i * V8 + j] = tmp_r;
             }
         }
 
@@ -484,7 +497,7 @@ int invmat8_opt(float *m, float *r)
 /// \return
 /// 0 - if the matrix is successfully inverted,
 /// 1 - if error has occured.
-int invmat16_orig(float *m, float *r)
+int invmat16_orig(float * __restrict m, float * __restrict r)
 {
     // Set E-matrix to r.
     for (int i = 0; i < V16; i++)
@@ -526,7 +539,7 @@ int invmat16_orig(float *m, float *r)
 
                 float tmp_r = r[lead_i * V16 + j];
                 r[lead_i * V16 + j] = r[i * V16 + j];
-                r[i * V16 + j] = tmp_r;                
+                r[i * V16 + j] = tmp_r;
             }
         }
 
@@ -566,7 +579,7 @@ int invmat16_orig(float *m, float *r)
 /// \return
 /// 0 - if the matrix is successfully inverted,
 /// 1 - if error has occured.
-int invmat16_opt(float *m, float *r)
+int invmat16_opt(float * __restrict m, float * __restrict r)
 {
     // Set E-matrix to r.
     for (int i = 0; i < V16; i++)
@@ -608,7 +621,7 @@ int invmat16_opt(float *m, float *r)
 
                 float tmp_r = r[lead_i * V16 + j];
                 r[lead_i * V16 + j] = r[i * V16 + j];
-                r[i * V16 + j] = tmp_r;                
+                r[i * V16 + j] = tmp_r;
             }
         }
 
