@@ -134,6 +134,7 @@ void matvec8_opt2(float * __restrict matr, float * __restrict vect, float * __re
                                    3 * V8, 2 * V8,     V8,      0);
 
     __m512 r, ri;
+
     r = _mm512_mask_i32gather_ps(r, 0xFF, ind, &tmp[0], _MM_SCALE_4);
 
     for (int i = 1; i < V8; i++)
@@ -207,6 +208,62 @@ void matvec16_opt(float * __restrict matr, float * __restrict vect, float * __re
 
 }
 
+/// \brief Multiplication 16*16-matrix on 16-vector.
+///
+/// Optimized version.
+///
+/// \param matr - matrix
+/// \param vect - vector
+/// \param matv - result
+void matvec16_opt2(float * __restrict matr, float * __restrict vect, float * __restrict matv)
+{
+
+#ifndef INTEL
+
+    matvec16_orig(matr, vect, matv);
+
+#else
+
+    __declspec(align(64)) float tmp[V256];
+
+    __assume_aligned(&matr[0], 64);
+    __assume_aligned(&vect[0], 64);
+    __assume_aligned(&matv[0], 64);
+    __assume_aligned(&tmp[0], 64);
+
+    __m512 v = _mm512_load_ps(vect);
+
+    for (int i = 0; i < V16; i++)
+    {
+        int ii = i * V16;
+
+        __m512 m = _mm512_load_ps(&matr[ii]);
+        __m512 mv = _mm512_mul_ps(m, v);
+
+        _mm512_store_ps(&tmp[ii], mv);
+    }
+
+    __m512i ind = _mm512_set_epi32(15 * V16, 14 * V16, 13 * V16, 12 * V16,
+                                   11 * V16, 10 * V16,  9 * V16,  8 * V16,
+                                    7 * V16,  6 * V16,  5 * V16,  4 * V16,
+                                    3 * V16,  2 * V16,      V16,        0);
+
+    __m512 r, ri;
+
+    r = _mm512_i32gather_ps(ind, &tmp[0], _MM_SCALE_4);
+
+    for (int i = 1; i < V16; i++)
+    {
+        ri = _mm512_i32gather_ps(ind, &tmp[i], _MM_SCALE_4);
+        r = _mm512_add_ps(r, ri);
+    }
+
+    _mm512_store_ps(matv, r);
+
+#endif
+
+}
+
 /// \brief Multiplication of two 8*8 matrices.
 ///
 /// Original version.
@@ -245,24 +302,53 @@ void matmat8_orig(float * __restrict a, float * __restrict b, float * __restrict
 /// \param r - result matrix
 void matmat8_opt(float * __restrict a, float * __restrict b, float * __restrict r)
 {
-    for (int i = 0; i < V8; i++)
+
+#ifndef INTEL
+
+    matmat8_orig(a, b, r);
+
+#else
+
+    __assume_aligned(a, 64);
+    __assume_aligned(b, 64);
+    __assume_aligned(r, 64);
+
+    __m512 b1, b2, bs, bs2, as, mul1, mul2;
+
+    __m512i ind1 = _mm512_set_epi32(     0,      0,      0,      0,
+                                         0,      0,      0,      0,
+                                    7 * V8, 6 * V8, 5 * V8, 4 * V8,
+                                    3 * V8, 2 * V8,     V8,      0);
+    __m512i ind2 = _mm512_permute4f128_epi32(ind1, _MM_PERM_BADC);
+
+    // Loop for b matrix.
+    for (int j = 0; j < V8; j += 2)
     {
-        int ii = i * V8;
+        b1 = _mm512_mask_i32gather_ps(_mm512_setzero_ps(),
+                                      0xFF, ind1, &b[j], _MM_SCALE_4);
+        b2 = _mm512_mask_i32gather_ps(_mm512_setzero_ps(),
+                                      0xFF00, ind2, &b[j + 1], _MM_SCALE_4);
+        bs = _mm512_add_ps(b1, b2);
+        bs2 = _mm512_permute4f128_ps(bs, _MM_PERM_BADC);
 
-        for (int j = 0; j < V8; j++)
+        // Loop for a matrix.
+        for (int i = 0; i < V8; i += 2)
         {
-            float sum = 0.0;
+            int ii = i * V8;
 
-            for (int k = 0; k < V8; k++)
-            {
-                int kk = k * V8;
+            as = _mm512_load_ps(&a[ii]);
+            mul1 = _mm512_mul_ps(as, bs);
+            mul2 = _mm512_mul_ps(as, bs2);
 
-                sum = sum + a[ii + k] * b[kk + j];
-            }
-
-            r[ii + j] = sum;
+            r[ii + j] = _mm512_mask_reduce_add_ps(0xFF, mul1);
+            r[ii + j + 1] = _mm512_mask_reduce_add_ps(0xFF, mul2);
+            r[ii + V8 + j] = _mm512_mask_reduce_add_ps(0xFF00, mul2);
+            r[ii + V8 + j + 1] = _mm512_mask_reduce_add_ps(0xFF00, mul1);
         }
     }
+
+#endif
+
 }
 
 /// \brief Multiplication of two 16*16 matrices.

@@ -10,22 +10,22 @@
 #include <stdlib.h>
 
 /// \brief matvec8 test cases count.
-#define MATVEC8_COUNT 0//120000
+#define MATVEC8_COUNT 1//120000
 
 /// \brief matvec16 test cases count.
-#define MATVEC16_COUNT 0//60000
+#define MATVEC16_COUNT 1//60000
 
 /// \brief matmat8 test cases count.
 #define MATMAT8_COUNT 1//15000
 
 /// \brief matmat16 test cases cout.
-#define MATMAT16_COUNT 0//15000
+#define MATMAT16_COUNT 1//15000
 
 /// \brief invmat8 test cases count.
-#define INVMAT8_COUNT 0//10000
+#define INVMAT8_COUNT 1//10000
 
 /// \brief invmat16 test cases count.
-#define INVMAT16_COUNT 0//2000
+#define INVMAT16_COUNT 1//2000
 
 /// \brief Matrices for matvec8 test.
 #ifdef INTEL
@@ -281,6 +281,7 @@ int main(int argc, char **argv)
     }
 
     cout << "VECMatrices : test begin" << endl;
+    cout << "------------------------------" << endl;
 
     Timer *timer = new Timer(Timer::OMP);
     double time_orig, time_opt, time_opt2;
@@ -354,6 +355,7 @@ int main(int argc, char **argv)
          << ", opt2 = " << check_opt2 << endl;
     DEBUG_CHECK(MATHS_IS_NEAR(check_orig, check_opt, 0.01), "matvec8 opt check failed");
     DEBUG_CHECK(MATHS_IS_NEAR(check_orig, check_opt2, 0.01), "matvec8 opt2 check failed");
+    cout << "------------------------------" << endl;
 
     // *----------*
     // | matvec16 |
@@ -379,11 +381,25 @@ int main(int argc, char **argv)
     time_opt = timer->Time();
     check_opt = array_sum(matvec16_matv, MATVEC16_COUNT * V16);
 
+    // Optimized 2.
+    clean_res();
+    timer->Init();
+    run3(repeats_count, MATVEC16_COUNT, matvec16_opt2, matvec16_matr, matvec16_vect, matvec16_matv, V256, V16, V16);
+    timer->Start();
+    run3(repeats_count, MATVEC16_COUNT, matvec16_opt2, matvec16_matr, matvec16_vect, matvec16_matv, V256, V16, V16);
+    timer->Stop();
+    time_opt2 = timer->Time();
+    check_opt2 = array_sum(matvec16_matv, MATVEC16_COUNT * V16);
+
     cout << "VECMatrices : matvec16 : orig = " << time_orig
-         << ", opt = " << time_opt << endl;
+         << ", opt = " << time_opt
+         << ", opt2 = " << time_opt2 << endl;
     cout << "VECMatrices : matvec16 check : orig = " << check_orig
-         << ", opt = " << check_opt << endl;
-    DEBUG_CHECK(MATHS_IS_NEAR(check_orig, check_opt, 0.01), "matvec16 check failed");
+         << ", opt = " << check_opt 
+         << ", opt2 = " << check_opt2 << endl;
+    DEBUG_CHECK(MATHS_IS_NEAR(check_orig, check_opt, 0.01), "matvec16 opt check failed");
+    DEBUG_CHECK(MATHS_IS_NEAR(check_orig, check_opt2, 0.01), "matvec16 opt2 check failed");
+    cout << "------------------------------" << endl;
 
     // *---------*
     // | matmat8 |
@@ -414,6 +430,7 @@ int main(int argc, char **argv)
     cout << "VECMatrices : matmat8 check : orig = " << check_orig
          << ", opt = " << check_opt << endl;
     DEBUG_CHECK(MATHS_IS_NEAR(check_orig, check_opt, 0.01), "matmat8 check failed");
+    cout << "------------------------------" << endl;
 
     // *----------*
     // | matmat16 |
@@ -444,6 +461,7 @@ int main(int argc, char **argv)
     cout << "VECMatrices : matmat16 check : orig = " << check_orig
          << ", opt = " << check_opt << endl;
     DEBUG_CHECK(MATHS_IS_NEAR(check_orig, check_opt, 0.01), "matmat16 check failed");
+    cout << "------------------------------" << endl;
 
     // *---------*
     // | invmat8 |
@@ -490,6 +508,7 @@ int main(int argc, char **argv)
     cout << "VECMatrices : invmat8 check : orig = " << check_orig
          << ", opt = " << check_opt << endl;
     DEBUG_CHECK(MATHS_IS_NEAR(check_orig, check_opt, 0.01), "invmat8 check failed");
+    cout << "------------------------------" << endl;
 
     // *----------*
     // | invmat16 |
@@ -536,6 +555,7 @@ int main(int argc, char **argv)
     cout << "VECMatrices : invmat16 check : orig = " << check_orig
          << ", opt = " << check_opt << endl;
     DEBUG_CHECK(MATHS_IS_NEAR(check_orig, check_opt, 0.01), "invmat16 check failed");
+    cout << "------------------------------" << endl;
 
     delete timer;
 
