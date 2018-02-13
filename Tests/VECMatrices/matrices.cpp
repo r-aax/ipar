@@ -313,22 +313,21 @@ void matmat8_opt(float * __restrict a, float * __restrict b, float * __restrict 
     __assume_aligned(b, 64);
     __assume_aligned(r, 64);
 
-    __m512 b1, b2, bs, bs2, as, mul1, mul2;
+    __m512 bs, bs2, as, mul1, mul2;
 
-    __m512i ind1 = _mm512_set_epi32(     0,      0,      0,      0,
-                                         0,      0,      0,      0,
-                                    7 * V8, 6 * V8, 5 * V8, 4 * V8,
-                                    3 * V8, 2 * V8,     V8,      0);
-    __m512i ind2 = _mm512_permute4f128_epi32(ind1, _MM_PERM_BADC);
+    __m512i ind = _mm512_set_epi32(7 * V8 + 1, 6 * V8 + 1,
+                                   5 * V8 + 1, 4 * V8 + 1,
+                                   3 * V8 + 1, 2 * V8 + 1,
+                                       V8 + 1,          1,
+                                       7 * V8,     6 * V8,
+                                       5 * V8,     4 * V8,
+                                       3 * V8,     2 * V8,
+                                           V8,          0);
 
     // Loop for b matrix.
     for (int j = 0; j < V8; j += 2)
     {
-        b1 = _mm512_mask_i32gather_ps(_mm512_setzero_ps(),
-                                      0xFF, ind1, &b[j], _MM_SCALE_4);
-        b2 = _mm512_mask_i32gather_ps(_mm512_setzero_ps(),
-                                      0xFF00, ind2, &b[j + 1], _MM_SCALE_4);
-        bs = _mm512_add_ps(b1, b2);
+        bs = _mm512_i32gather_ps(ind, &b[j], _MM_SCALE_4);
         bs2 = _mm512_permute4f128_ps(bs, _MM_PERM_BADC);
 
         // Loop for a matrix.
