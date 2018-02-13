@@ -388,24 +388,17 @@ void matmat16_orig(float * __restrict a, float * __restrict b, float * __restric
 /// \param r - result matrix
 void matmat16_opt(float * __restrict a, float * __restrict b, float * __restrict r)
 {
-    for (int i = 0; i < V16; i++)
-    {
-        int ii = i * V16;
 
-        for (int j = 0; j < V16; j++)
-        {
-            float sum = 0.0;
+#ifndef INTEL
 
-            for (int k = 0; k < V16; k++)
-            {
-                int kk = k * V16;
+    matmat16_orig(a, b, r);
 
-                sum = sum + a[ii + k] * b[kk + j];
-            }
+#else
 
-            r[ii + j] = sum;
-        }
-    }
+    matmat16_orig(a, b, r);
+
+#endif
+
 }
 
 /// \brief Invert 8*8 matrix.
