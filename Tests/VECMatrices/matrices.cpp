@@ -527,7 +527,75 @@ int invmat8_opt(float * __restrict m, float * __restrict r)
 
 #else
 
-    return invmat8_orig(m, r);
+    // Set E-matrix to r.
+    for (int i = 0; i < V8; i++)
+    {
+        for (int j = 0; j < V8; j++)
+        {
+            r[i * V8 + j] = (i == j) ? 1.0 : 0.0;
+        }
+    }
+
+    for (int i = 0; i < V8; i++)
+    {
+        // For q < i, w < i we have
+        // r[q, w] = 0, if q != w,
+        // r[q, w] = 1, if q == w.
+
+        // Find lead line from i to V8 - 1.
+        int lead_i = i;
+        for (int j = i + 1; j < V8; j++)
+        {
+            if (fabs(m[j * V8 + j]) > fabs(m[lead_i * V8 + lead_i]))
+            {
+                lead_i = j;
+            }
+        }
+        if (fabs(m[lead_i * V8 + lead_i]) < MATHS_EPS)
+        {
+            return 1;
+        }
+
+        // Interchange i-th and lead_i-th lines.
+        if (lead_i != i)
+        {
+            for (int j = 0; j < V8; j++)
+            {
+                float tmp_m = m[lead_i * V8 + j];
+                m[lead_i * V8 + j] = m[i * V8 + j];
+                m[i * V8 + j] = tmp_m;
+
+                float tmp_r = r[lead_i * V8 + j];
+                r[lead_i * V8 + j] = r[i * V8 + j];
+                r[i * V8 + j] = tmp_r;
+            }
+        }
+
+        // Scale i-th line.
+        float d = m[i * V8 + i];
+        for (int j = 0; j < V8; j++)
+        {
+            m[i * V8 + j] /= d;
+            r[i * V8 + j] /= d;
+        }
+
+        // Zero all other lines.
+        for (int j = 0; j < V8; j++)
+        {
+            if (j != i)
+            {
+                float t = m[j * V8 + i];
+
+                for (int k = i; k < V8; k++)
+                {
+                    m[j * V8 + k] -= m[i * V8 + k] * t;
+                    r[j * V8 + k] -= r[i * V8 + k] * t;
+                }
+            }
+        }
+    }
+
+    return 0;
 
 #endif
 

@@ -24,9 +24,31 @@ void print_m512(__m512 v)
     cout << "__m512 [";
     for (int i = 0; i < 16; i++)
     {
-	cout << tmp[i] << ", ";
+        cout << tmp[i] << ", ";
     }
     cout << "]" << endl;
+}
+
+/// \brief Print matrix 8x8.
+///
+/// \param Matrix pointer.
+void print_matrix8x8(float *m)
+{
+    cout << "matrix 8x8" << endl;
+
+    for (int i = 0; i < 8; i++)
+    {
+        int ii = i * 8;
+
+        cout << " ";
+
+        for (int j = 0; j < 8; j++)
+        {
+            cout << m[ii + j] << " ";
+        }
+
+        cout << endl;
+    }
 }
 
 #endif
