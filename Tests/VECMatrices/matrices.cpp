@@ -15,10 +15,10 @@
 ///
 /// Original version.
 ///
-/// \param matr - matrix
-/// \param vect - vector
-/// \param matv - result
-void matvec8_orig(float * __restrict matr, float * __restrict vect, float * __restrict matv)
+/// \param m - matrix
+/// \param v - vector
+/// \param r - result
+void matvec8_orig(float * __restrict m, float * __restrict v, float * __restrict r)
 {
     for (int i = 0; i < V8; i++)
     {
@@ -27,10 +27,10 @@ void matvec8_orig(float * __restrict matr, float * __restrict vect, float * __re
 
         for (int j = 0; j < V8; j++)
         {
-            sum = sum + matr[ii + j] * vect[j];
+            sum = sum + m[ii + j] * v[j];
         }
 
-        matv[i] = sum;
+        r[i] = sum;
     }
 }
 
@@ -38,44 +38,42 @@ void matvec8_orig(float * __restrict matr, float * __restrict vect, float * __re
 ///
 /// Optimized version.
 ///
-/// \param matr - matrix
-/// \param vect - vector
-/// \param matv - result 
-void matvec8_opt(float * __restrict matr, float * __restrict vect, float * __restrict matv)
+/// \param m - matrix
+/// \param v - vector
+/// \param r - result 
+void matvec8_opt(float * __restrict m, float * __restrict v, float * __restrict r)
 {
 
 #ifndef INTEL
 
-    matvec8_orig(matr, vect, matv);
+    matvec8_orig(m, v, r);
 
 #else
 
-    __assume_aligned(&matr[0], 64);
-    __assume_aligned(&vect[0], 64);
-    __assume_aligned(&matv[0], 64);
+    __assume_aligned(m, 64);
+    __assume_aligned(v, 64);
+    __assume_aligned(r, 64);
 
     // Hint for loading two copies of vector vect.
-    __m512 v1 = _mm512_setzero_ps();
-    __m512 v2 = _mm512_setzero_ps();
-    v1 = _mm512_mask_extload_ps(v1, 0xF0F, &vect[0],
-                                _MM_UPCONV_PS_NONE,
-                                _MM_BROADCAST_4X16,
-                                _MM_HINT_NONE);
-    v2 = _mm512_mask_extload_ps(v2, 0xF0F0, &vect[4],
-                                _MM_UPCONV_PS_NONE,
-                                _MM_BROADCAST_4X16,
-                                _MM_HINT_NONE);
-    __m512 v = _mm512_add_ps(v1, v2);
+    __m512 v1 = _mm512_mask_extload_ps(_mm512_setzero_ps(), 0xF0F, &v[0],
+                                       _MM_UPCONV_PS_NONE, _MM_BROADCAST_4X16,
+                                       _MM_HINT_NONE);
+    __m512 v2 = _mm512_mask_extload_ps(_mm512_setzero_ps(), 0xF0F0, &v[4],
+                                       _MM_UPCONV_PS_NONE, _MM_BROADCAST_4X16,
+                                       _MM_HINT_NONE);
+    __m512 vec = _mm512_add_ps(v1, v2);
+
+    __m512 mi, mul;
 
     for (int i = 0; i < V8; i += 2)
     {
         int ii = i * V8;
 
-        __m512 m = _mm512_load_ps(&matr[ii]);
-        __m512 mv = _mm512_mul_ps(m, v);
+        mi = _mm512_load_ps(&m[ii]);
+        mul = _mm512_mul_ps(mi, vec);
 
-        matv[i] = _mm512_mask_reduce_add_ps(0xFF, mv);
-        matv[i + 1] = _mm512_mask_reduce_add_ps(0xFF00, mv);
+        r[i] = _mm512_mask_reduce_add_ps(0xFF, mul);
+        r[i + 1] = _mm512_mask_reduce_add_ps(0xFF00, mul);
     }
 
 #endif
@@ -86,64 +84,60 @@ void matvec8_opt(float * __restrict matr, float * __restrict vect, float * __res
 ///
 /// Optimized version.
 ///
-/// \param matr - matrix
-/// \param vect - vector
-/// \param matv - result 
-void matvec8_opt2(float * __restrict matr, float * __restrict vect, float * __restrict matv)
+/// \param m - matrix
+/// \param v - vector
+/// \param r - result 
+void matvec8_opt2(float * __restrict m, float * __restrict v, float * __restrict r)
 {
 
 #ifndef INTEL
 
-    matvec8_orig(matr, vect, matv);
+    matvec8_orig(m, v, r);
 
 #else
 
-    __declspec(align(64)) float tmp[V64];
+    __declspec(align(64)) float t[V64];
 
-    __assume_aligned(&matr[0], 64);
-    __assume_aligned(&vect[0], 64);
-    __assume_aligned(&matv[0], 64);
-    __assume_aligned(&tmp[0], 64);
+    __assume_aligned(m, 64);
+    __assume_aligned(v, 64);
+    __assume_aligned(r, 64);
+    __assume_aligned(&t[0], 64);
 
     // Hint for loading two copies of vector vect.
-    __m512 v1 = _mm512_setzero_ps();
-    __m512 v2 = _mm512_setzero_ps();
-    v1 = _mm512_mask_extload_ps(v1, 0xF0F, &vect[0],
-                                _MM_UPCONV_PS_NONE,
-                                _MM_BROADCAST_4X16,
-                                _MM_HINT_NONE);
-    v2 = _mm512_mask_extload_ps(v2, 0xF0F0, &vect[4],
-                                _MM_UPCONV_PS_NONE,
-                                _MM_BROADCAST_4X16,
-                                _MM_HINT_NONE);
-    __m512 v = _mm512_add_ps(v1, v2);
+    __m512 v1 = _mm512_mask_extload_ps(_mm512_setzero_ps(), 0xF0F, &v[0],
+                                       _MM_UPCONV_PS_NONE, _MM_BROADCAST_4X16,
+                                        _MM_HINT_NONE);
+    __m512 v2 = _mm512_mask_extload_ps(_mm512_setzero_ps(), 0xF0F0, &v[4],
+                                       _MM_UPCONV_PS_NONE, _MM_BROADCAST_4X16,
+                                       _MM_HINT_NONE);
+    __m512 vec = _mm512_add_ps(v1, v2);
+
+    __m512 mi, mul;
 
     for (int i = 0; i < V8; i += 2)
     {
         int ii = i * V8;
 
-        __m512 m = _mm512_load_ps(&matr[ii]);
-        __m512 mv = _mm512_mul_ps(m, v);
+        mi = _mm512_load_ps(&m[ii]);
+        mul = _mm512_mul_ps(mi, vec);
 
-        _mm512_store_ps(&tmp[ii], mv);
+        _mm512_store_ps(&t[ii], mul);
     }
 
     __m512i ind = _mm512_set_epi32(     0,      0,      0,      0,
                                         0,      0,      0,      0,
                                    7 * V8, 6 * V8, 5 * V8, 4 * V8,
                                    3 * V8, 2 * V8,     V8,      0);
+    __m512 res =_mm512_setzero_ps();
+    __m512 ti;
 
-    __m512 r, ri;
-
-    r = _mm512_mask_i32gather_ps(r, 0xFF, ind, &tmp[0], _MM_SCALE_4);
-
-    for (int i = 1; i < V8; i++)
+    for (int i = 0; i < V8; i++)
     {
-        ri = _mm512_mask_i32gather_ps(ri, 0xFF, ind, &tmp[i], _MM_SCALE_4);
-        r = _mm512_mask_add_ps(r, 0xFF, r, ri);
+        ti = _mm512_mask_i32gather_ps(ti, 0xFF, ind, &t[i], _MM_SCALE_4);
+        res = _mm512_mask_add_ps(res, 0xFF, res, ti);
     }
 
-    _mm512_mask_store_ps(&matv[0], 0xFF, r);
+    _mm512_mask_store_ps(r, 0xFF, res);
 
 #endif
 
@@ -153,10 +147,10 @@ void matvec8_opt2(float * __restrict matr, float * __restrict vect, float * __re
 ///
 /// Original version.
 ///
-/// \param matr - matrix
-/// \param vect - vector
-/// \param matv - result
-void matvec16_orig(float * __restrict matr, float * __restrict vect, float * __restrict matv)
+/// \param m - matrix
+/// \param v - vector
+/// \param r - result
+void matvec16_orig(float * __restrict m, float * __restrict v, float * __restrict r)
 {
     for (int i = 0; i < V16; i++)
     {
@@ -165,10 +159,10 @@ void matvec16_orig(float * __restrict matr, float * __restrict vect, float * __r
 
         for (int j = 0; j < V16; j++)
         {
-            sum = sum + matr[ii + j] * vect[j];
+            sum = sum + m[ii + j] * v[j];
         }
 
-        matv[i] = sum;
+        r[i] = sum;
     }
 }
 
@@ -176,32 +170,32 @@ void matvec16_orig(float * __restrict matr, float * __restrict vect, float * __r
 ///
 /// Optimized version.
 ///
-/// \param matr - matrix
-/// \param vect - vector
-/// \param matv - result
-void matvec16_opt(float * __restrict matr, float * __restrict vect, float * __restrict matv)
+/// \param m - matrix
+/// \param v - vector
+/// \param r - result
+void matvec16_opt(float * __restrict m, float * __restrict v, float * __restrict r)
 {
 
 #ifndef INTEL
 
-    matvec16_orig(matr, vect, matv);
+    matvec16_orig(m, v, r);
 
 #else
 
-    __assume_aligned(&matr[0], 64);
-    __assume_aligned(&vect[0], 64);
-    __assume_aligned(&matv[0], 64);
+    __assume_aligned(m, 64);
+    __assume_aligned(v, 64);
+    __assume_aligned(r, 64);
 
-    __m512 v = _mm512_load_ps(vect);
+    __m512 vec = _mm512_load_ps(v);
+    __m512 mi, mul;
 
     for (int i = 0; i < V16; i++)
     {
         int ii = i * V16;
 
-        __m512 m = _mm512_load_ps(&matr[ii]);
-        __m512 mv = _mm512_mul_ps(m, v);
-
-        matv[i] = _mm512_reduce_add_ps(mv);
+        mi = _mm512_load_ps(&m[ii]);
+        mul = _mm512_mul_ps(mi, vec);
+        r[i] = _mm512_reduce_add_ps(mul);
     }
 
 #endif
@@ -212,53 +206,51 @@ void matvec16_opt(float * __restrict matr, float * __restrict vect, float * __re
 ///
 /// Optimized version.
 ///
-/// \param matr - matrix
-/// \param vect - vector
-/// \param matv - result
-void matvec16_opt2(float * __restrict matr, float * __restrict vect, float * __restrict matv)
+/// \param m - matrix
+/// \param v - vector
+/// \param r - result
+void matvec16_opt2(float * __restrict m, float * __restrict v, float * __restrict r)
 {
 
 #ifndef INTEL
 
-    matvec16_orig(matr, vect, matv);
+    matvec16_orig(m, v, r);
 
 #else
 
-    __declspec(align(64)) float tmp[V256];
+    __declspec(align(64)) float t[V256];
 
-    __assume_aligned(&matr[0], 64);
-    __assume_aligned(&vect[0], 64);
-    __assume_aligned(&matv[0], 64);
-    __assume_aligned(&tmp[0], 64);
+    __assume_aligned(m, 64);
+    __assume_aligned(v, 64);
+    __assume_aligned(r, 64);
+    __assume_aligned(&t[0], 64);
 
-    __m512 v = _mm512_load_ps(vect);
+    __m512 vec = _mm512_load_ps(v);
+    __m512 mi, mul;
 
     for (int i = 0; i < V16; i++)
     {
         int ii = i * V16;
 
-        __m512 m = _mm512_load_ps(&matr[ii]);
-        __m512 mv = _mm512_mul_ps(m, v);
-
-        _mm512_store_ps(&tmp[ii], mv);
+        mi = _mm512_load_ps(&m[ii]);
+        mul = _mm512_mul_ps(mi, vec);
+        _mm512_store_ps(&t[ii], mul);
     }
 
     __m512i ind = _mm512_set_epi32(15 * V16, 14 * V16, 13 * V16, 12 * V16,
                                    11 * V16, 10 * V16,  9 * V16,  8 * V16,
                                     7 * V16,  6 * V16,  5 * V16,  4 * V16,
                                     3 * V16,  2 * V16,      V16,        0);
-
-    __m512 r, ri;
-
-    r = _mm512_i32gather_ps(ind, &tmp[0], _MM_SCALE_4);
+    __m512 res = _mm512_setzero_ps();
+    __m512 ti;
 
     for (int i = 1; i < V16; i++)
     {
-        ri = _mm512_i32gather_ps(ind, &tmp[i], _MM_SCALE_4);
-        r = _mm512_add_ps(r, ri);
+        ti = _mm512_i32gather_ps(ind, &t[i], _MM_SCALE_4);
+        res = _mm512_add_ps(res, ti);
     }
 
-    _mm512_store_ps(matv, r);
+    _mm512_store_ps(r, res);
 
 #endif
 
@@ -313,7 +305,7 @@ void matmat8_opt(float * __restrict a, float * __restrict b, float * __restrict 
     __assume_aligned(b, 64);
     __assume_aligned(r, 64);
 
-    __m512 bs, bs2, as, mul1, mul2;
+    __m512 bj, bj2, ai, mul1, mul2;
 
     __m512i ind = _mm512_set_epi32(7 * V8 + 1, 6 * V8 + 1,
                                    5 * V8 + 1, 4 * V8 + 1,
@@ -327,17 +319,17 @@ void matmat8_opt(float * __restrict a, float * __restrict b, float * __restrict 
     // Loop for b matrix.
     for (int j = 0; j < V8; j += 2)
     {
-        bs = _mm512_i32gather_ps(ind, &b[j], _MM_SCALE_4);
-        bs2 = _mm512_permute4f128_ps(bs, _MM_PERM_BADC);
+        bj = _mm512_i32gather_ps(ind, &b[j], _MM_SCALE_4);
+        bj2 = _mm512_permute4f128_ps(bj, _MM_PERM_BADC);
 
         // Loop for a matrix.
         for (int i = 0; i < V8; i += 2)
         {
             int ii = i * V8;
 
-            as = _mm512_load_ps(&a[ii]);
-            mul1 = _mm512_mul_ps(as, bs);
-            mul2 = _mm512_mul_ps(as, bs2);
+            aj = _mm512_load_ps(&a[ii]);
+            mul1 = _mm512_mul_ps(ai, bj);
+            mul2 = _mm512_mul_ps(ai, bj2);
 
             r[ii + j] = _mm512_mask_reduce_add_ps(0xFF, mul1);
             r[ii + j + 1] = _mm512_mask_reduce_add_ps(0xFF, mul2);
@@ -399,7 +391,7 @@ void matmat16_opt(float * __restrict a, float * __restrict b, float * __restrict
     __assume_aligned(b, 64);
     __assume_aligned(r, 64);
 
-    __m512 bs, as, mul;
+    __m512 bj, ai, mul;
     __m512i ind = _mm512_set_epi32(15 * V16, 14 * V16, 13 * V16, 12 * V16,
                                    11 * V16, 10 * V16,  9 * V16,  8 * V16,
                                     7 * V16,  6 * V16,  5 * V16,  4 * V16,
@@ -408,15 +400,15 @@ void matmat16_opt(float * __restrict a, float * __restrict b, float * __restrict
     // Loop for b matrix.
     for (int j = 0; j < V16; j++)
     {
-        bs = _mm512_i32gather_ps(ind, &b[j], _MM_SCALE_4);
+        bj = _mm512_i32gather_ps(ind, &b[j], _MM_SCALE_4);
 
         // Loop for a matrix.
         for (int i = 0; i < V16; i++)
         {
             int ii = i * V16;
 
-            as = _mm512_load_ps(&a[ii]);
-            mul = _mm512_mul_ps(as, bs);
+            ai = _mm512_load_ps(&a[ii]);
+            mul = _mm512_mul_ps(ai, bj);
             r[ii + j] = _mm512_reduce_add_ps(mul);
         }
     }
@@ -527,7 +519,7 @@ int invmat8_opt(float * __restrict m, float * __restrict r)
 
 #else
 
-    __declspec(align(64)) float tmp[2 * V64];
+    __declspec(align(64)) float t[2 * V64];
 
     __assume_aligned(m, 64);
     __assume_aligned(r, 64);
@@ -547,8 +539,8 @@ int invmat8_opt(float * __restrict m, float * __restrict r)
     for (int i = 0; i < V8; i += 2)
     {
         vi = _mm512_load_ps(&m[i * V8]);
-        _mm512_i32scatter_ps(&tmp[i * V16], ind, vi, _MM_SCALE_4);
-        _mm512_i32scatter_ps(&tmp[i * V16 + V8], ind, vd, _MM_SCALE_4);
+        _mm512_i32scatter_ps(&t[i * V16], ind, vi, _MM_SCALE_4);
+        _mm512_i32scatter_ps(&t[i * V16 + V8], ind, vd, _MM_SCALE_4);
     }
 
     __m512i ind1 = _mm512_set_epi32(0, 0, 0, 0, 0, 0, 0, 0,
@@ -560,7 +552,7 @@ int invmat8_opt(float * __restrict m, float * __restrict r)
                                     2 * V16 + 2,
                                         V16 + 1,
                                               0);
-    _mm512_mask_i32scatter_ps(&tmp[V8], 0xFF, ind1, _mm512_set1_ps(1.0), _MM_SCALE_4);
+    _mm512_mask_i32scatter_ps(&t[V8], 0xFF, ind1, _mm512_set1_ps(1.0), _MM_SCALE_4);
 
     for (int i = 0; i < V8; i++)
     {
@@ -574,12 +566,12 @@ int invmat8_opt(float * __restrict m, float * __restrict r)
         int lead_i = i;
         for (int j = i + 1; j < V8; j++)
         {
-            if (fabs(tmp[j * V16 + i]) > fabs(tmp[lead_i * V16 + i]))
+            if (fabs(t[j * V16 + i]) > fabs(t[lead_i * V16 + i]))
             {
                 lead_i = j;
             }
         }
-        if (fabs(tmp[lead_i * V16 + i]) < MATHS_EPS)
+        if (fabs(t[lead_i * V16 + i]) < MATHS_EPS)
         {
             return 1;
         }
@@ -589,17 +581,17 @@ int invmat8_opt(float * __restrict m, float * __restrict r)
         {
             int ll = lead_i * V16;
 
-            vi = _mm512_load_ps(&tmp[ii]);
-            vl = _mm512_load_ps(&tmp[ll]);
-            _mm512_store_ps(&tmp[ll], vi);
-            _mm512_store_ps(&tmp[ii], vl);
+            vi = _mm512_load_ps(&t[ii]);
+            vl = _mm512_load_ps(&t[ll]);
+            _mm512_store_ps(&t[ll], vi);
+            _mm512_store_ps(&t[ii], vl);
         }
 
         // Scale i-th line.
-        vd = _mm512_set1_ps(1.0 / tmp[ii + i]);
-        vi = _mm512_load_ps(&tmp[ii]);
+        vd = _mm512_set1_ps(1.0 / t[ii + i]);
+        vi = _mm512_load_ps(&t[ii]);
         vi = _mm512_mul_ps(vi, vd);
-        _mm512_store_ps(&tmp[ii], vi);
+        _mm512_store_ps(&t[ii], vi);
 
         // Zero all other lines.
         for (int j = 0; j < V8; j++)
@@ -608,11 +600,11 @@ int invmat8_opt(float * __restrict m, float * __restrict r)
 
             if (j != i)
             {
-                vd = _mm512_set1_ps(-tmp[jj + i]);
-                vj = _mm512_load_ps(&tmp[jj]);
-                vi = _mm512_load_ps(&tmp[ii]);
+                vd = _mm512_set1_ps(-t[jj + i]);
+                vj = _mm512_load_ps(&t[jj]);
+                vi = _mm512_load_ps(&t[ii]);
                 vj = _mm512_fmadd_ps(vi, vd, vj);
-                _mm512_store_ps(&tmp[jj], vj);
+                _mm512_store_ps(&t[jj], vj);
             }
         }
     }
@@ -621,7 +613,7 @@ int invmat8_opt(float * __restrict m, float * __restrict r)
     // Copy to r.
     for (int i = 0; i < V8; i += 2)
     {
-        vi = _mm512_i32gather_ps(ind, &tmp[i * V16 + V8], _MM_SCALE_4);
+        vi = _mm512_i32gather_ps(ind, &t[i * V16 + V8], _MM_SCALE_4);
         _mm512_store_ps(&r[i * V8], vi);
     }
 
