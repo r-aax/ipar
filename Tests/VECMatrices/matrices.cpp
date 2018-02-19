@@ -349,16 +349,12 @@ void matmat8_opt(float * __restrict a, float * __restrict b, float * __restrict 
     __assume_aligned(b, 64);
     __assume_aligned(r, 64);
 
-    __m512 bj, bj2, ai, mul1, mul2;
+    __m512 bj, bj2, a0, a1, a2, a3, m0, m1, m2, m3, m4, m5, m6, m7, x0, x1, x2, x3, x4, x5, x6, x7;
 
-    __m512i ind = _mm512_set_epi32(7 * V8 + 1, 6 * V8 + 1,
-                                   5 * V8 + 1, 4 * V8 + 1,
-                                   3 * V8 + 1, 2 * V8 + 1,
-                                       V8 + 1,          1,
-                                       7 * V8,     6 * V8,
-                                       5 * V8,     4 * V8,
-                                       3 * V8,     2 * V8,
-                                           V8,          0);
+    __m512i ind = _mm512_set_epi32(7 * V8 + 1, 6 * V8 + 1, 5 * V8 + 1, 4 * V8 + 1,
+                                   3 * V8 + 1, 2 * V8 + 1,     V8 + 1,          1,
+                                       7 * V8,     6 * V8,     5 * V8,     4 * V8,
+                                       3 * V8,     2 * V8,         V8,          0);
 
     // Loop for b matrix.
     for (int j = 0; j < V8; j += 2)
@@ -366,20 +362,76 @@ void matmat8_opt(float * __restrict a, float * __restrict b, float * __restrict 
         bj = _mm512_i32gather_ps(ind, &b[j], _MM_SCALE_4);
         bj2 = _mm512_permute4f128_ps(bj, _MM_PERM_BADC);
 
-        // Loop for a matrix.
-        for (int i = 0; i < V8; i += 2)
-        {
-            int ii = i * V8;
+        // Bad performance.
+        //for (int i = 0; i < V8; i += 2)
+        //{
+        //    int ii = i * V8;
+        //
+        //    a0 = _mm512_load_ps(&a[ii]);
+        //    m0 = _mm512_mul_ps(a0, bj);
+        //    m1 = _mm512_mul_ps(a0, bj2);
+        //
+        //    r[ii + j] = _mm512_mask_reduce_add_ps(0xFF, m0);
+        //    r[ii + j + 1] = _mm512_mask_reduce_add_ps(0xFF, m1);
+        //    r[ii + V8 + j] = _mm512_mask_reduce_add_ps(0xFF00, m1);
+        //    r[ii + V8 + j + 1] = _mm512_mask_reduce_add_ps(0xFF00, m0);
+        //}
 
-            ai = _mm512_load_ps(&a[ii]);
-            mul1 = _mm512_mul_ps(ai, bj);
-            mul2 = _mm512_mul_ps(ai, bj2);
-
-            r[ii + j] = _mm512_mask_reduce_add_ps(0xFF, mul1);
-            r[ii + j + 1] = _mm512_mask_reduce_add_ps(0xFF, mul2);
-            r[ii + V8 + j] = _mm512_mask_reduce_add_ps(0xFF00, mul2);
-            r[ii + V8 + j + 1] = _mm512_mask_reduce_add_ps(0xFF00, mul1);
-        }
+        int ii0 = 0;
+        int ii1 = 2 * V8;
+        int ii2 = 4 * V8;
+        int ii3 = 6 * V8;
+        a0 = _mm512_load_ps(&a[ii0]);
+        a1 = _mm512_load_ps(&a[ii1]);
+        a2 = _mm512_load_ps(&a[ii2]);
+        a3 = _mm512_load_ps(&a[ii3]);
+        m0 = _mm512_mul_ps(a0, bj);
+        m1 = _mm512_mul_ps(a0, bj2);
+        m2 = _mm512_mul_ps(a1, bj);
+        m3 = _mm512_mul_ps(a1, bj2);
+        m4 = _mm512_mul_ps(a2, bj);
+        m5 = _mm512_mul_ps(a2, bj2);
+        m6 = _mm512_mul_ps(a3, bj);
+        m7 = _mm512_mul_ps(a3, bj2);
+        x0 = _mm512_add_ps(m0, _mm512_swizzle_ps(m0, _MM_SWIZ_REG_CDAB));
+        x1 = _mm512_add_ps(m1, _mm512_swizzle_ps(m1, _MM_SWIZ_REG_CDAB));
+        x2 = _mm512_add_ps(m2, _mm512_swizzle_ps(m2, _MM_SWIZ_REG_CDAB));
+        x3 = _mm512_add_ps(m3, _mm512_swizzle_ps(m3, _MM_SWIZ_REG_CDAB));
+        x4 = _mm512_add_ps(m4, _mm512_swizzle_ps(m4, _MM_SWIZ_REG_CDAB));
+        x5 = _mm512_add_ps(m5, _mm512_swizzle_ps(m5, _MM_SWIZ_REG_CDAB));
+        x6 = _mm512_add_ps(m6, _mm512_swizzle_ps(m6, _MM_SWIZ_REG_CDAB));
+        x7 = _mm512_add_ps(m7, _mm512_swizzle_ps(m7, _MM_SWIZ_REG_CDAB));
+        m0 = _mm512_mask_blend_ps(0xAAAA, x0, x1);
+        m1 = _mm512_mask_blend_ps(0xAAAA, x2, x3);
+        m2 = _mm512_mask_blend_ps(0xAAAA, x4, x5);
+        m3 = _mm512_mask_blend_ps(0xAAAA, x6, x7);
+        x0 = _mm512_add_ps(m0, _mm512_swizzle_ps(m0, _MM_SWIZ_REG_BADC));
+        x1 = _mm512_add_ps(m1, _mm512_swizzle_ps(m1, _MM_SWIZ_REG_BADC));
+        x2 = _mm512_add_ps(m2, _mm512_swizzle_ps(m2, _MM_SWIZ_REG_BADC));
+        x3 = _mm512_add_ps(m3, _mm512_swizzle_ps(m3, _MM_SWIZ_REG_BADC));
+        m0 = _mm512_mask_blend_ps(0xCCCC, x0, x1);
+        m1 = _mm512_mask_blend_ps(0xCCCC, x2, x3);
+        x0 = _mm512_add_ps(m0, _mm512_permute4f128_ps(m0, _MM_PERM_CDAB));
+        x1 = _mm512_add_ps(m1, _mm512_permute4f128_ps(m1, _MM_PERM_CDAB));
+        m0 = _mm512_mask_blend_ps(0xF0F0, x0, x1);
+        _mm512_i32scatter_ps(r,
+                             _mm512_set_epi32(ii3 + V8 + j,
+                                              ii3 + V8 + j + 1,
+                                              ii2 + V8 + j,
+                                              ii2 + V8 + j + 1,
+                                              ii1 + V8 + j,
+                                              ii1 + V8 + j + 1,
+                                              ii0 + V8 + j,
+                                              ii0 + V8 + j + 1,
+                                              ii3 + j + 1,
+                                              ii3 + j,
+                                              ii2 + j + 1,
+                                              ii2 + j,
+                                              ii1 + j + 1,
+                                              ii1 + j,
+                                              ii0 + j + 1,
+                                              ii0 + j),
+                             m0, _MM_SCALE_4);
     }
 
 #endif

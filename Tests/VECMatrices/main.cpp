@@ -11,22 +11,22 @@
 #include <stdlib.h>
 
 /// \brief matvec8 test cases count.
-#define MATVEC8_COUNT 1//120000
+#define MATVEC8_COUNT 10000
 
 /// \brief matvec16 test cases count.
-#define MATVEC16_COUNT 1//60000
+#define MATVEC16_COUNT 5000
 
 /// \brief matmat8 test cases count.
-#define MATMAT8_COUNT 1//15000
+#define MATMAT8_COUNT 10000
 
 /// \brief matmat16 test cases cout.
-#define MATMAT16_COUNT 1//15000
+#define MATMAT16_COUNT 5000
 
 /// \brief invmat8 test cases count.
-#define INVMAT8_COUNT 1//10000
+#define INVMAT8_COUNT 5000
 
 /// \brief invmat16 test cases count.
-#define INVMAT16_COUNT 1//2000
+#define INVMAT16_COUNT 1000
 
 /// \brief Matrices for matvec8 test.
 #ifdef INTEL
@@ -395,7 +395,7 @@ int main(int argc, char **argv)
         time_opt2 = timer->Time();
         check_opt2 = array_sum(matvec16_r, MATVEC16_COUNT * V16);
 
-        cout << "VECMatrices : matvec16 check = " << time_orig
+        cout << "VECMatrices : matvec16 : orig = " << time_orig
              << ", opt = " << time_opt
              << ", opt2 = " << time_opt2 << endl;
         DEBUG_CHECK(MATHS_IS_NEAR(check_orig, check_opt, 0.01), "matvec16 opt check failed");
