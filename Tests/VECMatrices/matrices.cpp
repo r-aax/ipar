@@ -54,22 +54,76 @@ void matvec8_opt(float * __restrict m, float * __restrict v, float * __restrict 
     __assume_aligned(v, 64);
     __assume_aligned(r, 64);
 
-    __m512i ind = _mm512_set_epi32(7, 6, 5, 4, 3, 2, 1, 0,
-                                   7, 6, 5, 4, 3, 2, 1, 0);
-    __m512 vec = _mm512_i32gather_ps(ind, v, _MM_SCALE_4);
+    // Bad performance (2x slower than common case).
+    //__m512 vec = _mm512_i32gather_ps(_mm512_set_epi32(7, 6, 5, 4, 3, 2, 1, 0,
+    //                                                  7, 6, 5, 4, 3, 2, 1, 0),
+    //                                 v, _MM_SCALE_4);
+    //__m512i ind = _mm512_set_epi32(0, 0, 0, 0, 7, 5, 3, 1,
+    //                               0, 0, 0, 0, 6, 4, 2, 0);
+    //__m512 ml, sh, ad;
+    //
+    //for (int i = 0; i < V8 / 2; i++)
+    //{
+    //    ml = _mm512_mul_ps(_mm512_load_ps(&m[i * 2 * V8]), vec);
+    //    sh = _mm512_swizzle_ps(ml, _MM_SWIZ_REG_CDAB);
+    //    ad = _mm512_add_ps(ml, sh);
+    //    sh = _mm512_swizzle_ps(ad, _MM_SWIZ_REG_BADC);
+    //    ml = _mm512_add_ps(ad, sh);
+    //    sh = _mm512_permute4f128_ps(ml, _MM_PERM_CDAB);
+    //    ad = _mm512_add_ps(ml, sh);
+    //    _mm512_mask_i32scatter_ps(r, 0x101 << i, ind, ad, _MM_SCALE_4);
+    //}
 
-    __m512 mi, mul;
+    // Bad performance (20% faster than common case).
+    __m512 vec = _mm512_i32gather_ps(_mm512_set_epi32(7, 6, 5, 4, 3, 2, 1, 0,
+                                                      7, 6, 5, 4, 3, 2, 1, 0),
+                                     v, _MM_SCALE_4);
+    __m512 m0, m2, m4, m6, x0, x2, x4, x6;
 
-    for (int i = 0; i < V8; i += 2)
-    {
-        int ii = i * V8;
+    m0 = _mm512_mul_ps(_mm512_load_ps(&m[0]), vec);
+    m2 = _mm512_mul_ps(_mm512_load_ps(&m[2 * V8]), vec);
+    m4 = _mm512_mul_ps(_mm512_load_ps(&m[4 * V8]), vec);
+    m6 = _mm512_mul_ps(_mm512_load_ps(&m[6 * V8]), vec);
+    x0 = _mm512_add_ps(m0, _mm512_swizzle_ps(m0, _MM_SWIZ_REG_CDAB));
+    x2 = _mm512_add_ps(m2, _mm512_swizzle_ps(m2, _MM_SWIZ_REG_CDAB));
+    x4 = _mm512_add_ps(m4, _mm512_swizzle_ps(m4, _MM_SWIZ_REG_CDAB));
+    x6 = _mm512_add_ps(m6, _mm512_swizzle_ps(m6, _MM_SWIZ_REG_CDAB));
+    m0 = _mm512_mask_blend_ps(0xAAAA, x0, x2);
+    m2 = _mm512_mask_blend_ps(0xAAAA, x4, x6);
+    x0 = _mm512_add_ps(m0, _mm512_swizzle_ps(m0, _MM_SWIZ_REG_BADC));
+    x2 = _mm512_add_ps(m2, _mm512_swizzle_ps(m2, _MM_SWIZ_REG_BADC));
+    m0 = _mm512_mask_blend_ps(0xCCCC, x0, x2);
+    x0 = _mm512_add_ps(m0, _mm512_permute4f128_ps(m0, _MM_PERM_CDAB));
+    _mm512_mask_i32scatter_ps(r, 0xF0F,
+                              _mm512_set_epi32(0, 0, 0, 0, 7, 5, 3, 1,
+                                               0, 0, 0, 0, 6, 4, 2, 0),
+                              x0, _MM_SCALE_4);
 
-        mi = _mm512_load_ps(&m[ii]);
-        mul = _mm512_mul_ps(mi, vec);
-
-        r[i] = _mm512_mask_reduce_add_ps(0xFF, mul);
-        r[i + 1] = _mm512_mask_reduce_add_ps(0xFF00, mul);
-    }
+    //__m512i mi, vi;
+    //__m512 m0, m2, m4, m6, v0, v2, v4, v6;
+    //
+    //mi = _mm512_set_epi32(7 * V8 + 1, 6 * V8 + 1, 5 * V8 + 1, 4 * V8 + 1,
+    //                      3 * V8 + 1, 2 * V8 + 1,     V8 + 1,          1,
+    //                          7 * V8,     6 * V8,     5 * V8,     4 * V8,
+    //                          3 * V8,     2 * V8,         V8,          0);
+    //vi = _mm512_set_epi32(1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0);
+    //m0 = _mm512_i32gather_ps(mi, &m[0], _MM_SCALE_4);
+    //m2 = _mm512_i32gather_ps(mi, &m[2], _MM_SCALE_4);
+    //m4 = _mm512_i32gather_ps(mi, &m[4], _MM_SCALE_4);
+    //m6 = _mm512_i32gather_ps(mi, &m[6], _MM_SCALE_4);
+    //v0 = _mm512_i32gather_ps(vi, &v[0], _MM_SCALE_4);
+    //v2 = _mm512_i32gather_ps(vi, &v[2], _MM_SCALE_4);
+    //v4 = _mm512_i32gather_ps(vi, &v[4], _MM_SCALE_4);
+    //v6 = _mm512_i32gather_ps(vi, &v[6], _MM_SCALE_4);
+    //m0 = _mm512_mul_ps(m0, v0);
+    //m2 = _mm512_mul_ps(m2, v2);
+    //m4 = _mm512_mul_ps(m4, v4);
+    //m6 = _mm512_mul_ps(m6, v6);
+    //m0 = _mm512_add_ps(m0, m2);
+    //m4 = _mm512_add_ps(m4, m6);
+    //m0 = _mm512_add_ps(m0, m4);
+    //m0 = _mm512_add_ps(m0, _mm512_permute4f128_ps(m0, _MM_PERM_BADC));
+    //_mm512_store_ps(r, m0);
 
 #endif
 
@@ -98,8 +152,8 @@ void matvec8_opt2(float * __restrict m, float * __restrict v, float * __restrict
     __assume_aligned(r, 64);
     __assume_aligned(&t[0], 64);
 
-    __512i ind = _mm512_set_epi32(7, 6, 5, 4, 3, 2, 1, 0,
-                                  7, 6, 5, 4, 3, 2, 1, 0);
+    __m512i ind = _mm512_set_epi32(7, 6, 5, 4, 3, 2, 1, 0,
+                                   7, 6, 5, 4, 3, 2, 1, 0);
     __m512 vec = _mm512_i32gather_ps(ind, v, _MM_SCALE_4);
 
     __m512 mi, mul;
@@ -114,10 +168,10 @@ void matvec8_opt2(float * __restrict m, float * __restrict v, float * __restrict
         _mm512_store_ps(&t[ii], mul);
     }
 
-    __m512i ind = _mm512_set_epi32(     0,      0,      0,      0,
-                                        0,      0,      0,      0,
-                                   7 * V8, 6 * V8, 5 * V8, 4 * V8,
-                                   3 * V8, 2 * V8,     V8,      0);
+    ind = _mm512_set_epi32(     0,      0,      0,      0,
+                                0,      0,      0,      0,
+                           7 * V8, 6 * V8, 5 * V8, 4 * V8,
+                           3 * V8, 2 * V8,     V8,      0);
     __m512 res =_mm512_setzero_ps();
     __m512 ti;
 
@@ -234,7 +288,7 @@ void matvec16_opt2(float * __restrict m, float * __restrict v, float * __restric
     __m512 res = _mm512_setzero_ps();
     __m512 ti;
 
-    for (int i = 1; i < V16; i++)
+    for (int i = 0; i < V16; i++)
     {
         ti = _mm512_i32gather_ps(ind, &t[i], _MM_SCALE_4);
         res = _mm512_add_ps(res, ti);
@@ -317,7 +371,7 @@ void matmat8_opt(float * __restrict a, float * __restrict b, float * __restrict 
         {
             int ii = i * V8;
 
-            aj = _mm512_load_ps(&a[ii]);
+            ai = _mm512_load_ps(&a[ii]);
             mul1 = _mm512_mul_ps(ai, bj);
             mul2 = _mm512_mul_ps(ai, bj2);
 
@@ -513,7 +567,7 @@ int invmat8_opt(float * __restrict m, float * __restrict r)
 
     __assume_aligned(m, 64);
     __assume_aligned(r, 64);
-    __assume_aligned(&tmp[0], 64);
+    __assume_aligned(&t[0], 64);
 
     __m512 vd, vi, vj, vl;
 

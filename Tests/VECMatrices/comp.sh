@@ -7,7 +7,7 @@ then
     COMP="mpiicc"
 fi
 
-FLAGS="-O2 -unroll=0 -xmic-avx512"
+FLAGS="-DINTEL -O2 -xmic-avx512 -inline-level=0"
 INFO_FLAGS="-qopt-report=5"
 EXE="VECMatrices.out"
 
