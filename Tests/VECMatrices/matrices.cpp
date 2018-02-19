@@ -54,14 +54,9 @@ void matvec8_opt(float * __restrict m, float * __restrict v, float * __restrict 
     __assume_aligned(v, 64);
     __assume_aligned(r, 64);
 
-    // Hint for loading two copies of vector vect.
-    __m512 v1 = _mm512_mask_extload_ps(_mm512_setzero_ps(), 0xF0F, &v[0],
-                                       _MM_UPCONV_PS_NONE, _MM_BROADCAST_4X16,
-                                       _MM_HINT_NONE);
-    __m512 v2 = _mm512_mask_extload_ps(_mm512_setzero_ps(), 0xF0F0, &v[4],
-                                       _MM_UPCONV_PS_NONE, _MM_BROADCAST_4X16,
-                                       _MM_HINT_NONE);
-    __m512 vec = _mm512_add_ps(v1, v2);
+    __m512i ind = _mm512_set_epi32(7, 6, 5, 4, 3, 2, 1, 0,
+                                   7, 6, 5, 4, 3, 2, 1, 0);
+    __m512 vec = _mm512_i32gather_ps(ind, v, _MM_SCALE_4);
 
     __m512 mi, mul;
 
@@ -103,14 +98,9 @@ void matvec8_opt2(float * __restrict m, float * __restrict v, float * __restrict
     __assume_aligned(r, 64);
     __assume_aligned(&t[0], 64);
 
-    // Hint for loading two copies of vector vect.
-    __m512 v1 = _mm512_mask_extload_ps(_mm512_setzero_ps(), 0xF0F, &v[0],
-                                       _MM_UPCONV_PS_NONE, _MM_BROADCAST_4X16,
-                                        _MM_HINT_NONE);
-    __m512 v2 = _mm512_mask_extload_ps(_mm512_setzero_ps(), 0xF0F0, &v[4],
-                                       _MM_UPCONV_PS_NONE, _MM_BROADCAST_4X16,
-                                       _MM_HINT_NONE);
-    __m512 vec = _mm512_add_ps(v1, v2);
+    __512i ind = _mm512_set_epi32(7, 6, 5, 4, 3, 2, 1, 0,
+                                  7, 6, 5, 4, 3, 2, 1, 0);
+    __m512 vec = _mm512_i32gather_ps(ind, v, _MM_SCALE_4);
 
     __m512 mi, mul;
 
@@ -608,7 +598,6 @@ int invmat8_opt(float * __restrict m, float * __restrict r)
             }
         }
     }
-
 
     // Copy to r.
     for (int i = 0; i < V8; i += 2)
