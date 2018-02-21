@@ -1,6 +1,12 @@
-#!/bin/sh
+#!/bin/bash
 
-COMP="mpic++"
+COMP="$1"
+
+if [[ -z "$COMP" ]]
+then
+    COMP="mpicxx"
+fi
+
 EXE="MPITopo.out"
 
 rm -f $EXE

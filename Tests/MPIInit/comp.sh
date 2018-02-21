@@ -1,6 +1,12 @@
-#!/bin/sh
+#!/bin/bash
 
-COMP="mpic++"
+COMP="$1"
+
+if [[ -z "$COMP" ]]
+then
+    COMP="mpicxx"
+fi
+
 EXE="MPIInit.out"
 
 rm -f $EXE
