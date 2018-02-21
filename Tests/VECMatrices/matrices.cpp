@@ -21,7 +21,8 @@
 /// \brief Macro for 2 perm + 2 blend + 1 add.
 #define PERM_2_BLEND_2_ADD_1(X, Y, PERM_TYPE, BLEND_MASK) \
     _mm512_add_ps(_mm512_mask_blend_ps(BLEND_MASK, X, Y), \
-                  _mm512_mask_blend_ps(_mm512_permute4f128_ps(X, PERM_TYPE), \
+                  _mm512_mask_blend_ps(BLEND_MASK, \
+                                       _mm512_permute4f128_ps(X, PERM_TYPE), \
                                        _mm512_permute4f128_ps(Y, PERM_TYPE)))
 
 /// \brief Multiplication 8*8-matrix on 8-vector.
@@ -265,7 +266,7 @@ void matvec16_opt(float * __restrict m, float * __restrict v, float * __restrict
     m14 = _mm512_mul_ps(_mm512_load_ps(&m[14 * V16]), vec);
     m15 = _mm512_mul_ps(_mm512_load_ps(&m[15 * V16]), vec);
 
-#if 1
+#if 0
 
     // This variant is faster (2 swiz + 2 add + 1 blend is better than
     //                         2 swiz + 2 blend + 1 add).
@@ -334,27 +335,27 @@ void matvec16_opt(float * __restrict m, float * __restrict v, float * __restrict
 #else
 
     // Stage 1.
-    x00 = SWIZ_2_BLEND_2_ADD_a(m00, m01, _MM_SWIZ_REG_CDAB, 0xAAAA);
-    x01 = SWIZ_2_BLEND_2_ADD_a(m02, m03, _MM_SWIZ_REG_CDAB, 0xAAAA);
-    x02 = SWIZ_2_BLEND_2_ADD_a(m04, m05, _MM_SWIZ_REG_CDAB, 0xAAAA);
-    x03 = SWIZ_2_BLEND_2_ADD_a(m06, m07, _MM_SWIZ_REG_CDAB, 0xAAAA);
-    x04 = SWIZ_2_BLEND_2_ADD_a(m08, m09, _MM_SWIZ_REG_CDAB, 0xAAAA);
-    x05 = SWIZ_2_BLEND_2_ADD_a(m10, m11, _MM_SWIZ_REG_CDAB, 0xAAAA);
-    x06 = SWIZ_2_BLEND_2_ADD_a(m12, m13, _MM_SWIZ_REG_CDAB, 0xAAAA);
-    x07 = SWIZ_2_BLEND_2_ADD_a(m14, m15, _MM_SWIZ_REG_CDAB, 0xAAAA);
+    x00 = SWIZ_2_BLEND_2_ADD_1(m00, m01, _MM_SWIZ_REG_CDAB, 0xAAAA);
+    x01 = SWIZ_2_BLEND_2_ADD_1(m02, m03, _MM_SWIZ_REG_CDAB, 0xAAAA);
+    x02 = SWIZ_2_BLEND_2_ADD_1(m04, m05, _MM_SWIZ_REG_CDAB, 0xAAAA);
+    x03 = SWIZ_2_BLEND_2_ADD_1(m06, m07, _MM_SWIZ_REG_CDAB, 0xAAAA);
+    x04 = SWIZ_2_BLEND_2_ADD_1(m08, m09, _MM_SWIZ_REG_CDAB, 0xAAAA);
+    x05 = SWIZ_2_BLEND_2_ADD_1(m10, m11, _MM_SWIZ_REG_CDAB, 0xAAAA);
+    x06 = SWIZ_2_BLEND_2_ADD_1(m12, m13, _MM_SWIZ_REG_CDAB, 0xAAAA);
+    x07 = SWIZ_2_BLEND_2_ADD_1(m14, m15, _MM_SWIZ_REG_CDAB, 0xAAAA);
 
     // Stage 2.
-    m00 = SWIZ_2_BLEND_2_ADD_a(x00, x01, _MM_SWIZ_REG_BADC, 0xCCCC);
-    m01 = SWIZ_2_BLEND_2_ADD_a(x02, x03, _MM_SWIZ_REG_BADC, 0xCCCC);
-    m02 = SWIZ_2_BLEND_2_ADD_a(x04, x05, _MM_SWIZ_REG_BADC, 0xCCCC);
-    m03 = SWIZ_2_BLEND_2_ADD_a(x06, x07, _MM_SWIZ_REG_BADC, 0xCCCC);
+    m00 = SWIZ_2_BLEND_2_ADD_1(x00, x01, _MM_SWIZ_REG_BADC, 0xCCCC);
+    m01 = SWIZ_2_BLEND_2_ADD_1(x02, x03, _MM_SWIZ_REG_BADC, 0xCCCC);
+    m02 = SWIZ_2_BLEND_2_ADD_1(x04, x05, _MM_SWIZ_REG_BADC, 0xCCCC);
+    m03 = SWIZ_2_BLEND_2_ADD_1(x06, x07, _MM_SWIZ_REG_BADC, 0xCCCC);
 
     // Stage 3.
-    x00 = PERM_2_BLEND_2_ADD_a(m00, m01, _MM_PERM_CDAB, 0xF0F0);
-    x01 = PERM_2_BLEND_2_ADD_a(m02, m03, _MM_PERM_CDAB, 0xF0F0);
+    x00 = PERM_2_BLEND_2_ADD_1(m00, m01, _MM_PERM_CDAB, 0xF0F0);
+    x01 = PERM_2_BLEND_2_ADD_1(m02, m03, _MM_PERM_CDAB, 0xF0F0);
 
     // Stage 4.
-    m00 = PERM_2_BLEND_2_ADD_a(x00, x01, _MM_PERM_BADC, 0xFF00);
+    m00 = PERM_2_BLEND_2_ADD_1(x00, x01, _MM_PERM_BADC, 0xFF00);
 
 #endif
 
