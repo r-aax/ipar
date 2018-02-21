@@ -580,26 +580,78 @@ void matmat16_opt(float * __restrict a, float * __restrict b, float * __restrict
     __assume_aligned(b, 64);
     __assume_aligned(r, 64);
 
-    __m512 bj, ai, mul;
+    __m512 bj, mul;
     __m512i ind = _mm512_set_epi32(15 * V16, 14 * V16, 13 * V16, 12 * V16,
                                    11 * V16, 10 * V16,  9 * V16,  8 * V16,
                                     7 * V16,  6 * V16,  5 * V16,  4 * V16,
                                     3 * V16,  2 * V16,      V16,        0);
+    __m512 a00, a01, a02, a03, a04, a05, a06, a07, a08, a09, a10, a11, a12, a13, a14, a15,
+           x00, x01, x02, x03, x04, x05, x06, x07, x08, x09, x10, x11, x12, x13, x14, x15;
 
     // Loop for b matrix.
     for (int j = 0; j < V16; j++)
     {
         bj = _mm512_i32gather_ps(ind, &b[j], _MM_SCALE_4);
 
-        // Loop for a matrix.
-        for (int i = 0; i < V16; i++)
-        {
-            int ii = i * V16;
+        // Load and mul.
+        a00 = _mm512_mul_ps(_mm512_load_ps(&a[0]), bj);
+        a01 = _mm512_mul_ps(_mm512_load_ps(&a[V16]), bj);
+        a02 = _mm512_mul_ps(_mm512_load_ps(&a[2 * V16]), bj);
+        a03 = _mm512_mul_ps(_mm512_load_ps(&a[3 * V16]), bj);
+        a04 = _mm512_mul_ps(_mm512_load_ps(&a[4 * V16]), bj);
+        a05 = _mm512_mul_ps(_mm512_load_ps(&a[5 * V16]), bj);
+        a06 = _mm512_mul_ps(_mm512_load_ps(&a[6 * V16]), bj);
+        a07 = _mm512_mul_ps(_mm512_load_ps(&a[7 * V16]), bj);
+        a08 = _mm512_mul_ps(_mm512_load_ps(&a[8 * V16]), bj);
+        a09 = _mm512_mul_ps(_mm512_load_ps(&a[9 * V16]), bj);
+        a10 = _mm512_mul_ps(_mm512_load_ps(&a[10 * V16]), bj);
+        a11 = _mm512_mul_ps(_mm512_load_ps(&a[11 * V16]), bj);
+        a12 = _mm512_mul_ps(_mm512_load_ps(&a[12 * V16]), bj);
+        a13 = _mm512_mul_ps(_mm512_load_ps(&a[13 * V16]), bj);
+        a14 = _mm512_mul_ps(_mm512_load_ps(&a[14 * V16]), bj);
+        a15 = _mm512_mul_ps(_mm512_load_ps(&a[15 * V16]), bj);
 
-            ai = _mm512_load_ps(&a[ii]);
-            mul = _mm512_mul_ps(ai, bj);
-            r[ii + j] = _mm512_reduce_add_ps(mul);
-        }
+        // Stage 1.
+        x00 = SWIZ_2_ADD_2_BLEND_1(a00, a01, _MM_SWIZ_REG_CDAB, 0xAAAA);
+        x01 = SWIZ_2_ADD_2_BLEND_1(a02, a03, _MM_SWIZ_REG_CDAB, 0xAAAA);
+        x02 = SWIZ_2_ADD_2_BLEND_1(a04, a05, _MM_SWIZ_REG_CDAB, 0xAAAA);
+        x03 = SWIZ_2_ADD_2_BLEND_1(a06, a07, _MM_SWIZ_REG_CDAB, 0xAAAA);
+        x04 = SWIZ_2_ADD_2_BLEND_1(a08, a09, _MM_SWIZ_REG_CDAB, 0xAAAA);
+        x05 = SWIZ_2_ADD_2_BLEND_1(a10, a11, _MM_SWIZ_REG_CDAB, 0xAAAA);
+        x06 = SWIZ_2_ADD_2_BLEND_1(a12, a13, _MM_SWIZ_REG_CDAB, 0xAAAA);
+        x07 = SWIZ_2_ADD_2_BLEND_1(a14, a15, _MM_SWIZ_REG_CDAB, 0xAAAA);
+
+        // Stage 2.
+        a00 = SWIZ_2_ADD_2_BLEND_1(x00, x01, _MM_SWIZ_REG_BADC, 0xCCCC);
+        a01 = SWIZ_2_ADD_2_BLEND_1(x02, x03, _MM_SWIZ_REG_BADC, 0xCCCC);
+        a02 = SWIZ_2_ADD_2_BLEND_1(x04, x05, _MM_SWIZ_REG_BADC, 0xCCCC);
+        a03 = SWIZ_2_ADD_2_BLEND_1(x06, x07, _MM_SWIZ_REG_BADC, 0xCCCC);
+
+        // Stage 3.
+        x00 = PERM_2_ADD_2_BLEND_1(a00, a01, _MM_PERM_CDAB, 0xF0F0);
+        x01 = PERM_2_ADD_2_BLEND_1(a02, a03, _MM_PERM_CDAB, 0xF0F0);
+
+        // Stage 4.
+        a00 = PERM_2_ADD_2_BLEND_1(x00, x01, _MM_PERM_BADC, 0xFF00);
+
+        _mm512_i32scatter_ps(r,
+                             _mm512_set_epi32(15 * V16 + j,
+                                              14 * V16 + j,
+                                              13 * V16 + j,
+                                              12 * V16 + j,
+                                              11 * V16 + j,
+                                              10 * V16 + j,
+                                               9 * V16 + j,
+                                               8 * V16 + j,
+                                               7 * V16 + j,
+                                               6 * V16 + j,
+                                               5 * V16 + j,
+                                               4 * V16 + j,
+                                               3 * V16 + j,
+                                               2 * V16 + j,
+                                                   V16 + j,
+                                                         j),
+                             a00, _MM_SCALE_4);
     }
 
 #endif
