@@ -110,15 +110,9 @@ void matvec8_opt(float * __restrict m, float * __restrict v, float * __restrict 
     m2 = _mm512_mul_ps(_mm512_load_ps(&m[2 * V8]), vec);
     m4 = _mm512_mul_ps(_mm512_load_ps(&m[4 * V8]), vec);
     m6 = _mm512_mul_ps(_mm512_load_ps(&m[6 * V8]), vec);
-    x0 = _mm512_add_ps(m0, _mm512_swizzle_ps(m0, _MM_SWIZ_REG_CDAB));
-    x2 = _mm512_add_ps(m2, _mm512_swizzle_ps(m2, _MM_SWIZ_REG_CDAB));
-    x4 = _mm512_add_ps(m4, _mm512_swizzle_ps(m4, _MM_SWIZ_REG_CDAB));
-    x6 = _mm512_add_ps(m6, _mm512_swizzle_ps(m6, _MM_SWIZ_REG_CDAB));
-    m0 = _mm512_mask_blend_ps(0xAAAA, x0, x2);
-    m2 = _mm512_mask_blend_ps(0xAAAA, x4, x6);
-    x0 = _mm512_add_ps(m0, _mm512_swizzle_ps(m0, _MM_SWIZ_REG_BADC));
-    x2 = _mm512_add_ps(m2, _mm512_swizzle_ps(m2, _MM_SWIZ_REG_BADC));
-    m0 = _mm512_mask_blend_ps(0xCCCC, x0, x2);
+    x0 = SWIZ_2_ADD_2_BLEND_1(m0, m2, _MM_SWIZ_REG_CDAB, 0xAAAA);
+    x2 = SWIZ_2_ADD_2_BLEND_1(m4, m6, _MM_SWIZ_REG_CDAB, 0xAAAA);
+    m0 = SWIZ_2_ADD_2_BLEND_1(x0, x2, _MM_SWIZ_REG_BADC, 0xCCCC);
     x0 = _mm512_add_ps(m0, _mm512_permute4f128_ps(m0, _MM_PERM_CDAB));
     _mm512_mask_i32scatter_ps(r, 0xF0F,
                               _mm512_set_epi32(0, 0, 0, 0, 7, 5, 3, 1,
@@ -486,27 +480,15 @@ void matmat8_opt(float * __restrict a, float * __restrict b, float * __restrict 
         m5 = _mm512_mul_ps(a2, bj2);
         m6 = _mm512_mul_ps(a3, bj);
         m7 = _mm512_mul_ps(a3, bj2);
-        x0 = _mm512_add_ps(m0, _mm512_swizzle_ps(m0, _MM_SWIZ_REG_CDAB));
-        x1 = _mm512_add_ps(m1, _mm512_swizzle_ps(m1, _MM_SWIZ_REG_CDAB));
-        x2 = _mm512_add_ps(m2, _mm512_swizzle_ps(m2, _MM_SWIZ_REG_CDAB));
-        x3 = _mm512_add_ps(m3, _mm512_swizzle_ps(m3, _MM_SWIZ_REG_CDAB));
-        x4 = _mm512_add_ps(m4, _mm512_swizzle_ps(m4, _MM_SWIZ_REG_CDAB));
-        x5 = _mm512_add_ps(m5, _mm512_swizzle_ps(m5, _MM_SWIZ_REG_CDAB));
-        x6 = _mm512_add_ps(m6, _mm512_swizzle_ps(m6, _MM_SWIZ_REG_CDAB));
-        x7 = _mm512_add_ps(m7, _mm512_swizzle_ps(m7, _MM_SWIZ_REG_CDAB));
-        m0 = _mm512_mask_blend_ps(0xAAAA, x0, x1);
-        m1 = _mm512_mask_blend_ps(0xAAAA, x2, x3);
-        m2 = _mm512_mask_blend_ps(0xAAAA, x4, x5);
-        m3 = _mm512_mask_blend_ps(0xAAAA, x6, x7);
-        x0 = _mm512_add_ps(m0, _mm512_swizzle_ps(m0, _MM_SWIZ_REG_BADC));
-        x1 = _mm512_add_ps(m1, _mm512_swizzle_ps(m1, _MM_SWIZ_REG_BADC));
-        x2 = _mm512_add_ps(m2, _mm512_swizzle_ps(m2, _MM_SWIZ_REG_BADC));
-        x3 = _mm512_add_ps(m3, _mm512_swizzle_ps(m3, _MM_SWIZ_REG_BADC));
-        m0 = _mm512_mask_blend_ps(0xCCCC, x0, x1);
-        m1 = _mm512_mask_blend_ps(0xCCCC, x2, x3);
-        x0 = _mm512_add_ps(m0, _mm512_permute4f128_ps(m0, _MM_PERM_CDAB));
-        x1 = _mm512_add_ps(m1, _mm512_permute4f128_ps(m1, _MM_PERM_CDAB));
-        m0 = _mm512_mask_blend_ps(0xF0F0, x0, x1);
+        //
+        x0 = SWIZ_2_ADD_2_BLEND_1(m0, m1, _MM_SWIZ_REG_CDAB, 0xAAAA);
+        x1 = SWIZ_2_ADD_2_BLEND_1(m2, m3, _MM_SWIZ_REG_CDAB, 0xAAAA);
+        x2 = SWIZ_2_ADD_2_BLEND_1(m4, m5, _MM_SWIZ_REG_CDAB, 0xAAAA);
+        x3 = SWIZ_2_ADD_2_BLEND_1(m6, m7, _MM_SWIZ_REG_CDAB, 0xAAAA);
+        m0 = SWIZ_2_ADD_2_BLEND_1(x0, x1, _MM_SWIZ_REG_BADC, 0xCCCC);
+        m1 = SWIZ_2_ADD_2_BLEND_1(x2, x3, _MM_SWIZ_REG_BADC, 0xCCCC);
+        x0 = PERM_2_ADD_2_BLEND_1(m0, m1, _MM_PERM_CDAB, 0xF0F0);
+        //
         _mm512_i32scatter_ps(r,
                              _mm512_set_epi32(ii3 + V8 + j,
                                               ii3 + V8 + j + 1,
@@ -524,7 +506,7 @@ void matmat8_opt(float * __restrict a, float * __restrict b, float * __restrict 
                                               ii1 + j,
                                               ii0 + j + 1,
                                               ii0 + j),
-                             m0, _MM_SCALE_4);
+                             x0, _MM_SCALE_4);
     }
 
 #endif
