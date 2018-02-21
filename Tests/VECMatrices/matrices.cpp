@@ -252,6 +252,11 @@ void matvec16_opt(float * __restrict m, float * __restrict v, float * __restrict
     m14 = _mm512_mul_ps(_mm512_load_ps(&m[14 * V16]), vec);
     m15 = _mm512_mul_ps(_mm512_load_ps(&m[15 * V16]), vec);
 
+#if 1
+
+    // This variant is faster (2 swiz + 2 add + 1 blend is better than
+    //                         2 swiz + 2 blend + 1 add).
+
     // Stage 1 - 2 sums.
     x00 = _mm512_add_ps(m00, _mm512_swizzle_ps(m00, _MM_SWIZ_REG_CDAB));
     x01 = _mm512_add_ps(m01, _mm512_swizzle_ps(m01, _MM_SWIZ_REG_CDAB));
@@ -312,6 +317,78 @@ void matvec16_opt(float * __restrict m, float * __restrict v, float * __restrict
 
     // Blend.
     m00 = _mm512_mask_blend_ps(0xFF00, x00, x01);
+
+#else
+
+    // Stage 1.
+    x00 = _mm512_add_ps(_mm512_mask_blend_ps(0xAAAA, m00, m01),
+                        _mm512_mask_blend_ps(0xAAAA,
+                                             _mm512_swizzle_ps(m00, _MM_SWIZ_REG_CDAB),
+                                             _mm512_swizzle_ps(m01, _MM_SWIZ_REG_CDAB)));
+    x01 = _mm512_add_ps(_mm512_mask_blend_ps(0xAAAA, m02, m03),
+                        _mm512_mask_blend_ps(0xAAAA,
+                                             _mm512_swizzle_ps(m02, _MM_SWIZ_REG_CDAB),
+                                             _mm512_swizzle_ps(m03, _MM_SWIZ_REG_CDAB)));
+    x02 = _mm512_add_ps(_mm512_mask_blend_ps(0xAAAA, m04, m05),
+                        _mm512_mask_blend_ps(0xAAAA,
+                                             _mm512_swizzle_ps(m04, _MM_SWIZ_REG_CDAB),
+                                             _mm512_swizzle_ps(m05, _MM_SWIZ_REG_CDAB)));
+    x03 = _mm512_add_ps(_mm512_mask_blend_ps(0xAAAA, m06, m07),
+                        _mm512_mask_blend_ps(0xAAAA,
+                                             _mm512_swizzle_ps(m06, _MM_SWIZ_REG_CDAB),
+                                             _mm512_swizzle_ps(m07, _MM_SWIZ_REG_CDAB)));
+    x04 = _mm512_add_ps(_mm512_mask_blend_ps(0xAAAA, m08, m09),
+                        _mm512_mask_blend_ps(0xAAAA,
+                                             _mm512_swizzle_ps(m08, _MM_SWIZ_REG_CDAB),
+                                             _mm512_swizzle_ps(m09, _MM_SWIZ_REG_CDAB)));
+    x05 = _mm512_add_ps(_mm512_mask_blend_ps(0xAAAA, m10, m11),
+                        _mm512_mask_blend_ps(0xAAAA,
+                                             _mm512_swizzle_ps(m10, _MM_SWIZ_REG_CDAB),
+                                             _mm512_swizzle_ps(m11, _MM_SWIZ_REG_CDAB)));
+    x06 = _mm512_add_ps(_mm512_mask_blend_ps(0xAAAA, m12, m13),
+                        _mm512_mask_blend_ps(0xAAAA,
+                                             _mm512_swizzle_ps(m12, _MM_SWIZ_REG_CDAB),
+                                             _mm512_swizzle_ps(m13, _MM_SWIZ_REG_CDAB)));
+    x07 = _mm512_add_ps(_mm512_mask_blend_ps(0xAAAA, m14, m15),
+                        _mm512_mask_blend_ps(0xAAAA,
+                                             _mm512_swizzle_ps(m14, _MM_SWIZ_REG_CDAB),
+                                             _mm512_swizzle_ps(m15, _MM_SWIZ_REG_CDAB)));
+
+    // Stage 2.
+    m00 = _mm512_add_ps(_mm512_mask_blend_ps(0xCCCC, x00, x01),
+                        _mm512_mask_blend_ps(0xCCCC,
+                                             _mm512_swizzle_ps(x00, _MM_SWIZ_REG_BADC),
+                                             _mm512_swizzle_ps(x01, _MM_SWIZ_REG_BADC)));
+    m01 = _mm512_add_ps(_mm512_mask_blend_ps(0xCCCC, x02, x03),
+                        _mm512_mask_blend_ps(0xCCCC,
+                                             _mm512_swizzle_ps(x02, _MM_SWIZ_REG_BADC),
+                                             _mm512_swizzle_ps(x03, _MM_SWIZ_REG_BADC)));
+    m02 = _mm512_add_ps(_mm512_mask_blend_ps(0xCCCC, x04, x05),
+                        _mm512_mask_blend_ps(0xCCCC,
+                                             _mm512_swizzle_ps(x04, _MM_SWIZ_REG_BADC),
+                                             _mm512_swizzle_ps(x05, _MM_SWIZ_REG_BADC)));
+    m03 = _mm512_add_ps(_mm512_mask_blend_ps(0xCCCC, x06, x07),
+                        _mm512_mask_blend_ps(0xCCCC,
+                                             _mm512_swizzle_ps(x06, _MM_SWIZ_REG_BADC),
+                                             _mm512_swizzle_ps(x07, _MM_SWIZ_REG_BADC)));
+
+    // Stage 3.
+    x00 = _mm512_add_ps(_mm512_mask_blend_ps(0xF0F0, m00, m01),
+                        _mm512_mask_blend_ps(0xF0F0,
+                                             _mm512_permute4f128_ps(m00, _MM_PERM_CDAB),
+                                             _mm512_permute4f128_ps(m01, _MM_PERM_CDAB)));
+    x01 = _mm512_add_ps(_mm512_mask_blend_ps(0xF0F0, m02, m03),
+                        _mm512_mask_blend_ps(0xF0F0,
+                                             _mm512_permute4f128_ps(m02, _MM_PERM_CDAB),
+                                             _mm512_permute4f128_ps(m03, _MM_PERM_CDAB)));
+
+    // Stage 4.
+    m00 = _mm512_add_ps(_mm512_mask_blend_ps(0xFF00, x00, x01),
+                        _mm512_mask_blend_ps(0xFF00,
+                                             _mm512_permute4f128_ps(x00, _MM_PERM_BADC),
+                                             _mm512_permute4f128_ps(x01, _MM_PERM_BADC)));
+
+#endif
 
     _mm512_store_ps(r, m00);
 
