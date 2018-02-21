@@ -231,16 +231,89 @@ void matvec16_opt(float * __restrict m, float * __restrict v, float * __restrict
     __assume_aligned(r, 64);
 
     __m512 vec = _mm512_load_ps(v);
-    __m512 mi, mul;
+    __m512 m00, m01, m02, m03, m04, m05, m06, m07, m08, m09, m10, m11, m12, m13, m14, m15,
+           x00, x01, x02, x03, x04, x05, x06, x07, x08, x09, x10, x11, x12, x13, x14, x15;
 
-    for (int i = 0; i < V16; i++)
-    {
-        int ii = i * V16;
+    // Fetch out 16x16 matrix.
+    m00 = _mm512_mul_ps(_mm512_load_ps(&m[0]), vec);
+    m01 = _mm512_mul_ps(_mm512_load_ps(&m[V16]), vec);
+    m02 = _mm512_mul_ps(_mm512_load_ps(&m[2 * V16]), vec);
+    m03 = _mm512_mul_ps(_mm512_load_ps(&m[3 * V16]), vec);
+    m04 = _mm512_mul_ps(_mm512_load_ps(&m[4 * V16]), vec);
+    m05 = _mm512_mul_ps(_mm512_load_ps(&m[5 * V16]), vec);
+    m06 = _mm512_mul_ps(_mm512_load_ps(&m[6 * V16]), vec);
+    m07 = _mm512_mul_ps(_mm512_load_ps(&m[7 * V16]), vec);
+    m08 = _mm512_mul_ps(_mm512_load_ps(&m[8 * V16]), vec);
+    m09 = _mm512_mul_ps(_mm512_load_ps(&m[9 * V16]), vec);
+    m10 = _mm512_mul_ps(_mm512_load_ps(&m[10 * V16]), vec);
+    m11 = _mm512_mul_ps(_mm512_load_ps(&m[11 * V16]), vec);
+    m12 = _mm512_mul_ps(_mm512_load_ps(&m[12 * V16]), vec);
+    m13 = _mm512_mul_ps(_mm512_load_ps(&m[13 * V16]), vec);
+    m14 = _mm512_mul_ps(_mm512_load_ps(&m[14 * V16]), vec);
+    m15 = _mm512_mul_ps(_mm512_load_ps(&m[15 * V16]), vec);
 
-        mi = _mm512_load_ps(&m[ii]);
-        mul = _mm512_mul_ps(mi, vec);
-        r[i] = _mm512_reduce_add_ps(mul);
-    }
+    // Stage 1 - 2 sums.
+    x00 = _mm512_add_ps(m00, _mm512_swizzle_ps(m00, _MM_SWIZ_REG_CDAB));
+    x01 = _mm512_add_ps(m01, _mm512_swizzle_ps(m01, _MM_SWIZ_REG_CDAB));
+    x02 = _mm512_add_ps(m02, _mm512_swizzle_ps(m02, _MM_SWIZ_REG_CDAB));
+    x03 = _mm512_add_ps(m03, _mm512_swizzle_ps(m03, _MM_SWIZ_REG_CDAB));
+    x04 = _mm512_add_ps(m04, _mm512_swizzle_ps(m04, _MM_SWIZ_REG_CDAB));
+    x05 = _mm512_add_ps(m05, _mm512_swizzle_ps(m05, _MM_SWIZ_REG_CDAB));
+    x06 = _mm512_add_ps(m06, _mm512_swizzle_ps(m06, _MM_SWIZ_REG_CDAB));
+    x07 = _mm512_add_ps(m07, _mm512_swizzle_ps(m07, _MM_SWIZ_REG_CDAB));
+    x08 = _mm512_add_ps(m08, _mm512_swizzle_ps(m08, _MM_SWIZ_REG_CDAB));
+    x09 = _mm512_add_ps(m09, _mm512_swizzle_ps(m09, _MM_SWIZ_REG_CDAB));
+    x10 = _mm512_add_ps(m10, _mm512_swizzle_ps(m10, _MM_SWIZ_REG_CDAB));
+    x11 = _mm512_add_ps(m11, _mm512_swizzle_ps(m11, _MM_SWIZ_REG_CDAB));
+    x12 = _mm512_add_ps(m12, _mm512_swizzle_ps(m12, _MM_SWIZ_REG_CDAB));
+    x13 = _mm512_add_ps(m13, _mm512_swizzle_ps(m13, _MM_SWIZ_REG_CDAB));
+    x14 = _mm512_add_ps(m14, _mm512_swizzle_ps(m14, _MM_SWIZ_REG_CDAB));
+    x15 = _mm512_add_ps(m15, _mm512_swizzle_ps(m15, _MM_SWIZ_REG_CDAB));
+
+    // Blend.
+    m00 = _mm512_mask_blend_ps(0xAAAA, x00, x01);
+    m01 = _mm512_mask_blend_ps(0xAAAA, x02, x03);
+    m02 = _mm512_mask_blend_ps(0xAAAA, x04, x05);
+    m03 = _mm512_mask_blend_ps(0xAAAA, x06, x07);
+    m04 = _mm512_mask_blend_ps(0xAAAA, x08, x09);
+    m05 = _mm512_mask_blend_ps(0xAAAA, x10, x11);
+    m06 = _mm512_mask_blend_ps(0xAAAA, x12, x13);
+    m07 = _mm512_mask_blend_ps(0xAAAA, x14, x15);
+
+    // Stage 2 - 4 sums.
+    x00 = _mm512_add_ps(m00, _mm512_swizzle_ps(m00, _MM_SWIZ_REG_BADC));
+    x01 = _mm512_add_ps(m01, _mm512_swizzle_ps(m01, _MM_SWIZ_REG_BADC));
+    x02 = _mm512_add_ps(m02, _mm512_swizzle_ps(m02, _MM_SWIZ_REG_BADC));
+    x03 = _mm512_add_ps(m03, _mm512_swizzle_ps(m03, _MM_SWIZ_REG_BADC));
+    x04 = _mm512_add_ps(m04, _mm512_swizzle_ps(m04, _MM_SWIZ_REG_BADC));
+    x05 = _mm512_add_ps(m05, _mm512_swizzle_ps(m05, _MM_SWIZ_REG_BADC));
+    x06 = _mm512_add_ps(m06, _mm512_swizzle_ps(m06, _MM_SWIZ_REG_BADC));
+    x07 = _mm512_add_ps(m07, _mm512_swizzle_ps(m07, _MM_SWIZ_REG_BADC));
+
+    // Blend.
+    m00 = _mm512_mask_blend_ps(0xCCCC, x00, x01);
+    m01 = _mm512_mask_blend_ps(0xCCCC, x02, x03);
+    m02 = _mm512_mask_blend_ps(0xCCCC, x04, x05);
+    m03 = _mm512_mask_blend_ps(0xCCCC, x06, x07);
+
+    // Stage 3 - 8 sums.
+    x00 = _mm512_add_ps(m00, _mm512_permute4f128_ps(m00, _MM_PERM_CDAB));
+    x01 = _mm512_add_ps(m01, _mm512_permute4f128_ps(m01, _MM_PERM_CDAB));
+    x02 = _mm512_add_ps(m02, _mm512_permute4f128_ps(m02, _MM_PERM_CDAB));
+    x03 = _mm512_add_ps(m03, _mm512_permute4f128_ps(m03, _MM_PERM_CDAB));
+
+    // Blend.
+    m00 = _mm512_mask_blend_ps(0xF0F0, x00, x01);
+    m01 = _mm512_mask_blend_ps(0xF0F0, x02, x03);
+
+    // Stage 4 - 16 sums.
+    x00 = _mm512_add_ps(m00, _mm512_permute4f128_ps(m00, _MM_PERM_BADC));
+    x01 = _mm512_add_ps(m01, _mm512_permute4f128_ps(m01, _MM_PERM_BADC));
+
+    // Blend.
+    m00 = _mm512_mask_blend_ps(0xFF00, x00, x01);
+
+    _mm512_store_ps(r, m00);
 
 #endif
 
