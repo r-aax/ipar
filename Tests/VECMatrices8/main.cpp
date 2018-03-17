@@ -281,7 +281,7 @@ int main(int argc, char **argv)
 	   repeats_count = atoi(argv[1]);
     }
 
-    cout << "VECMatrices : test begin" << endl;
+    cout << "VECMatrices8 : test begin" << endl;
     cout << "------------------------------" << endl;
 
     Timer *timer = new Timer(Timer::OMP);
@@ -350,12 +350,12 @@ int main(int argc, char **argv)
         time_opt2 = timer->Time();
         check_opt2 = array_sum(matvec8_r, MATVEC8_COUNT * V8);
 
-        cout << "VECMatrices : matvec8 : orig = " << time_orig
+        cout << "VECMatrices8 : matvec8 : orig = " << time_orig
              << ", opt = " << time_opt 
              << ", opt2 = " << time_opt2 << endl;
         DEBUG_CHECK(MATHS_IS_NEAR(check_orig, check_opt, 0.01), "matvec8 opt check failed");
         DEBUG_CHECK(MATHS_IS_NEAR(check_orig, check_opt2, 0.01), "matvec8 opt2 check failed");
-        cout << "VECMatrices : matvec8 check : " << check_orig << endl;
+        cout << "VECMatrices8 : matvec8 check : " << check_orig << endl;
         cout << "------------------------------" << endl;
     }
 
@@ -395,12 +395,12 @@ int main(int argc, char **argv)
         time_opt2 = timer->Time();
         check_opt2 = array_sum(matvec16_r, MATVEC16_COUNT * V16);
 
-        cout << "VECMatrices : matvec16 : orig = " << time_orig
+        cout << "VECMatrices8 : matvec16 : orig = " << time_orig
              << ", opt = " << time_opt
              << ", opt2 = " << time_opt2 << endl;
         DEBUG_CHECK(MATHS_IS_NEAR(check_orig, check_opt, 0.01), "matvec16 opt check failed");
         DEBUG_CHECK(MATHS_IS_NEAR(check_orig, check_opt2, 0.01), "matvec16 opt2 check failed");
-        cout << "VECMatrices : matvec16 check : " << check_orig << endl;
+        cout << "VECMatrices8 : matvec16 check : " << check_orig << endl;
         cout << "------------------------------" << endl;
     }
 
@@ -430,10 +430,10 @@ int main(int argc, char **argv)
         time_opt = timer->Time();
         check_opt = array_sum(matmat8_r, MATMAT8_COUNT * V64);
 
-        cout << "VECMatrices : matmat8 : orig = " << time_orig
+        cout << "VECMatrices8 : matmat8 : orig = " << time_orig
              << ", opt = " << time_opt << endl;
         DEBUG_CHECK(MATHS_IS_NEAR(check_orig, check_opt, 0.01), "matmat8 check failed");
-        cout << "VECMatrices : matmat8 check : " << check_orig << endl;
+        cout << "VECMatrices8 : matmat8 check : " << check_orig << endl;
         cout << "------------------------------" << endl;
     }
 
@@ -463,10 +463,10 @@ int main(int argc, char **argv)
         time_opt = timer->Time();
         check_opt = array_sum(matmat16_r, MATMAT16_COUNT * V256);
 
-        cout << "VECMatrices : matmat16 : orig = " << time_orig
+        cout << "VECMatrices8 : matmat16 : orig = " << time_orig
              << ", opt = " << time_opt << endl;
         DEBUG_CHECK(MATHS_IS_NEAR(check_orig, check_opt, 0.01), "matmat16 check failed");
-        cout << "VECMatrices : matmat16 check : " << check_orig << endl;
+        cout << "VECMatrices8 : matmat16 check : " << check_orig << endl;
         cout << "------------------------------" << endl;
     }
 
@@ -512,10 +512,10 @@ int main(int argc, char **argv)
         time_opt = timer->Time();
         check_opt = array_sum(invmat8_r, INVMAT8_COUNT * V64);
 
-        cout << "VECMatrices : invmat8 : orig = " << time_orig
+        cout << "VECMatrices8 : invmat8 : orig = " << time_orig
              << ", opt = " << time_opt << endl;
         DEBUG_CHECK(MATHS_IS_NEAR(check_orig, check_opt, 0.01), "invmat8 check failed");
-        cout << "VECMatrices : invmat8 check : " << check_orig << endl;
+        cout << "VECMatrices8 : invmat8 check : " << check_orig << endl;
         cout << "------------------------------" << endl;
     }
 
@@ -561,14 +561,14 @@ int main(int argc, char **argv)
         time_opt = timer->Time();
         check_opt = array_sum(invmat16_r, INVMAT16_COUNT * V256);
 
-        cout << "VECMatrices : invmat16 : orig = " << time_orig
+        cout << "VECMatrices8 : invmat16 : orig = " << time_orig
              << ", opt = " << time_opt << endl;
         DEBUG_CHECK(MATHS_IS_NEAR(check_orig, check_opt, 0.01), "invmat16 check failed");
-        cout << "VECMatrices : invmat16 check : " << check_orig << endl;
+        cout << "VECMatrices8 : invmat16 check : " << check_orig << endl;
         cout << "------------------------------" << endl;
     }
 
     delete timer;
 
-    cout << "VECMatrices : test end" << endl;
+    cout << "VECMatrices8 : test end" << endl;
 }
