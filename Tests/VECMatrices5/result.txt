@@ -1,0 +1,28 @@
+VECMatrices5 : test begin
+------------------------------
+VECMatrices5 : matvec5 : orig = 2.19345e-05, opt = 1.81198e-05
+VECMatrices5 : matvec5 check : 6164.56
+------------------------------
+VECMatrices5 : test end
+VECMatrices5 : test begin
+------------------------------
+VECMatrices5 : matvec5 : orig = 9.5129e-05, opt = 4.19617e-05
+Internal Error : matvec5 opt check failed (main.cpp, 193)
+VECMatrices5 : test begin
+------------------------------
+VECMatrices5 : matvec5 : orig = 8.91685e-05, opt = 7.10487e-05
+VECMatrices5 : matvec5 check : 18757.6
+------------------------------
+VECMatrices5 : test end
+VECMatrices5 : test begin
+------------------------------
+VECMatrices5 : matvec5 : orig = 9.48906e-05, opt = 8.08239e-05
+VECMatrices5 : matvec5 check : 18698.9
+------------------------------
+VECMatrices5 : test end
+VECMatrices5 : test begin
+------------------------------
+VECMatrices5 : matvec5 : orig = 0.000108957, opt = 0.000236034
+VECMatrices5 : matvec5 check : 18698.9
+------------------------------
+VECMatrices5 : test end

@@ -18,10 +18,10 @@
 #endif
 
 /// \brief matvec5 test cases count.
-#define MATVEC5_COUNT 1000
+#define MATVEC5_COUNT 3000
 
 /// \brief Matrices for matvec5 test.
-ALIGN_64 float matvec5_m[MATVEC5_COUNT * V40];
+ALIGN_64 float matvec5_m[MATVEC5_COUNT * V48];
 
 /// \brief Vectors for matvec8 test.
 ALIGN_64 float matvec5_v[MATVEC5_COUNT * V8];
@@ -159,7 +159,7 @@ int main(int argc, char **argv)
     double check_orig, check_opt, check_opt2;
 
     // Init.
-    random_array(matvec5_m, MATVEC5_COUNT * V40);
+    random_array(matvec5_m, MATVEC5_COUNT * V48);
     random_array(matvec5_v, MATVEC5_COUNT * V8);
 
     // *---------*
@@ -171,9 +171,9 @@ int main(int argc, char **argv)
         // Original.
         clean_res();
         timer->Init();
-        run3(repeats_count, MATVEC5_COUNT, matvec5_orig, matvec5_m, matvec5_v, matvec5_r, V40, V8, V8);
+        run3(repeats_count, MATVEC5_COUNT, matvec5_orig, matvec5_m, matvec5_v, matvec5_r, V48, V8, V8);
         timer->Start();
-        run3(repeats_count, MATVEC5_COUNT, matvec5_orig, matvec5_m, matvec5_v, matvec5_r, V40, V8, V8);
+        run3(repeats_count, MATVEC5_COUNT, matvec5_orig, matvec5_m, matvec5_v, matvec5_r, V48, V8, V8);
         timer->Stop();
         time_orig = timer->Time();
         check_orig = array_sum(matvec5_r, MATVEC5_COUNT * V8);
@@ -181,9 +181,9 @@ int main(int argc, char **argv)
         // Optimized.
         clean_res();
         timer->Init();
-        run3(repeats_count, MATVEC5_COUNT, matvec5_opt, matvec5_m, matvec5_v, matvec5_r, V40, V8, V8);
+        run3(repeats_count, MATVEC5_COUNT / 3, matvec5_3x_opt, matvec5_m, matvec5_v, matvec5_r, 3 * V48, 3 * V8, 3 * V8);
         timer->Start();
-        run3(repeats_count, MATVEC5_COUNT, matvec5_opt, matvec5_m, matvec5_v, matvec5_r, V40, V8, V8);
+        run3(repeats_count, MATVEC5_COUNT / 3, matvec5_3x_opt, matvec5_m, matvec5_v, matvec5_r, 3 * V48, 3 * V8, 3 * V8);
         timer->Stop();
         time_opt = timer->Time();
         check_opt = array_sum(matvec5_r, MATVEC5_COUNT * V8);
