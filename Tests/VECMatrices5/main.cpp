@@ -166,6 +166,8 @@ int main(int argc, char **argv)
     // | matvec5 |
     // *---------*
 
+    matvec5_opt_init();
+
     if (MATVEC5_COUNT > 0)
     {
         // Original.

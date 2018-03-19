@@ -15,6 +15,7 @@
 
 //--------------------------------------------------------------------------------------------------
 void matvec5_orig(float * __restrict m, float * __restrict v, float * __restrict r);
+void matvec5_opt_init();
 void matvec5_3x_opt(float * __restrict m, float * __restrict v, float * __restrict r);
 //--------------------------------------------------------------------------------------------------
 
