@@ -22,7 +22,7 @@ void print_m512(__m512 v)
     _mm512_store_ps(&tmp[0], v);
 
     cout << "__m512 [";
-    for (int i = 0; i < 16; i++)
+    for (int i = 15; i >= 0; i--)
     {
         cout << tmp[i] << ", ";
     }

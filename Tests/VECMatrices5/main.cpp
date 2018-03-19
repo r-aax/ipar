@@ -17,8 +17,8 @@
 #define ALIGN_64
 #endif
 
-/// \brief matvec5 test cases count.
-#define MATVEC5_COUNT 3000
+/// \brief matvec5 test cases count (must be divisible by 3).
+#define MATVEC5_COUNT 30000
 
 /// \brief Matrices for matvec5 test.
 ALIGN_64 float matvec5_m[MATVEC5_COUNT * V48];
