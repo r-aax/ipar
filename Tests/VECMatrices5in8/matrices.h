@@ -4,8 +4,14 @@
 #ifndef MATRICES_H
 #define MATRICES_H
 
+/// \brief Constant 5.
+#define V5 5
+
 /// \brief Constant 8.
 #define V8 8
+
+/// \brief Constant 16.
+#define V16 16
 
 /// \brief Constant 64.
 #define V64 (V8 * V8)
