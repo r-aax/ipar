@@ -202,67 +202,67 @@ int main(int argc, char **argv)
     // | matvec5in8 |
     // *---------*
 
-    if (MATVEC5IN8_COUNT > 0)
-    {
-        // Original.
-        clean_res();
-        timer->Init();
-        run3(repeats_count, MATVEC5IN8_COUNT, matvec5in8_orig, matvec5in8_m, matvec5in8_v, matvec5in8_r, V64, V8, V8);
-        timer->Start();
-        run3(repeats_count, MATVEC5IN8_COUNT, matvec5in8_orig, matvec5in8_m, matvec5in8_v, matvec5in8_r, V64, V8, V8);
-        timer->Stop();
-        time_orig = timer->Time();
-        check_orig = array_sum(matvec5in8_r, MATVEC5IN8_COUNT * V8);
+//    if (MATVEC5IN8_COUNT > 0)
+//    {
+//        // Original.
+//        clean_res();
+//        timer->Init();
+//        run3(repeats_count, MATVEC5IN8_COUNT, matvec5in8_orig, matvec5in8_m, matvec5in8_v, matvec5in8_r, V64, V8, V8);
+//        timer->Start();
+//        run3(repeats_count, MATVEC5IN8_COUNT, matvec5in8_orig, matvec5in8_m, matvec5in8_v, matvec5in8_r, V64, V8, V8);
+//        timer->Stop();
+//        time_orig = timer->Time();
+//        check_orig = array_sum(matvec5in8_r, MATVEC5IN8_COUNT * V8);
+//
+//        // Optimized.
+//        clean_res();
+//        timer->Init();
+//        run3(repeats_count, MATVEC5IN8_COUNT, matvec5in8_opt, matvec5in8_m, matvec5in8_v, matvec5in8_r, V64, V8, V8);
+//        timer->Start();
+//        run3(repeats_count, MATVEC5IN8_COUNT, matvec5in8_opt, matvec5in8_m, matvec5in8_v, matvec5in8_r, V64, V8, V8);
+//        timer->Stop();
+//        time_opt = timer->Time();
+//        check_opt = array_sum(matvec5in8_r, MATVEC5IN8_COUNT * V8);
 
-        // Optimized.
-        clean_res();
-        timer->Init();
-        run3(repeats_count, MATVEC5IN8_COUNT, matvec5in8_opt, matvec5in8_m, matvec5in8_v, matvec5in8_r, V64, V8, V8);
-        timer->Start();
-        run3(repeats_count, MATVEC5IN8_COUNT, matvec5in8_opt, matvec5in8_m, matvec5in8_v, matvec5in8_r, V64, V8, V8);
-        timer->Stop();
-        time_opt = timer->Time();
-        check_opt = array_sum(matvec5in8_r, MATVEC5IN8_COUNT * V8);
-
-        cout << "VECMatrices5in8 : matvec5in8 : orig = " << time_orig
-             << ", opt = " << time_opt << endl;
+//        cout << "VECMatrices5in8 : matvec5in8 : orig = " << time_orig
+//             << ", opt = " << time_opt << endl;
 //        DEBUG_CHECK(MATHS_IS_NEAR(check_orig, check_opt, 0.01), "matvec5in8 opt check failed");
-        cout << "VECMatrices5in8 : matvec5in8 check : " << check_orig << endl;
-        cout << "------------------------------" << endl;
-    }
+//        cout << "VECMatrices5in8 : matvec5in8 check : " << check_orig << endl;
+//        cout << "------------------------------" << endl;
+//    }
 
     // *---------*
     // | matmat5in8 |
     // *---------*
 
-    if (MATMAT5IN8_COUNT > 0)
-    {
-        // Original.
-        clean_res();
-        timer->Init();
-        run3(repeats_count, MATMAT5IN8_COUNT, matmat5in8_orig, matmat5in8_a, matmat5in8_b, matmat5in8_r, V64, V64, V64);
-        timer->Start();
-        run3(repeats_count, MATMAT5IN8_COUNT, matmat5in8_orig, matmat5in8_a, matmat5in8_b, matmat5in8_r, V64, V64, V64);
-        timer->Stop();
-        time_orig = timer->Time();
-        check_orig = array_sum(matmat5in8_r, MATMAT5IN8_COUNT * V64);
-
-        // Optimized.
-        clean_res();
-        timer->Init();
-        run3(repeats_count, MATMAT5IN8_COUNT, matmat5in8_opt, matmat5in8_a, matmat5in8_b, matmat5in8_r, V64, V64, V64);
-        timer->Start();
-        run3(repeats_count, MATMAT5IN8_COUNT, matmat5in8_opt, matmat5in8_a, matmat5in8_b, matmat5in8_r, V64, V64, V64);
-        timer->Stop();
-        time_opt = timer->Time();
-        check_opt = array_sum(matmat5in8_r, MATMAT5IN8_COUNT * V64);
-
-        cout << "VECMatrices5in8 : matmat5in8 : orig = " << time_orig
-             << ", opt = " << time_opt << endl;
+//    if (MATMAT5IN8_COUNT > 0)
+//    {
+//        // Original.
+//        clean_res();
+//        timer->Init();
+//        run3(repeats_count, MATMAT5IN8_COUNT, matmat5in8_orig, matmat5in8_a, matmat5in8_b, matmat5in8_r, V64, V64, V64);
+//        timer->Start();
+//        run3(repeats_count, MATMAT5IN8_COUNT, matmat5in8_orig, matmat5in8_a, matmat5in8_b, matmat5in8_r, V64, V64, V64);
+//        timer->Stop();
+//        time_orig = timer->Time();
+//        check_orig = array_sum(matmat5in8_r, MATMAT5IN8_COUNT * V64);
+//
+//        // Optimized.
+//        clean_res();
+//        timer->Init();
+//        run3(repeats_count, MATMAT5IN8_COUNT, matmat5in8_opt, matmat5in8_a, matmat5in8_b, matmat5in8_r, V64, V64, V64);
+//        timer->Start();
+//        run3(repeats_count, MATMAT5IN8_COUNT, matmat5in8_opt, matmat5in8_a, matmat5in8_b, matmat5in8_r, V64, V64, V64);
+//        timer->Stop();
+//        time_opt = timer->Time();
+//        check_opt = array_sum(matmat5in8_r, MATMAT5IN8_COUNT * V64);
+//
+//        cout << "VECMatrices5in8 : matmat5in8 : orig = " << time_orig
+//             << ", opt = " << time_opt << endl;
 //        DEBUG_CHECK(MATHS_IS_NEAR(check_orig, check_opt, 0.01), "matmat5in8 check failed");
-        cout << "VECMatrices5in8 : matmat5in8 check : " << check_orig << endl;
-        cout << "------------------------------" << endl;
-    }
+//        cout << "VECMatrices5in8 : matmat5in8 check : " << check_orig << endl;
+//        cout << "------------------------------" << endl;
+//    }
 
     // *---------*
     // | invmat5in8 |
@@ -308,7 +308,7 @@ int main(int argc, char **argv)
 
         cout << "VECMatrices5in8 : invmat5in8 : orig = " << time_orig
              << ", opt = " << time_opt << endl;
-//        DEBUG_CHECK(MATHS_IS_NEAR(check_orig, check_opt, 0.01), "invmat5in8 check failed");
+        DEBUG_CHECK(MATHS_IS_NEAR(check_orig, check_opt, 0.01), "invmat5in8 check failed");
         cout << "VECMatrices5in8 : invmat5in8 check : " << check_orig << endl;
         cout << "------------------------------" << endl;
     }

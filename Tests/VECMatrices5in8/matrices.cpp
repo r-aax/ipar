@@ -338,23 +338,29 @@ int invmat5in8_opt(float * __restrict m, float * __restrict r)
 
     vd = _mm512_setzero_ps();
 
-    for (int i = 0; i < V8 - 2; i += 2)
+    // Zero tmp.
+    for (int i = 0; i < V5; i++)
     {
-        vi = _mm512_load_ps(&m[i * V8]);
-        _mm512_i32scatter_ps(&t[i * V16], ind, vi, _MM_SCALE_4);
-        _mm512_i32scatter_ps(&t[i * V16 + V8], ind, vd, _MM_SCALE_4);
+	_mm512_store_ps(&t[i * V16], vd);
     }
 
+    // Write input matrix to tmp.
+    vi = _mm512_load_ps(&m[0]);
+    _mm512_mask_i32scatter_ps(&t[0], 0x1F1F, ind, vi, _MM_SCALE_4);
+    vi = _mm512_load_ps(&m[2 * V8]);
+    _mm512_mask_i32scatter_ps(&t[2 * V16], 0x1F1F, ind, vi, _MM_SCALE_4);
+    vi = _mm512_load_ps(&m[4 & V8]);
+    _mm512_mask_i32scatter_ps(&t[4 * V16], 0x1F, ind, vi, _MM_SCALE_4);
+
+    // Write E's diagonal.
     __m512i ind1 = _mm512_set_epi32(0, 0, 0, 0, 0, 0, 0, 0,
-                                    7 * V16 + 7,
-                                    6 * V16 + 6,
-                                    5 * V16 + 5,
+                                    0, 0, 0,
                                     4 * V16 + 4,
                                     3 * V16 + 3,
                                     2 * V16 + 2,
                                         V16 + 1,
                                               0);
-    _mm512_mask_i32scatter_ps(&t[V8], 0xFF, ind1, _mm512_set1_ps(1.0), _MM_SCALE_4);
+    _mm512_mask_i32scatter_ps(&t[V8], 0x1F, ind1, _mm512_set1_ps(1.0), _MM_SCALE_4);
 
     for (int i = 0; i < V5; i++)
     {
@@ -412,7 +418,7 @@ int invmat5in8_opt(float * __restrict m, float * __restrict r)
     }
 
     // Copy to r.
-    for (int i = 0; i < V8 - 2; i += 2)
+    for (int i = 0; i < V8; i += 2)
     {
         vi = _mm512_i32gather_ps(ind, &t[i * V16 + V8], _MM_SCALE_4);
         _mm512_store_ps(&r[i * V8], vi);
