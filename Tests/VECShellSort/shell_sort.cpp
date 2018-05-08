@@ -25,11 +25,11 @@ __m512i ind_k;
 void shell_sort_orig(float *m, int n)
 {
     // stat
-    int len[100];
-    for (int i = 0; i < 100; i++)
-    {
-	len[i] = 0;
-    }
+//    int len[100];
+//    for (int i = 0; i < 100; i++)
+//    {
+//	len[i] = 0;
+//    }
 
     int i, j, k;
 
@@ -52,7 +52,7 @@ void shell_sort_orig(float *m, int n)
 		}
 	    }
 	
-	    len[(i - j) / k]++;
+//	    len[(i - j) / k]++;
 	
 	    m[j] = t;
 	}
@@ -60,12 +60,12 @@ void shell_sort_orig(float *m, int n)
     }
 
     // stat
-    cout << "hist" << endl;
-    for (int i = 0; i < 100; i++)
-    {
-	cout << len[i] << " ";
-    }
-    cout << endl;
+//    cout << "hist" << endl;
+//    for (int i = 0; i < 100; i++)
+//    {
+//	cout << len[i] << " ";
+//    }
+//    cout << endl;
 }
 
 #ifdef INTEL
@@ -175,10 +175,8 @@ void shell_sort_step_big_i16(float *m, int n, int k, int i)
     __m512i ind_jk;
     __m512 q;
 
-    int ss = 0;
     do
     {
-	ss++;
 	mask = mask & _mm512_mask_cmp_epi32_mask(mask, ind_j, ind_k, _MM_CMPINT_GE);
 	ind_jk = _mm512_mask_sub_epi32(ind_j, mask, ind_j, ind_k);
 	q = _mm512_mask_i32gather_ps(q, mask, ind_jk, m, _MM_SCALE_4);
@@ -187,7 +185,6 @@ void shell_sort_step_big_i16(float *m, int n, int k, int i)
 	ind_j = _mm512_mask_sub_epi32(ind_j, mask, ind_j, ind_k);
     }
     while (mask != 0x0);
-    len16[ss]++;
 
     _mm512_i32scatter_ps(m, ind_j, t, _MM_SCALE_4);
 }
@@ -313,12 +310,6 @@ void shell_sort_opt(float *m, int n)
 
 #else
 
-    // stat2
-    for (int i = 0; i < 100; i++)
-    {
-	len16[i] = 0;
-    }
-
     int k;
 
     for (k = n / 2; k >= 16; k /= 2)
@@ -335,14 +326,6 @@ void shell_sort_opt(float *m, int n)
 //    {
 //	shell_sort_step_small(m, n, k);
 //    }
-
-    // stat2
-    cout << "stat16" << endl;
-    for (int i = 0; i < 100; i++)
-    {
-	cout << len16[i] << " ";
-    }
-    cout << endl;
 
 #endif
 

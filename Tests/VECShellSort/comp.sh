@@ -7,7 +7,7 @@ then
     COMP="mpiicc"
 fi
 
-#FLAGS="-DINTEL -O3 -xmic-avx512 -qopt-prefetch"
+FLAGS="-DINTEL -O3 -xmic-avx512 -qopt-prefetch"
 INFO_FLAGS="-qopt-report=5"
 EXE="VECShellSort.out"
 

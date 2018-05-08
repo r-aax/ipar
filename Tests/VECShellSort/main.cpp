@@ -12,7 +12,7 @@
 #include <math.h>
 
 /// \brief Array size.
-#define ARRAY_SIZE 2000000
+#define ARRAY_SIZE 100000
 
 /// \brief Align.
 #ifdef INTEL
