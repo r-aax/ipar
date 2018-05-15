@@ -11,8 +11,14 @@
 #include <stdlib.h>
 #include <math.h>
 
-/// \brief Array size.
-#define ARRAY_SIZE 100000
+/// \brief Min array size.
+#define MIN_ARRAY_SIZE 10000
+
+/// \brief Max array size.
+#define MAX_ARRAY_SIZE 2000000
+
+/// \brief Array size step.
+#define ARRAY_SIZE_STEP 10000
 
 /// \brief Align.
 #ifdef INTEL
@@ -22,14 +28,13 @@
 #endif
 
 /// \brief Array.
-ALIGN_64 float m[ARRAY_SIZE];
+ALIGN_64 float m[MAX_ARRAY_SIZE];
 
 /// \brief Array for orig.
-ALIGN_64 float m_orig[ARRAY_SIZE];
+ALIGN_64 float m_orig[MAX_ARRAY_SIZE];
 
 /// \brief Array for opt.
-ALIGN_64 float m_opt[ARRAY_SIZE];
-
+ALIGN_64 float m_opt[MAX_ARRAY_SIZE];
 
 using namespace Utils;
 
@@ -66,8 +71,8 @@ static double array_pm_sum(float *a, int c)
 
     for (int i = 0; i < c; i++)
     {
-	s += m * a[i];
-	m = -m;
+        s += m * a[i];
+        m = -m;
     }
 
     return s;
@@ -108,12 +113,12 @@ static bool is_array_sorted(float *a, int c)
 {
     for (int i = 0; i < c - 1; i++)
     {
-	if (MATHS_IS_GT(a[i], a[i + 1]))
-	{
-	    cout << "! " << a[i] << " <= " << a[i + 1] << endl;
-	
-	    return false;
-	}
+        if (MATHS_IS_GT(a[i], a[i + 1]))
+        {
+            cout << "! " << a[i] << " <= " << a[i + 1] << endl;
+
+            return false;
+        }
     }
 
     return true;
@@ -138,62 +143,64 @@ static void arrays_copy(float *from, float *to, int c)
 /// \param argv - arguments
 int main(int argc, char **argv)
 {
-    //for (int AA = 10000; AA < ARRAY_SIZE + 1; AA += 10000)
-    //{
-    int AA = ARRAY_SIZE;
+    cout << "================================================" << endl;
+
+    for (int AA = MIN_ARRAY_SIZE; AA <= MAX_ARRAY_SIZE; AA += ARRAY_SIZE_STEP)
+    {
+    //int AA = MAX_ARRAY_SIZE;
 
     int repeats_count = 1;
 
     // Parse repeats count if given.
     if (argc == 2)
     {
-	repeats_count = atoi(argv[1]);
+        repeats_count = atoi(argv[1]);
     }
 
     cout << "VECShellSort : test begin " << AA << endl;
-    cout << "------------------------------" << endl;
 
     Timer *timer = new Timer(Timer::OMP);
     double time_orig, time_opt, sum_orig, sum_opt, pm_sum_orig, pm_sum_opt;
     bool check_orig, check_opt;
 
     // Init.
-    random_array(m,  ARRAY_SIZE);
+    random_array(m,  AA);
 
     // Original.
-    arrays_copy(m, m_orig, ARRAY_SIZE);
+    arrays_copy(m, m_orig, AA);
     timer->Init();
     shell_sort_orig(m_orig, AA);
-    arrays_copy(m, m_orig, ARRAY_SIZE);
+    arrays_copy(m, m_orig, AA);
     timer->Start();
     shell_sort_orig(m_orig, AA);
     timer->Stop();
     time_orig = timer->Time();
-    check_orig = is_array_sorted(m_orig, ARRAY_SIZE);
-    sum_orig = array_sum(m_orig, ARRAY_SIZE);
-    pm_sum_orig = array_pm_sum(m_orig, ARRAY_SIZE);
+    check_orig = is_array_sorted(m_orig, AA);
+    sum_orig = array_sum(m_orig, AA);
+    pm_sum_orig = array_pm_sum(m_orig, AA);
 
     // Optimized.
     shell_sort_opt_prepare();
-    arrays_copy(m, m_opt, ARRAY_SIZE);
+    arrays_copy(m, m_opt, AA);
     timer->Init();
     shell_sort_opt(m_opt, AA);
-    arrays_copy(m, m_opt, ARRAY_SIZE);
+    arrays_copy(m, m_opt, AA);
     timer->Start();
     shell_sort_opt(m_opt, AA);
     timer->Stop();
     time_opt = timer->Time();
-    check_opt = is_array_sorted(m_opt, ARRAY_SIZE);
-    sum_opt = array_sum(m_opt, ARRAY_SIZE);
-    pm_sum_opt = array_pm_sum(m_opt, ARRAY_SIZE);
+    check_opt = is_array_sorted(m_opt, AA);
+    sum_opt = array_sum(m_opt, AA);
+    pm_sum_opt = array_pm_sum(m_opt, AA);
 
     cout << "VECShellSort : orig = " << time_orig << ", opt = " << time_opt << endl;
-    //DEBUG_CHECK(check_orig, "orig check failed");
+    //DEBUG_CHECK(check_orig, "orig checAk failed");
     //DEBUG_CHECK(check_opt, "opt check failed");
     cout << "VECShellSort : sum orig = " << sum_orig << ", sum opt = " << sum_opt << endl;
     cout << "VECShellSort : pm_sum orig = " << pm_sum_orig << ", pm_sum opt = " << pm_sum_opt << endl;
+    cout << "VECShellSort : speedup = " << ((time_orig - time_opt) / time_orig) * 100.0 << "%" << endl;
+    cout << "------------------------------------------------" << endl;
 
     delete timer;
-
-//    }
+    }
 }

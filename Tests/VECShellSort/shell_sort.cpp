@@ -24,48 +24,32 @@ __m512i ind_k;
 /// \param n - array element count
 void shell_sort_orig(float *m, int n)
 {
-    // stat
-//    int len[100];
-//    for (int i = 0; i < 100; i++)
-//    {
-//	len[i] = 0;
-//    }
-
     int i, j, k;
 
     for (k = n / 2; k > 0; k /= 2)
     {
-	if (k >= 16) {
-	for (i = k; i < n; i++)
-	{
-	    float t = m[i];
-	
-	    for (j = i; j >= k; j -= k)
-	    {
-		if (t < m[j - k])
-		{
-		    m[j] = m[j - k];
-		}
-		else
-		{
-		    break;
-		}
-	    }
-	
-//	    len[(i - j) / k]++;
-	
-	    m[j] = t;
-	}
-	}
-    }
+        if (k >= 16)
+        {
+        for (i = k; i < n; i++)
+        {
+            float t = m[i];
 
-    // stat
-//    cout << "hist" << endl;
-//    for (int i = 0; i < 100; i++)
-//    {
-//	cout << len[i] << " ";
-//    }
-//    cout << endl;
+            for (j = i; j >= k; j -= k)
+            {
+                if (t < m[j - k])
+                {
+                    m[j] = m[j - k];
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            m[j] = t;
+        }
+        }
+    }
 }
 
 #ifdef INTEL
@@ -83,14 +67,14 @@ void shell_sort_step_i(float *m, int n, int k, int i)
 
     for (j = i; j >= k; j -= k)
     {
-	if (t < m[j - k])
-	{
-	    m[j] = m[j - k];
-	}
-	else
-	{
-	    break;
-	}
+        if (t < m[j - k])
+        {
+             m[j] = m[j - k];
+        }
+        else
+        {
+            break;
+        }
     }
 
     m[j] = t;
@@ -109,14 +93,14 @@ void shell_sort_step_small_i(float *m, int n, int k, int i)
 
     for (j = i; j >= k; j -= k)
     {
-	if (t < m[j - k])
-	{
-	    m[j] = m[j - k];
-	}
-	else
-	{
-	    break;
-	}
+        if (t < m[j - k])
+        {
+            m[j] = m[j - k];
+        }
+        else
+        {
+            break;
+        }
     }
 
     m[j] = t;
@@ -137,24 +121,24 @@ void shell_sort_step_i_mod(float *m, int n, int k, int i)
 
     do
     {
-	bool p1 = (j >= k);
+        bool p1 = (j >= k);
 
-	if (!p1)
-	{
-	    break;
-	}
+        if (!p1)
+        {
+            break;
+        }
 
-	float q = m[j - k];
+        float q = m[j - k];
 
-	bool p2 = (t < q);
+        bool p2 = (t < q);
 
-	if (!p2)
-	{
-	    break;
-	}
+        if (!p2)
+        {
+            break;
+        }
 
-	m[j] = q;
-	j -= k;
+        m[j] = q;
+        j -= k;
     }
     while (true);
 
@@ -169,6 +153,30 @@ void shell_sort_step_i_mod(float *m, int n, int k, int i)
 /// \param i - insert position
 void shell_sort_step_big_i16(float *m, int n, int k, int i)
 {
+
+#if 1
+
+    int j = i;
+    __m512i ind_j = _mm512_add_epi32(ind_i, ind_straight);
+    __m512 t = _mm512_load_ps(&m[j]);
+    __mmask16 mask = 0xFFFF;
+    __m512 q;
+
+    do
+    {
+        mask = mask & _mm512_mask_cmp_epi32_mask(mask, ind_j, ind_k, _MM_CMPINT_GE);
+        q = _mm512_mask_load_ps(q, mask, &m[j - k]);
+        mask = mask & _mm512_mask_cmp_ps_mask(mask, t, q, _MM_CMPINT_LT);
+        _mm512_mask_store_ps(&m[j], mask, q);
+        ind_j = _mm512_mask_sub_epi32(ind_j, mask, ind_j, ind_k);
+        j -= k;
+    }
+    while (mask != 0x0);
+
+    _mm512_i32scatter_ps(m, ind_j, t, _MM_SCALE_4);
+
+#else
+
     __m512i ind_j = _mm512_add_epi32(ind_i, ind_straight);
     __m512 t = _mm512_i32gather_ps(ind_j, m, _MM_SCALE_4);
     __mmask16 mask = 0xFFFF;
@@ -177,16 +185,19 @@ void shell_sort_step_big_i16(float *m, int n, int k, int i)
 
     do
     {
-	mask = mask & _mm512_mask_cmp_epi32_mask(mask, ind_j, ind_k, _MM_CMPINT_GE);
-	ind_jk = _mm512_mask_sub_epi32(ind_j, mask, ind_j, ind_k);
-	q = _mm512_mask_i32gather_ps(q, mask, ind_jk, m, _MM_SCALE_4);
-	mask = mask & _mm512_mask_cmp_ps_mask(mask, t, q, _MM_CMPINT_LT);
-	_mm512_mask_i32scatter_ps(m, mask, ind_j, q, _MM_SCALE_4);
-	ind_j = _mm512_mask_sub_epi32(ind_j, mask, ind_j, ind_k);
+        mask = mask & _mm512_mask_cmp_epi32_mask(mask, ind_j, ind_k, _MM_CMPINT_GE);
+        ind_jk = _mm512_mask_sub_epi32(ind_j, mask, ind_j, ind_k);
+        q = _mm512_mask_i32gather_ps(q, mask, ind_jk, m, _MM_SCALE_4);
+        mask = mask & _mm512_mask_cmp_ps_mask(mask, t, q, _MM_CMPINT_LT);
+        _mm512_mask_i32scatter_ps(m, mask, ind_j, q, _MM_SCALE_4);
+        ind_j = _mm512_mask_sub_epi32(ind_j, mask, ind_j, ind_k);
     }
     while (mask != 0x0);
 
     _mm512_i32scatter_ps(m, ind_j, t, _MM_SCALE_4);
+
+#endif
+
 }
 
 /// \brief Insert from i position for step k in shell sorting (k repeats).
@@ -205,12 +216,12 @@ void shell_sort_step_mid_ik(float *m, int n, int k, int i)
 
     do
     {
-	mask = mask & _mm512_mask_cmp_epi32_mask(mask, ind_j, ind_k, _MM_CMPINT_GE);
-	ind_jk = _mm512_mask_sub_epi32(ind_j, mask, ind_j, ind_k);
-	q = _mm512_mask_i32gather_ps(q, mask, ind_jk, m, _MM_SCALE_4);
-	mask = mask & _mm512_mask_cmp_ps_mask(mask, t, q, _MM_CMPINT_LT);
-	_mm512_mask_i32scatter_ps(m, mask, ind_j, q, _MM_SCALE_4);
-	ind_j = _mm512_mask_sub_epi32(ind_j, mask, ind_j, ind_k);
+        mask = mask & _mm512_mask_cmp_epi32_mask(mask, ind_j, ind_k, _MM_CMPINT_GE);
+        ind_jk = _mm512_mask_sub_epi32(ind_j, mask, ind_j, ind_k);
+        q = _mm512_mask_i32gather_ps(q, mask, ind_jk, m, _MM_SCALE_4);
+        mask = mask & _mm512_mask_cmp_ps_mask(mask, t, q, _MM_CMPINT_LT);
+        _mm512_mask_i32scatter_ps(m, mask, ind_j, q, _MM_SCALE_4);
+        ind_j = _mm512_mask_sub_epi32(ind_j, mask, ind_j, ind_k);
     }
     while (mask != 0x0);
 
@@ -230,15 +241,15 @@ void shell_sort_step_big(float *m, int n, int k)
 
     while (i + 15  < n)
     {
-	ind_i = _mm512_set1_epi32(i);
-	shell_sort_step_big_i16(m, n, k, i);
-	i += 16;
+        ind_i = _mm512_set1_epi32(i);
+        shell_sort_step_big_i16(m, n, k, i);
+        i += 16;
     }
 
     while (i < n)
     {
-	shell_sort_step_i(m, n, k, i);
-	i++;
+        shell_sort_step_i(m, n, k, i);
+        i++;
     }
 }
 
@@ -255,15 +266,15 @@ void shell_sort_step_mid(float *m, int n, int k)
 
     while (i + (k - 1)  < n)
     {
-	ind_i = _mm512_set1_epi32(i);
-	shell_sort_step_mid_ik(m, n, k, i);
-	i += k;
+        ind_i = _mm512_set1_epi32(i);
+        shell_sort_step_mid_ik(m, n, k, i);
+        i += k;
     }
 
     while (i < n)
     {
-	shell_sort_step_i(m, n, k, i);
-	i++;
+        shell_sort_step_i(m, n, k, i);
+        i++;
     }
 }
 
@@ -278,7 +289,7 @@ void shell_sort_step_small(float *m, int n, int k)
 
     for (i = k; i < n; i++)
     {
-	shell_sort_step_small_i(m, n, k, i);
+        shell_sort_step_small_i(m, n, k, i);
     }
 }
 
@@ -314,18 +325,13 @@ void shell_sort_opt(float *m, int n)
 
     for (k = n / 2; k >= 16; k /= 2)
     {
-	shell_sort_step_big(m, n, k);
+        shell_sort_step_big(m, n, k);
     }
 
-//    for(; k >= 4; k /= 2)
-//    {
-//	shell_sort_step_mid(m, n, k);
-//    }
-
-//    for (; k > 0; k /= 2)
-//    {
-//	shell_sort_step_small(m, n, k);
-//    }
+    //for (; k > 0; k /= 2)
+    //{
+    //    shell_sort_step_small(m, n, k);
+    //}
 
 #endif
 

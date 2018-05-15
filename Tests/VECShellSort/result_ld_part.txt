@@ -1,0 +1,1601 @@
+================================================
+VECShellSort : test begin 10000
+! 0.000223212 <= 4.68777e-05
+! 0.000223212 <= 4.68777e-05
+VECShellSort : orig = 0.00170302, opt = 0.000447989
+VECShellSort : sum orig = 4971.32, sum opt = 4971.32
+VECShellSort : pm_sum orig = -0.4244, pm_sum opt = -0.4244
+VECShellSort : speedup = 73.6945%
+------------------------------------------------
+VECShellSort : test begin 20000
+! 0.00219013 <= 0.0014435
+! 0.00219013 <= 0.0014435
+VECShellSort : orig = 0.00389004, opt = 0.00102305
+VECShellSort : sum orig = 9987.51, sum opt = 9987.51
+VECShellSort : pm_sum orig = -0.503087, pm_sum opt = -0.503087
+VECShellSort : speedup = 73.7007%
+------------------------------------------------
+VECShellSort : test begin 30000
+! 0.00238017 <= 0.000120335
+! 0.00238017 <= 0.000120335
+VECShellSort : orig = 0.00533605, opt = 0.00125003
+VECShellSort : sum orig = 14944.3, sum opt = 14944.3
+VECShellSort : pm_sum orig = -0.589518, pm_sum opt = -0.589518
+VECShellSort : speedup = 76.5739%
+------------------------------------------------
+VECShellSort : test begin 40000
+! 0.00118375 <= 0.000259054
+! 0.00118375 <= 0.000259054
+VECShellSort : orig = 0.00855494, opt = 0.00232506
+VECShellSort : sum orig = 20083.7, sum opt = 20083.7
+VECShellSort : pm_sum orig = -0.556469, pm_sum opt = -0.556469
+VECShellSort : speedup = 72.822%
+------------------------------------------------
+VECShellSort : test begin 50000
+! 0.000825626 <= 0.000150681
+! 0.000825626 <= 0.000150681
+VECShellSort : orig = 0.0100179, opt = 0.00243402
+VECShellSort : sum orig = 25002.1, sum opt = 25002.1
+VECShellSort : pm_sum orig = -0.302108, pm_sum opt = -0.302108
+VECShellSort : speedup = 75.7033%
+------------------------------------------------
+VECShellSort : test begin 60000
+! 0.000364471 <= 0.000275856
+! 0.000364471 <= 0.000275856
+VECShellSort : orig = 0.012207, opt = 0.00308299
+VECShellSort : sum orig = 29937.8, sum opt = 29937.8
+VECShellSort : pm_sum orig = -0.501894, pm_sum opt = -0.501894
+VECShellSort : speedup = 74.7441%
+------------------------------------------------
+VECShellSort : test begin 70000
+! 0.000476838 <= 0.000184059
+! 0.000476838 <= 0.000184059
+VECShellSort : orig = 0.015399, opt = 0.00392914
+VECShellSort : sum orig = 35095.6, sum opt = 35095.6
+VECShellSort : pm_sum orig = -0.527892, pm_sum opt = -0.527892
+VECShellSort : speedup = 74.4844%
+------------------------------------------------
+VECShellSort : test begin 80000
+! 0.00026293 <= 0.000130641
+! 0.00026293 <= 0.000130641
+VECShellSort : orig = 0.0196478, opt = 0.00572991
+VECShellSort : sum orig = 40150.7, sum opt = 40150.7
+VECShellSort : pm_sum orig = -0.471984, pm_sum opt = -0.471984
+VECShellSort : speedup = 70.8369%
+------------------------------------------------
+VECShellSort : test begin 90000
+! 0.000833089 <= 0.000175004
+! 0.000833089 <= 0.000175004
+VECShellSort : orig = 0.021596, opt = 0.00545692
+VECShellSort : sum orig = 44884.9, sum opt = 44884.9
+VECShellSort : pm_sum orig = -0.553564, pm_sum opt = -0.553564
+VECShellSort : speedup = 74.7317%
+------------------------------------------------
+VECShellSort : test begin 100000
+! 0.000388661 <= 9.72673e-05
+! 0.000388661 <= 9.72673e-05
+VECShellSort : orig = 0.022923, opt = 0.00597405
+VECShellSort : sum orig = 50015.3, sum opt = 50015.3
+VECShellSort : pm_sum orig = -0.811436, pm_sum opt = -0.811436
+VECShellSort : speedup = 73.9386%
+------------------------------------------------
+VECShellSort : test begin 110000
+! 0.000360427 <= 0.00011014
+! 0.000360427 <= 0.00011014
+VECShellSort : orig = 0.026238, opt = 0.00675416
+VECShellSort : sum orig = 54970.9, sum opt = 54970.9
+VECShellSort : pm_sum orig = -0.562982, pm_sum opt = -0.562982
+VECShellSort : speedup = 74.2581%
+------------------------------------------------
+VECShellSort : test begin 120000
+! 0.000213779 <= 0.000181565
+! 0.000213779 <= 0.000181565
+VECShellSort : orig = 0.0278499, opt = 0.00749993
+VECShellSort : sum orig = 59936.8, sum opt = 59936.8
+VECShellSort : pm_sum orig = -0.515338, pm_sum opt = -0.515338
+VECShellSort : speedup = 73.0702%
+------------------------------------------------
+VECShellSort : test begin 130000
+! 7.50395e-05 <= 2.76379e-05
+! 7.50395e-05 <= 2.76379e-05
+VECShellSort : orig = 0.0309241, opt = 0.00785613
+VECShellSort : sum orig = 64925.5, sum opt = 64925.5
+VECShellSort : pm_sum orig = -0.398178, pm_sum opt = -0.398178
+VECShellSort : speedup = 74.5954%
+------------------------------------------------
+VECShellSort : test begin 140000
+! 0.000251818 <= 2.67467e-05
+! 0.000251818 <= 2.67467e-05
+VECShellSort : orig = 0.03492, opt = 0.00924802
+VECShellSort : sum orig = 70089.9, sum opt = 70089.9
+VECShellSort : pm_sum orig = -0.515486, pm_sum opt = -0.515486
+VECShellSort : speedup = 73.5165%
+------------------------------------------------
+VECShellSort : test begin 150000
+! 0.000244177 <= 0.000190045
+! 0.000244177 <= 0.000190045
+VECShellSort : orig = 0.038595, opt = 0.0102699
+VECShellSort : sum orig = 74991.1, sum opt = 74991.1
+VECShellSort : pm_sum orig = -0.445247, pm_sum opt = -0.445247
+VECShellSort : speedup = 73.3906%
+------------------------------------------------
+VECShellSort : test begin 160000
+! 0.000314924 <= 1.18837e-06
+! 0.000314924 <= 1.18837e-06
+VECShellSort : orig = 0.0450361, opt = 0.01401
+VECShellSort : sum orig = 79918.7, sum opt = 79918.7
+VECShellSort : pm_sum orig = -0.50863, pm_sum opt = -0.50863
+VECShellSort : speedup = 68.8917%
+------------------------------------------------
+VECShellSort : test begin 170000
+! 3.80403e-05 <= 3.44994e-05
+! 3.80403e-05 <= 3.44994e-05
+VECShellSort : orig = 0.0476708, opt = 0.0167019
+VECShellSort : sum orig = 85127.4, sum opt = 85127.4
+VECShellSort : pm_sum orig = -0.525585, pm_sum opt = -0.525585
+VECShellSort : speedup = 64.964%
+------------------------------------------------
+VECShellSort : test begin 180000
+! 0.00017402 <= 7.21393e-05
+! 0.00017402 <= 7.21393e-05
+VECShellSort : orig = 0.0530891, opt = 0.014272
+VECShellSort : sum orig = 90011.9, sum opt = 90011.9
+VECShellSort : pm_sum orig = -0.445166, pm_sum opt = -0.445166
+VECShellSort : speedup = 73.117%
+------------------------------------------------
+VECShellSort : test begin 190000
+! 4.92646e-05 <= 4.71906e-05
+! 4.92646e-05 <= 4.71906e-05
+VECShellSort : orig = 0.047348, opt = 0.0129619
+VECShellSort : sum orig = 95003.5, sum opt = 95003.5
+VECShellSort : pm_sum orig = -0.50491, pm_sum opt = -0.50491
+VECShellSort : speedup = 72.6243%
+------------------------------------------------
+VECShellSort : test begin 200000
+! 0.000176403 <= 2.57278e-05
+! 0.000176403 <= 2.57278e-05
+VECShellSort : orig = 0.0535998, opt = 0.0146921
+VECShellSort : sum orig = 99815.5, sum opt = 99815.5
+VECShellSort : pm_sum orig = -0.374006, pm_sum opt = -0.374006
+VECShellSort : speedup = 72.5893%
+------------------------------------------------
+VECShellSort : test begin 210000
+! 5.96014e-05 <= 1.61845e-05
+! 5.96014e-05 <= 1.61845e-05
+VECShellSort : orig = 0.0543749, opt = 0.0152891
+VECShellSort : sum orig = 104977, sum opt = 104977
+VECShellSort : pm_sum orig = -0.520299, pm_sum opt = -0.520299
+VECShellSort : speedup = 71.8821%
+------------------------------------------------
+VECShellSort : test begin 220000
+! 5.93956e-05 <= 5.60917e-05
+! 5.93956e-05 <= 5.60917e-05
+VECShellSort : orig = 0.0588639, opt = 0.015873
+VECShellSort : sum orig = 109917, sum opt = 109917
+VECShellSort : pm_sum orig = -0.526421, pm_sum opt = -0.526421
+VECShellSort : speedup = 73.0345%
+------------------------------------------------
+VECShellSort : test begin 230000
+! 0.000202406 <= 1.23996e-05
+! 0.000202406 <= 1.23996e-05
+VECShellSort : orig = 0.057013, opt = 0.0155079
+VECShellSort : sum orig = 114945, sum opt = 114945
+VECShellSort : pm_sum orig = 0.202225, pm_sum opt = 0.202225
+VECShellSort : speedup = 72.7993%
+------------------------------------------------
+VECShellSort : test begin 240000
+! 0.000244979 <= 5.80689e-05
+! 0.000244979 <= 5.80689e-05
+VECShellSort : orig = 0.0642841, opt = 0.018332
+VECShellSort : sum orig = 120180, sum opt = 120180
+VECShellSort : pm_sum orig = -0.493945, pm_sum opt = -0.493945
+VECShellSort : speedup = 71.4828%
+------------------------------------------------
+VECShellSort : test begin 250000
+! 0.000235552 <= 0.000235482
+! 0.000235552 <= 0.000235482
+VECShellSort : orig = 0.0684009, opt = 0.020771
+VECShellSort : sum orig = 125071, sum opt = 125071
+VECShellSort : pm_sum orig = -0.574804, pm_sum opt = -0.574804
+VECShellSort : speedup = 69.6334%
+------------------------------------------------
+VECShellSort : test begin 260000
+! 2.32728e-05 <= 9.01753e-06
+! 2.32728e-05 <= 9.01753e-06
+VECShellSort : orig = 0.0706348, opt = 0.01896
+VECShellSort : sum orig = 129921, sum opt = 129921
+VECShellSort : pm_sum orig = -0.493136, pm_sum opt = -0.493136
+VECShellSort : speedup = 73.1577%
+------------------------------------------------
+VECShellSort : test begin 270000
+! 8.55769e-05 <= 9.50415e-06
+! 8.55769e-05 <= 9.50415e-06
+VECShellSort : orig = 0.0852239, opt = 0.0245068
+VECShellSort : sum orig = 135091, sum opt = 135091
+VECShellSort : pm_sum orig = -0.465643, pm_sum opt = -0.465643
+VECShellSort : speedup = 71.2442%
+------------------------------------------------
+VECShellSort : test begin 280000
+! 0.000133032 <= 3.03471e-06
+! 0.000133032 <= 3.03471e-06
+VECShellSort : orig = 0.081727, opt = 0.0235469
+VECShellSort : sum orig = 140013, sum opt = 140013
+VECShellSort : pm_sum orig = -0.480634, pm_sum opt = -0.480634
+VECShellSort : speedup = 71.1883%
+------------------------------------------------
+VECShellSort : test begin 290000
+! 3.48748e-05 <= 2.21338e-05
+! 3.48748e-05 <= 2.21338e-05
+VECShellSort : orig = 0.0862651, opt = 0.024591
+VECShellSort : sum orig = 145007, sum opt = 145007
+VECShellSort : pm_sum orig = -0.490045, pm_sum opt = -0.490045
+VECShellSort : speedup = 71.4937%
+------------------------------------------------
+VECShellSort : test begin 300000
+! 3.99998e-05 <= 1.16997e-05
+! 3.99998e-05 <= 1.16997e-05
+VECShellSort : orig = 0.087893, opt = 0.0247259
+VECShellSort : sum orig = 149807, sum opt = 149807
+VECShellSort : pm_sum orig = -0.537017, pm_sum opt = -0.537017
+VECShellSort : speedup = 71.8682%
+------------------------------------------------
+VECShellSort : test begin 310000
+! 2.56388e-05 <= 1.02078e-05
+! 2.56388e-05 <= 1.02078e-05
+VECShellSort : orig = 0.092998, opt = 0.0252681
+VECShellSort : sum orig = 155215, sum opt = 155215
+VECShellSort : pm_sum orig = -0.531781, pm_sum opt = -0.531781
+VECShellSort : speedup = 72.8294%
+------------------------------------------------
+VECShellSort : test begin 320000
+! 3.6513e-05 <= 3.56971e-05
+! 3.6513e-05 <= 3.56971e-05
+VECShellSort : orig = 0.104915, opt = 0.035238
+VECShellSort : sum orig = 159951, sum opt = 159951
+VECShellSort : pm_sum orig = -0.491299, pm_sum opt = -0.491299
+VECShellSort : speedup = 66.4128%
+------------------------------------------------
+VECShellSort : test begin 330000
+! 7.12895e-05 <= 4.24958e-05
+! 7.12895e-05 <= 4.24958e-05
+VECShellSort : orig = 0.0934741, opt = 0.027344
+VECShellSort : sum orig = 165052, sum opt = 165052
+VECShellSort : pm_sum orig = -0.456931, pm_sum opt = -0.456931
+VECShellSort : speedup = 70.747%
+------------------------------------------------
+VECShellSort : test begin 340000
+! 8.56253e-05 <= 9.93395e-06
+! 8.56253e-05 <= 9.93395e-06
+VECShellSort : orig = 0.10821, opt = 0.0377319
+VECShellSort : sum orig = 169873, sum opt = 169873
+VECShellSort : pm_sum orig = -0.489427, pm_sum opt = -0.489427
+VECShellSort : speedup = 65.1309%
+------------------------------------------------
+VECShellSort : test begin 350000
+! 3.46736e-05 <= 1.38199e-05
+! 3.46736e-05 <= 1.38199e-05
+VECShellSort : orig = 0.102112, opt = 0.028446
+VECShellSort : sum orig = 175047, sum opt = 175047
+VECShellSort : pm_sum orig = -0.503806, pm_sum opt = -0.503806
+VECShellSort : speedup = 72.1423%
+------------------------------------------------
+VECShellSort : test begin 360000
+! 4.91845e-05 <= 1.76299e-05
+! 4.91845e-05 <= 1.76299e-05
+VECShellSort : orig = 0.114486, opt = 0.032783
+VECShellSort : sum orig = 180121, sum opt = 180121
+VECShellSort : pm_sum orig = -0.462107, pm_sum opt = -0.462107
+VECShellSort : speedup = 71.365%
+------------------------------------------------
+VECShellSort : test begin 370000
+! 3.88897e-05 <= 3.07071e-05
+! 3.88897e-05 <= 3.07071e-05
+VECShellSort : orig = 0.109739, opt = 0.031883
+VECShellSort : sum orig = 185261, sum opt = 185261
+VECShellSort : pm_sum orig = -0.536089, pm_sum opt = -0.536089
+VECShellSort : speedup = 70.9465%
+------------------------------------------------
+VECShellSort : test begin 380000
+! 0.000179835 <= 2.04849e-05
+! 0.000179835 <= 2.04849e-05
+VECShellSort : orig = 0.109287, opt = 0.0319271
+VECShellSort : sum orig = 189800, sum opt = 189800
+VECShellSort : pm_sum orig = -0.506205, pm_sum opt = -0.506205
+VECShellSort : speedup = 70.786%
+------------------------------------------------
+VECShellSort : test begin 390000
+! 0.000134305 <= 9.45665e-06
+! 0.000134305 <= 9.45665e-06
+VECShellSort : orig = 0.116425, opt = 0.03333
+VECShellSort : sum orig = 195195, sum opt = 195195
+VECShellSort : pm_sum orig = -0.516142, pm_sum opt = -0.516142
+VECShellSort : speedup = 71.3722%
+------------------------------------------------
+VECShellSort : test begin 400000
+! 0.000140507 <= 0.000128935
+! 0.000140507 <= 0.000128935
+VECShellSort : orig = 0.120515, opt = 0.035033
+VECShellSort : sum orig = 200039, sum opt = 200039
+VECShellSort : pm_sum orig = -0.53187, pm_sum opt = -0.53187
+VECShellSort : speedup = 70.9306%
+------------------------------------------------
+VECShellSort : test begin 410000
+! 0.000131944 <= 9.84287e-05
+! 0.000131944 <= 9.84287e-05
+VECShellSort : orig = 0.122698, opt = 0.037004
+VECShellSort : sum orig = 204867, sum opt = 204867
+VECShellSort : pm_sum orig = -0.489867, pm_sum opt = -0.489867
+VECShellSort : speedup = 69.8414%
+------------------------------------------------
+VECShellSort : test begin 420000
+! 7.70176e-05 <= 6.61132e-05
+! 7.70176e-05 <= 6.61132e-05
+VECShellSort : orig = 0.124235, opt = 0.0368168
+VECShellSort : sum orig = 209623, sum opt = 209623
+VECShellSort : pm_sum orig = -0.476301, pm_sum opt = -0.476301
+VECShellSort : speedup = 70.3651%
+------------------------------------------------
+VECShellSort : test begin 430000
+! 0.00017002 <= 0.000128814
+! 0.00017002 <= 0.000128814
+VECShellSort : orig = 0.123949, opt = 0.0334001
+VECShellSort : sum orig = 215286, sum opt = 215286
+VECShellSort : pm_sum orig = -0.102951, pm_sum opt = -0.102951
+VECShellSort : speedup = 73.0533%
+------------------------------------------------
+VECShellSort : test begin 440000
+! 1.68937e-05 <= 4.42378e-08
+! 1.68937e-05 <= 4.42378e-08
+VECShellSort : orig = 0.136286, opt = 0.0381489
+VECShellSort : sum orig = 220035, sum opt = 220035
+VECShellSort : pm_sum orig = -0.54411, pm_sum opt = -0.54411
+VECShellSort : speedup = 72.0082%
+------------------------------------------------
+VECShellSort : test begin 450000
+! 9.73581e-05 <= 7.17863e-06
+! 9.73581e-05 <= 7.17863e-06
+VECShellSort : orig = 0.139897, opt = 0.0402761
+VECShellSort : sum orig = 225005, sum opt = 225005
+VECShellSort : pm_sum orig = -0.43512, pm_sum opt = -0.43512
+VECShellSort : speedup = 71.2102%
+------------------------------------------------
+VECShellSort : test begin 460000
+! 4.43482e-05 <= 9.35839e-06
+! 4.43482e-05 <= 9.35839e-06
+VECShellSort : orig = 0.133585, opt = 0.0373249
+VECShellSort : sum orig = 229773, sum opt = 229773
+VECShellSort : pm_sum orig = -0.211013, pm_sum opt = -0.211013
+VECShellSort : speedup = 72.0591%
+------------------------------------------------
+VECShellSort : test begin 470000
+! 8.47667e-05 <= 2.45268e-05
+! 8.47667e-05 <= 2.45268e-05
+VECShellSort : orig = 0.144281, opt = 0.0398722
+VECShellSort : sum orig = 235158, sum opt = 235158
+VECShellSort : pm_sum orig = -0.459045, pm_sum opt = -0.459045
+VECShellSort : speedup = 72.3649%
+------------------------------------------------
+VECShellSort : test begin 480000
+! 0.00012916 <= 6.03357e-05
+! 0.00012916 <= 6.03357e-05
+VECShellSort : orig = 0.148841, opt = 0.0460429
+VECShellSort : sum orig = 240279, sum opt = 240279
+VECShellSort : pm_sum orig = -0.497415, pm_sum opt = -0.497415
+VECShellSort : speedup = 69.0657%
+------------------------------------------------
+VECShellSort : test begin 490000
+! 4.95277e-05 <= 5.838e-06
+! 4.95277e-05 <= 5.838e-06
+VECShellSort : orig = 0.151631, opt = 0.0446069
+VECShellSort : sum orig = 244938, sum opt = 244938
+VECShellSort : pm_sum orig = -0.516995, pm_sum opt = -0.516995
+VECShellSort : speedup = 70.5819%
+------------------------------------------------
+VECShellSort : test begin 500000
+! 0.000131355 <= 1.5215e-05
+! 0.000131355 <= 1.5215e-05
+VECShellSort : orig = 0.15148, opt = 0.04896
+VECShellSort : sum orig = 250090, sum opt = 250090
+VECShellSort : pm_sum orig = -0.437351, pm_sum opt = -0.437351
+VECShellSort : speedup = 67.6789%
+------------------------------------------------
+VECShellSort : test begin 510000
+! 1.17947e-05 <= 2.96766e-06
+! 1.17947e-05 <= 2.96766e-06
+VECShellSort : orig = 0.149179, opt = 0.049036
+VECShellSort : sum orig = 254978, sum opt = 254978
+VECShellSort : pm_sum orig = -0.452098, pm_sum opt = -0.452098
+VECShellSort : speedup = 67.1294%
+------------------------------------------------
+VECShellSort : test begin 520000
+! 2.90391e-05 <= 2.26609e-05
+! 2.90391e-05 <= 2.26609e-05
+VECShellSort : orig = 0.161172, opt = 0.0460861
+VECShellSort : sum orig = 259755, sum opt = 259755
+VECShellSort : pm_sum orig = -0.48112, pm_sum opt = -0.48112
+VECShellSort : speedup = 71.4056%
+------------------------------------------------
+VECShellSort : test begin 530000
+! 8.38749e-06 <= 3.47057e-06
+! 8.38749e-06 <= 3.47057e-06
+VECShellSort : orig = 0.166523, opt = 0.0495951
+VECShellSort : sum orig = 264968, sum opt = 264968
+VECShellSort : pm_sum orig = -0.393288, pm_sum opt = -0.393288
+VECShellSort : speedup = 70.2173%
+------------------------------------------------
+VECShellSort : test begin 540000
+! 2.37334e-05 <= 1.88062e-05
+! 2.37334e-05 <= 1.88062e-05
+VECShellSort : orig = 0.187116, opt = 0.0538671
+VECShellSort : sum orig = 269589, sum opt = 269589
+VECShellSort : pm_sum orig = -0.511116, pm_sum opt = -0.511116
+VECShellSort : speedup = 71.2119%
+------------------------------------------------
+VECShellSort : test begin 550000
+! 4.66709e-05 <= 4.29628e-05
+! 4.66709e-05 <= 4.29628e-05
+VECShellSort : orig = 0.182328, opt = 0.0557978
+VECShellSort : sum orig = 275240, sum opt = 275240
+VECShellSort : pm_sum orig = -0.487386, pm_sum opt = -0.487386
+VECShellSort : speedup = 69.397%
+------------------------------------------------
+VECShellSort : test begin 560000
+! 2.93651e-05 <= 9.32626e-06
+! 2.93651e-05 <= 9.32626e-06
+VECShellSort : orig = 0.185694, opt = 0.056448
+VECShellSort : sum orig = 280357, sum opt = 280357
+VECShellSort : pm_sum orig = -0.504432, pm_sum opt = -0.504432
+VECShellSort : speedup = 69.6016%
+------------------------------------------------
+VECShellSort : test begin 570000
+! 3.7163e-05 <= 3.67146e-05
+! 3.7163e-05 <= 3.67146e-05
+VECShellSort : orig = 0.184287, opt = 0.055469
+VECShellSort : sum orig = 285140, sum opt = 285140
+VECShellSort : pm_sum orig = -0.509469, pm_sum opt = -0.509469
+VECShellSort : speedup = 69.9007%
+------------------------------------------------
+VECShellSort : test begin 580000
+! 3.09329e-05 <= 2.23913e-05
+! 3.09329e-05 <= 2.23913e-05
+VECShellSort : orig = 0.192537, opt = 0.0591691
+VECShellSort : sum orig = 290068, sum opt = 290068
+VECShellSort : pm_sum orig = -0.494723, pm_sum opt = -0.494723
+VECShellSort : speedup = 69.2687%
+------------------------------------------------
+VECShellSort : test begin 590000
+! 2.6206e-05 <= 1.02073e-05
+! 2.6206e-05 <= 1.02073e-05
+VECShellSort : orig = 0.196111, opt = 0.072957
+VECShellSort : sum orig = 295043, sum opt = 295043
+VECShellSort : pm_sum orig = -2.72403, pm_sum opt = -2.72403
+VECShellSort : speedup = 62.7981%
+------------------------------------------------
+VECShellSort : test begin 600000
+! 2.29315e-05 <= 4.23286e-07
+! 2.29315e-05 <= 4.23286e-07
+VECShellSort : orig = 0.199812, opt = 0.0584781
+VECShellSort : sum orig = 300174, sum opt = 300174
+VECShellSort : pm_sum orig = -0.482256, pm_sum opt = -0.482256
+VECShellSort : speedup = 70.7335%
+------------------------------------------------
+VECShellSort : test begin 610000
+! 5.8963e-05 <= 2.16519e-05
+! 5.8963e-05 <= 2.16519e-05
+VECShellSort : orig = 0.209177, opt = 0.0594008
+VECShellSort : sum orig = 305137, sum opt = 305137
+VECShellSort : pm_sum orig = -0.501982, pm_sum opt = -0.501982
+VECShellSort : speedup = 71.6026%
+------------------------------------------------
+VECShellSort : test begin 620000
+! 3.96851e-05 <= 3.76254e-07
+! 3.96851e-05 <= 3.76254e-07
+VECShellSort : orig = 0.212316, opt = 0.0612741
+VECShellSort : sum orig = 309814, sum opt = 309814
+VECShellSort : pm_sum orig = -0.527227, pm_sum opt = -0.527227
+VECShellSort : speedup = 71.1402%
+------------------------------------------------
+VECShellSort : test begin 630000
+! 4.02867e-05 <= 1.58222e-05
+! 4.02867e-05 <= 1.58222e-05
+VECShellSort : orig = 0.200118, opt = 0.0570972
+VECShellSort : sum orig = 315170, sum opt = 315170
+VECShellSort : pm_sum orig = -0.505672, pm_sum opt = -0.505672
+VECShellSort : speedup = 71.4682%
+------------------------------------------------
+VECShellSort : test begin 640000
+! 2.06707e-05 <= 7.15628e-06
+! 2.06707e-05 <= 7.15628e-06
+VECShellSort : orig = 0.243095, opt = 0.088232
+VECShellSort : sum orig = 320073, sum opt = 320073
+VECShellSort : pm_sum orig = -0.500063, pm_sum opt = -0.500063
+VECShellSort : speedup = 63.7047%
+------------------------------------------------
+VECShellSort : test begin 650000
+! 7.46502e-05 <= 5.51646e-05
+! 7.46502e-05 <= 5.51646e-05
+VECShellSort : orig = 0.219649, opt = 0.0657611
+VECShellSort : sum orig = 324963, sum opt = 324963
+VECShellSort : pm_sum orig = -0.493905, pm_sum opt = -0.493905
+VECShellSort : speedup = 70.0608%
+------------------------------------------------
+VECShellSort : test begin 660000
+! 1.64853e-05 <= 7.15954e-06
+! 1.64853e-05 <= 7.15954e-06
+VECShellSort : orig = 0.209362, opt = 0.0651629
+VECShellSort : sum orig = 330007, sum opt = 330007
+VECShellSort : pm_sum orig = -0.48386, pm_sum opt = -0.48386
+VECShellSort : speedup = 68.8755%
+------------------------------------------------
+VECShellSort : test begin 670000
+! 9.77051e-05 <= 2.56803e-05
+! 9.77051e-05 <= 2.56803e-05
+VECShellSort : orig = 0.222716, opt = 0.067081
+VECShellSort : sum orig = 334769, sum opt = 334769
+VECShellSort : pm_sum orig = -0.5341, pm_sum opt = -0.5341
+VECShellSort : speedup = 69.8805%
+------------------------------------------------
+VECShellSort : test begin 680000
+! 2.09222e-05 <= 1.6273e-05
+! 2.09222e-05 <= 1.6273e-05
+VECShellSort : orig = 0.237617, opt = 0.083739
+VECShellSort : sum orig = 339517, sum opt = 339517
+VECShellSort : pm_sum orig = -0.479657, pm_sum opt = -0.479657
+VECShellSort : speedup = 64.7588%
+------------------------------------------------
+VECShellSort : test begin 690000
+! 6.85607e-05 <= 1.0604e-05
+! 6.85607e-05 <= 1.0604e-05
+VECShellSort : orig = 0.218006, opt = 0.0647051
+VECShellSort : sum orig = 344826, sum opt = 344826
+VECShellSort : pm_sum orig = -0.471864, pm_sum opt = -0.471864
+VECShellSort : speedup = 70.3195%
+------------------------------------------------
+VECShellSort : test begin 700000
+! 3.34843e-05 <= 2.94358e-05
+! 3.34843e-05 <= 2.94358e-05
+VECShellSort : orig = 0.232368, opt = 0.067733
+VECShellSort : sum orig = 349618, sum opt = 349618
+VECShellSort : pm_sum orig = -0.50284, pm_sum opt = -0.50284
+VECShellSort : speedup = 70.851%
+------------------------------------------------
+VECShellSort : test begin 710000
+! 5.22332e-05 <= 1.37873e-05
+! 5.22332e-05 <= 1.37873e-05
+VECShellSort : orig = 0.240589, opt = 0.0719121
+VECShellSort : sum orig = 355012, sum opt = 355012
+VECShellSort : pm_sum orig = -0.485297, pm_sum opt = -0.485297
+VECShellSort : speedup = 70.11%
+------------------------------------------------
+VECShellSort : test begin 720000
+! 1.77445e-05 <= 1.5954e-05
+! 1.77445e-05 <= 1.5954e-05
+VECShellSort : orig = 0.256722, opt = 0.0776012
+VECShellSort : sum orig = 359377, sum opt = 359377
+VECShellSort : pm_sum orig = -0.50519, pm_sum opt = -0.50519
+VECShellSort : speedup = 69.7723%
+------------------------------------------------
+VECShellSort : test begin 730000
+! 9.5184e-05 <= 1.29659e-05
+! 9.5184e-05 <= 1.29659e-05
+VECShellSort : orig = 0.24302, opt = 0.0732679
+VECShellSort : sum orig = 365118, sum opt = 365118
+VECShellSort : pm_sum orig = -0.490328, pm_sum opt = -0.490328
+VECShellSort : speedup = 69.8511%
+------------------------------------------------
+VECShellSort : test begin 740000
+! 5.13308e-05 <= 8.00705e-06
+! 5.13308e-05 <= 8.00705e-06
+VECShellSort : orig = 0.252471, opt = 0.0766921
+VECShellSort : sum orig = 369944, sum opt = 369944
+VECShellSort : pm_sum orig = -0.497049, pm_sum opt = -0.497049
+VECShellSort : speedup = 69.6234%
+------------------------------------------------
+VECShellSort : test begin 750000
+! 4.89689e-05 <= 8.71532e-06
+! 4.89689e-05 <= 8.71532e-06
+VECShellSort : orig = 0.259019, opt = 0.079407
+VECShellSort : sum orig = 375103, sum opt = 375103
+VECShellSort : pm_sum orig = -0.480552, pm_sum opt = -0.480552
+VECShellSort : speedup = 69.3432%
+------------------------------------------------
+VECShellSort : test begin 760000
+! 6.41216e-07 <= 3.29223e-07
+! 6.41216e-07 <= 3.29223e-07
+VECShellSort : orig = 0.246854, opt = 0.0754781
+VECShellSort : sum orig = 379947, sum opt = 379947
+VECShellSort : pm_sum orig = -0.493647, pm_sum opt = -0.493647
+VECShellSort : speedup = 69.424%
+------------------------------------------------
+VECShellSort : test begin 770000
+! 1.866e-05 <= 1.5669e-05
+! 1.866e-05 <= 1.5669e-05
+VECShellSort : orig = 0.261325, opt = 0.0725429
+VECShellSort : sum orig = 385612, sum opt = 385612
+VECShellSort : pm_sum orig = -0.489214, pm_sum opt = -0.489214
+VECShellSort : speedup = 72.2403%
+------------------------------------------------
+VECShellSort : test begin 780000
+! 1.07498e-05 <= 1.46683e-07
+! 1.07498e-05 <= 1.46683e-07
+VECShellSort : orig = 0.261729, opt = 0.078027
+VECShellSort : sum orig = 389533, sum opt = 389533
+VECShellSort : pm_sum orig = -0.514672, pm_sum opt = -0.514672
+VECShellSort : speedup = 70.1879%
+------------------------------------------------
+VECShellSort : test begin 790000
+! 1.03307e-05 <= 1.18883e-06
+! 1.03307e-05 <= 1.18883e-06
+VECShellSort : orig = 0.25358, opt = 0.0736878
+VECShellSort : sum orig = 395177, sum opt = 395177
+VECShellSort : pm_sum orig = -0.308703, pm_sum opt = -0.308703
+VECShellSort : speedup = 70.941%
+------------------------------------------------
+VECShellSort : test begin 800000
+! 3.32333e-05 <= 3.20049e-05
+! 3.32333e-05 <= 3.20049e-05
+VECShellSort : orig = 0.282175, opt = 0.0886421
+VECShellSort : sum orig = 400116, sum opt = 400116
+VECShellSort : pm_sum orig = -0.485839, pm_sum opt = -0.485839
+VECShellSort : speedup = 68.5861%
+------------------------------------------------
+VECShellSort : test begin 810000
+! 3.36678e-05 <= 1.14641e-05
+! 3.36678e-05 <= 1.14641e-05
+VECShellSort : orig = 0.287793, opt = 0.0919678
+VECShellSort : sum orig = 405438, sum opt = 405438
+VECShellSort : pm_sum orig = -0.51445, pm_sum opt = -0.51445
+VECShellSort : speedup = 68.0438%
+------------------------------------------------
+VECShellSort : test begin 820000
+! 4.6751e-05 <= 3.14508e-06
+! 4.6751e-05 <= 3.14508e-06
+VECShellSort : orig = 0.261143, opt = 0.083384
+VECShellSort : sum orig = 410271, sum opt = 410271
+VECShellSort : pm_sum orig = -0.529965, pm_sum opt = -0.529965
+VECShellSort : speedup = 68.0696%
+------------------------------------------------
+VECShellSort : test begin 830000
+! 1.62143e-06 <= 3.7998e-07
+! 1.62143e-06 <= 3.7998e-07
+VECShellSort : orig = 0.286968, opt = 0.0865979
+VECShellSort : sum orig = 415086, sum opt = 415086
+VECShellSort : pm_sum orig = -0.499241, pm_sum opt = -0.499241
+VECShellSort : speedup = 69.8231%
+------------------------------------------------
+VECShellSort : test begin 840000
+! 2.13808e-05 <= 1.10809e-05
+! 2.13808e-05 <= 1.10809e-05
+VECShellSort : orig = 0.283167, opt = 0.089529
+VECShellSort : sum orig = 420308, sum opt = 420308
+VECShellSort : pm_sum orig = -0.514266, pm_sum opt = -0.514266
+VECShellSort : speedup = 68.3829%
+------------------------------------------------
+VECShellSort : test begin 850000
+! 2.77576e-05 <= 9.6811e-07
+! 2.77576e-05 <= 9.6811e-07
+VECShellSort : orig = 0.297259, opt = 0.093647
+VECShellSort : sum orig = 424991, sum opt = 424991
+VECShellSort : pm_sum orig = -0.490556, pm_sum opt = -0.490556
+VECShellSort : speedup = 68.4965%
+------------------------------------------------
+VECShellSort : test begin 860000
+! 5.09741e-05 <= 3.24389e-05
+! 5.09741e-05 <= 3.24389e-05
+VECShellSort : orig = 0.28803, opt = 0.0831079
+VECShellSort : sum orig = 430123, sum opt = 430123
+VECShellSort : pm_sum orig = -0.404897, pm_sum opt = -0.404897
+VECShellSort : speedup = 71.1461%
+------------------------------------------------
+VECShellSort : test begin 870000
+! 7.00913e-06 <= 2.84333e-06
+! 7.00913e-06 <= 2.84333e-06
+VECShellSort : orig = 0.29403, opt = 0.0897989
+VECShellSort : sum orig = 434942, sum opt = 434942
+VECShellSort : pm_sum orig = -0.463224, pm_sum opt = -0.463224
+VECShellSort : speedup = 69.4593%
+------------------------------------------------
+VECShellSort : test begin 880000
+! 2.83923e-05 <= 1.91657e-05
+! 2.83923e-05 <= 1.91657e-05
+VECShellSort : orig = 0.314182, opt = 0.0955291
+VECShellSort : sum orig = 439698, sum opt = 439698
+VECShellSort : pm_sum orig = -0.516866, pm_sum opt = -0.516866
+VECShellSort : speedup = 69.5944%
+------------------------------------------------
+VECShellSort : test begin 890000
+! 7.70921e-05 <= 2.75085e-05
+! 7.70921e-05 <= 2.75085e-05
+VECShellSort : orig = 0.287071, opt = 0.087369
+VECShellSort : sum orig = 445804, sum opt = 445804
+VECShellSort : pm_sum orig = -0.492222, pm_sum opt = -0.492222
+VECShellSort : speedup = 69.5654%
+------------------------------------------------
+VECShellSort : test begin 900000
+! 1.36839e-05 <= 3.18047e-06
+! 1.36839e-05 <= 3.18047e-06
+VECShellSort : orig = 0.305202, opt = 0.0886319
+VECShellSort : sum orig = 449592, sum opt = 449592
+VECShellSort : pm_sum orig = -0.506029, pm_sum opt = -0.506029
+VECShellSort : speedup = 70.9596%
+------------------------------------------------
+VECShellSort : test begin 910000
+! 2.81315e-05 <= 1.25566e-05
+! 2.81315e-05 <= 1.25566e-05
+VECShellSort : orig = 0.305586, opt = 0.0970559
+VECShellSort : sum orig = 454609, sum opt = 454609
+VECShellSort : pm_sum orig = -0.468493, pm_sum opt = -0.468493
+VECShellSort : speedup = 68.2394%
+------------------------------------------------
+VECShellSort : test begin 920000
+! 2.00737e-05 <= 2.76417e-06
+! 2.00737e-05 <= 2.76417e-06
+VECShellSort : orig = 0.29624, opt = 0.0894089
+VECShellSort : sum orig = 460166, sum opt = 460166
+VECShellSort : pm_sum orig = -0.930511, pm_sum opt = -0.930511
+VECShellSort : speedup = 69.8188%
+------------------------------------------------
+VECShellSort : test begin 930000
+! 2.10959e-05 <= 1.30781e-05
+! 2.10959e-05 <= 1.30781e-05
+VECShellSort : orig = 0.306055, opt = 0.098191
+VECShellSort : sum orig = 464779, sum opt = 464779
+VECShellSort : pm_sum orig = -0.425569, pm_sum opt = -0.425569
+VECShellSort : speedup = 67.9172%
+------------------------------------------------
+VECShellSort : test begin 940000
+! 4.91571e-05 <= 2.46437e-05
+! 4.91571e-05 <= 2.46437e-05
+VECShellSort : orig = 0.326803, opt = 0.096652
+VECShellSort : sum orig = 469735, sum opt = 469735
+VECShellSort : pm_sum orig = -0.498192, pm_sum opt = -0.498192
+VECShellSort : speedup = 70.425%
+------------------------------------------------
+VECShellSort : test begin 950000
+! 2.08775e-05 <= 1.59731e-05
+! 2.08775e-05 <= 1.59731e-05
+VECShellSort : orig = 0.332252, opt = 0.0930049
+VECShellSort : sum orig = 475042, sum opt = 475042
+VECShellSort : pm_sum orig = -0.52337, pm_sum opt = -0.52337
+VECShellSort : speedup = 72.0077%
+------------------------------------------------
+VECShellSort : test begin 960000
+! 7.36788e-05 <= 4.60539e-07
+! 7.36788e-05 <= 4.60539e-07
+VECShellSort : orig = 0.372596, opt = 0.125802
+VECShellSort : sum orig = 479693, sum opt = 479693
+VECShellSort : pm_sum orig = -0.489405, pm_sum opt = -0.489405
+VECShellSort : speedup = 66.2363%
+------------------------------------------------
+VECShellSort : test begin 970000
+! 4.48702e-05 <= 1.40117e-06
+! 4.48702e-05 <= 1.40117e-06
+VECShellSort : orig = 0.327593, opt = 0.100142
+VECShellSort : sum orig = 485514, sum opt = 485514
+VECShellSort : pm_sum orig = -0.489627, pm_sum opt = -0.489627
+VECShellSort : speedup = 69.431%
+------------------------------------------------
+VECShellSort : test begin 980000
+! 6.50063e-07 <= 3.96278e-07
+! 6.50063e-07 <= 3.96278e-07
+VECShellSort : orig = 0.348373, opt = 0.110009
+VECShellSort : sum orig = 490248, sum opt = 490248
+VECShellSort : pm_sum orig = -0.477201, pm_sum opt = -0.477201
+VECShellSort : speedup = 68.4221%
+------------------------------------------------
+VECShellSort : test begin 990000
+! 2.87713e-05 <= 1.64704e-05
+! 2.87713e-05 <= 1.64704e-05
+VECShellSort : orig = 0.320489, opt = 0.094444
+VECShellSort : sum orig = 494677, sum opt = 494677
+VECShellSort : pm_sum orig = -0.60142, pm_sum opt = -0.60142
+VECShellSort : speedup = 70.5313%
+------------------------------------------------
+VECShellSort : test begin 1000000
+! 1.49286e-05 <= 1.83983e-06
+! 1.49286e-05 <= 1.83983e-06
+VECShellSort : orig = 0.343695, opt = 0.116315
+VECShellSort : sum orig = 499905, sum opt = 499905
+VECShellSort : pm_sum orig = -0.492583, pm_sum opt = -0.492583
+VECShellSort : speedup = 66.1575%
+------------------------------------------------
+VECShellSort : test begin 1010000
+! 7.08504e-06 <= 2.48943e-06
+! 7.08504e-06 <= 2.48943e-06
+VECShellSort : orig = 0.37073, opt = 0.120752
+VECShellSort : sum orig = 505056, sum opt = 505056
+VECShellSort : pm_sum orig = -0.473143, pm_sum opt = -0.473143
+VECShellSort : speedup = 67.4286%
+------------------------------------------------
+VECShellSort : test begin 1020000
+! 3.23574e-05 <= 2.06204e-05
+! 3.23574e-05 <= 2.06204e-05
+VECShellSort : orig = 0.366109, opt = 0.122939
+VECShellSort : sum orig = 509749, sum opt = 509749
+VECShellSort : pm_sum orig = -0.494017, pm_sum opt = -0.494017
+VECShellSort : speedup = 66.4201%
+------------------------------------------------
+VECShellSort : test begin 1030000
+! 5.30439e-05 <= 4.89783e-05
+! 5.30439e-05 <= 4.89783e-05
+VECShellSort : orig = 0.36145, opt = 0.10438
+VECShellSort : sum orig = 515533, sum opt = 515533
+VECShellSort : pm_sum orig = -0.512823, pm_sum opt = -0.512823
+VECShellSort : speedup = 71.1218%
+------------------------------------------------
+VECShellSort : test begin 1040000
+! 3.02619e-05 <= 1.40732e-05
+! 3.02619e-05 <= 1.40732e-05
+VECShellSort : orig = 0.391512, opt = 0.119852
+VECShellSort : sum orig = 520141, sum opt = 520141
+VECShellSort : pm_sum orig = -0.51566, pm_sum opt = -0.51566
+VECShellSort : speedup = 69.3874%
+------------------------------------------------
+VECShellSort : test begin 1050000
+! 9.02964e-06 <= 3.94043e-06
+! 9.02964e-06 <= 3.94043e-06
+VECShellSort : orig = 0.41441, opt = 0.136001
+VECShellSort : sum orig = 525209, sum opt = 525209
+VECShellSort : pm_sum orig = -1.30457, pm_sum opt = -1.30457
+VECShellSort : speedup = 67.1821%
+------------------------------------------------
+VECShellSort : test begin 1060000
+! 1.73161e-05 <= 5.28153e-06
+! 1.73161e-05 <= 5.28153e-06
+VECShellSort : orig = 0.400269, opt = 0.125006
+VECShellSort : sum orig = 530109, sum opt = 530109
+VECShellSort : pm_sum orig = -0.39626, pm_sum opt = -0.39626
+VECShellSort : speedup = 68.7695%
+------------------------------------------------
+VECShellSort : test begin 1070000
+! 1.52048e-05 <= 6.021e-07
+! 1.52048e-05 <= 6.021e-07
+VECShellSort : orig = 0.386689, opt = 0.119913
+VECShellSort : sum orig = 534785, sum opt = 534785
+VECShellSort : pm_sum orig = -0.498153, pm_sum opt = -0.498153
+VECShellSort : speedup = 68.9898%
+------------------------------------------------
+VECShellSort : test begin 1080000
+! 4.18518e-05 <= 2.71201e-06
+! 4.18518e-05 <= 2.71201e-06
+VECShellSort : orig = 0.413666, opt = 0.121306
+VECShellSort : sum orig = 540596, sum opt = 540596
+VECShellSort : pm_sum orig = -0.502794, pm_sum opt = -0.502794
+VECShellSort : speedup = 70.6753%
+------------------------------------------------
+VECShellSort : test begin 1090000
+! 8.08155e-06 <= 5.10365e-07
+! 8.08155e-06 <= 5.10365e-07
+VECShellSort : orig = 0.395597, opt = 0.127199
+VECShellSort : sum orig = 544839, sum opt = 544839
+VECShellSort : pm_sum orig = -0.506273, pm_sum opt = -0.506273
+VECShellSort : speedup = 67.8463%
+------------------------------------------------
+VECShellSort : test begin 1100000
+! 1.07884e-05 <= 6.28503e-06
+! 1.07884e-05 <= 6.28503e-06
+VECShellSort : orig = 0.416382, opt = 0.137573
+VECShellSort : sum orig = 550017, sum opt = 550017
+VECShellSort : pm_sum orig = -0.504801, pm_sum opt = -0.504801
+VECShellSort : speedup = 66.9599%
+------------------------------------------------
+VECShellSort : test begin 1110000
+! 1.53827e-05 <= 1.29361e-06
+! 1.53827e-05 <= 1.29361e-06
+VECShellSort : orig = 0.420161, opt = 0.120546
+VECShellSort : sum orig = 554975, sum opt = 554975
+VECShellSort : pm_sum orig = -0.495583, pm_sum opt = -0.495583
+VECShellSort : speedup = 71.3096%
+------------------------------------------------
+VECShellSort : test begin 1120000
+! 2.29762e-05 <= 1.14338e-05
+! 2.29762e-05 <= 1.14338e-05
+VECShellSort : orig = 0.421152, opt = 0.137079
+VECShellSort : sum orig = 560321, sum opt = 560321
+VECShellSort : pm_sum orig = -0.492409, pm_sum opt = -0.492409
+VECShellSort : speedup = 67.4514%
+------------------------------------------------
+VECShellSort : test begin 1130000
+! 2.52267e-05 <= 5.01052e-06
+! 2.52267e-05 <= 5.01052e-06
+VECShellSort : orig = 0.423923, opt = 0.126996
+VECShellSort : sum orig = 565134, sum opt = 565134
+VECShellSort : pm_sum orig = -0.49279, pm_sum opt = -0.49279
+VECShellSort : speedup = 70.0427%
+------------------------------------------------
+VECShellSort : test begin 1140000
+! 2.65641e-05 <= 5.25732e-07
+! 2.65641e-05 <= 5.25732e-07
+VECShellSort : orig = 0.426229, opt = 0.136992
+VECShellSort : sum orig = 569720, sum opt = 569720
+VECShellSort : pm_sum orig = -0.50236, pm_sum opt = -0.50236
+VECShellSort : speedup = 67.8595%
+------------------------------------------------
+VECShellSort : test begin 1150000
+! 5.57886e-05 <= 5.34905e-06
+! 5.57886e-05 <= 5.34905e-06
+VECShellSort : orig = 0.434071, opt = 0.142599
+VECShellSort : sum orig = 575343, sum opt = 575343
+VECShellSort : pm_sum orig = -0.502869, pm_sum opt = -0.502869
+VECShellSort : speedup = 67.1485%
+------------------------------------------------
+VECShellSort : test begin 1160000
+! 1.82772e-05 <= 1.42641e-05
+! 1.82772e-05 <= 1.42641e-05
+VECShellSort : orig = 0.444, opt = 0.137529
+VECShellSort : sum orig = 579794, sum opt = 579794
+VECShellSort : pm_sum orig = -0.491022, pm_sum opt = -0.491022
+VECShellSort : speedup = 69.025%
+------------------------------------------------
+VECShellSort : test begin 1170000
+! 3.29525e-05 <= 1.36406e-05
+! 3.29525e-05 <= 1.36406e-05
+VECShellSort : orig = 0.44988, opt = 0.145786
+VECShellSort : sum orig = 585457, sum opt = 585457
+VECShellSort : pm_sum orig = -0.500125, pm_sum opt = -0.500125
+VECShellSort : speedup = 67.5945%
+------------------------------------------------
+VECShellSort : test begin 1180000
+! 5.99371e-05 <= 5.12484e-05
+! 5.99371e-05 <= 5.12484e-05
+VECShellSort : orig = 0.435015, opt = 0.16057
+VECShellSort : sum orig = 590438, sum opt = 590438
+VECShellSort : pm_sum orig = -2.85996, pm_sum opt = -2.85996
+VECShellSort : speedup = 63.0886%
+------------------------------------------------
+VECShellSort : test begin 1190000
+! 2.0978e-05 <= 9.00123e-07
+! 2.0978e-05 <= 9.00123e-07
+VECShellSort : orig = 0.438689, opt = 0.140067
+VECShellSort : sum orig = 595184, sum opt = 595184
+VECShellSort : pm_sum orig = -0.497127, pm_sum opt = -0.497127
+VECShellSort : speedup = 68.0714%
+------------------------------------------------
+VECShellSort : test begin 1200000
+! 5.55534e-06 <= 2.98163e-06
+! 5.55534e-06 <= 2.98163e-06
+VECShellSort : orig = 0.456872, opt = 0.13962
+VECShellSort : sum orig = 600228, sum opt = 600228
+VECShellSort : pm_sum orig = -0.519165, pm_sum opt = -0.519165
+VECShellSort : speedup = 69.44%
+------------------------------------------------
+VECShellSort : test begin 1210000
+! 9.70066e-06 <= 2.37487e-08
+! 9.70066e-06 <= 2.37487e-08
+VECShellSort : orig = 0.452012, opt = 0.135042
+VECShellSort : sum orig = 604852, sum opt = 604852
+VECShellSort : pm_sum orig = -0.565696, pm_sum opt = -0.565696
+VECShellSort : speedup = 70.1242%
+------------------------------------------------
+VECShellSort : test begin 1220000
+! 1.02445e-05 <= 3.96837e-06
+! 1.02445e-05 <= 3.96837e-06
+VECShellSort : orig = 0.479744, opt = 0.152144
+VECShellSort : sum orig = 610148, sum opt = 610148
+VECShellSort : pm_sum orig = -0.480119, pm_sum opt = -0.480119
+VECShellSort : speedup = 68.2864%
+------------------------------------------------
+VECShellSort : test begin 1230000
+! 2.38097e-05 <= 5.74533e-06
+! 2.38097e-05 <= 5.74533e-06
+VECShellSort : orig = 0.44982, opt = 0.142802
+VECShellSort : sum orig = 615296, sum opt = 615296
+VECShellSort : pm_sum orig = -0.480994, pm_sum opt = -0.480994
+VECShellSort : speedup = 68.2535%
+------------------------------------------------
+VECShellSort : test begin 1240000
+! 1.29729e-05 <= 1.22199e-05
+! 1.29729e-05 <= 1.22199e-05
+VECShellSort : orig = 0.482849, opt = 0.146497
+VECShellSort : sum orig = 619758, sum opt = 619758
+VECShellSort : pm_sum orig = -0.490805, pm_sum opt = -0.490805
+VECShellSort : speedup = 69.6599%
+------------------------------------------------
+VECShellSort : test begin 1250000
+! 3.08133e-05 <= 4.96907e-06
+! 3.08133e-05 <= 4.96907e-06
+VECShellSort : orig = 0.437173, opt = 0.135493
+VECShellSort : sum orig = 624546, sum opt = 624546
+VECShellSort : pm_sum orig = -0.511297, pm_sum opt = -0.511297
+VECShellSort : speedup = 69.007%
+------------------------------------------------
+VECShellSort : test begin 1260000
+! 2.45851e-05 <= 1.57258e-05
+! 2.45851e-05 <= 1.57258e-05
+VECShellSort : orig = 0.4547, opt = 0.137522
+VECShellSort : sum orig = 629929, sum opt = 629929
+VECShellSort : pm_sum orig = -0.509367, pm_sum opt = -0.509367
+VECShellSort : speedup = 69.7554%
+------------------------------------------------
+VECShellSort : test begin 1270000
+! 2.51308e-05 <= 8.74046e-06
+! 2.51308e-05 <= 8.74046e-06
+VECShellSort : orig = 0.472937, opt = 0.160951
+VECShellSort : sum orig = 634780, sum opt = 634780
+VECShellSort : pm_sum orig = -0.492099, pm_sum opt = -0.492099
+VECShellSort : speedup = 65.9678%
+------------------------------------------------
+VECShellSort : test begin 1280000
+! 5.62663e-05 <= 4.23053e-06
+! 5.62663e-05 <= 4.23053e-06
+VECShellSort : orig = 0.564566, opt = 0.223717
+VECShellSort : sum orig = 640317, sum opt = 640317
+VECShellSort : pm_sum orig = -0.494518, pm_sum opt = -0.494518
+VECShellSort : speedup = 60.3736%
+------------------------------------------------
+VECShellSort : test begin 1290000
+! 1.23279e-05 <= 3.44077e-06
+! 1.23279e-05 <= 3.44077e-06
+VECShellSort : orig = 0.477498, opt = 0.143765
+VECShellSort : sum orig = 644747, sum opt = 644747
+VECShellSort : pm_sum orig = -0.500908, pm_sum opt = -0.500908
+VECShellSort : speedup = 69.892%
+------------------------------------------------
+VECShellSort : test begin 1300000
+! 1.1574e-05 <= 7.75047e-06
+! 1.1574e-05 <= 7.75047e-06
+VECShellSort : orig = 0.500029, opt = 0.164213
+VECShellSort : sum orig = 650346, sum opt = 650346
+VECShellSort : pm_sum orig = -0.496492, pm_sum opt = -0.496492
+VECShellSort : speedup = 67.1593%
+------------------------------------------------
+VECShellSort : test begin 1310000
+! 2.45892e-05 <= 7.21822e-06
+! 2.45892e-05 <= 7.21822e-06
+VECShellSort : orig = 0.516896, opt = 0.15512
+VECShellSort : sum orig = 655268, sum opt = 655268
+VECShellSort : pm_sum orig = -0.481531, pm_sum opt = -0.481531
+VECShellSort : speedup = 69.9901%
+------------------------------------------------
+VECShellSort : test begin 1320000
+! 1.45435e-05 <= 1.14986e-05
+! 1.45435e-05 <= 1.14986e-05
+VECShellSort : orig = 0.483322, opt = 0.158559
+VECShellSort : sum orig = 659553, sum opt = 659553
+VECShellSort : pm_sum orig = -0.468478, pm_sum opt = -0.468478
+VECShellSort : speedup = 67.194%
+------------------------------------------------
+VECShellSort : test begin 1330000
+! 1.08043e-05 <= 6.15418e-06
+! 1.08043e-05 <= 6.15418e-06
+VECShellSort : orig = 0.491063, opt = 0.155474
+VECShellSort : sum orig = 664307, sum opt = 664307
+VECShellSort : pm_sum orig = -0.517899, pm_sum opt = -0.517899
+VECShellSort : speedup = 68.3393%
+------------------------------------------------
+VECShellSort : test begin 1340000
+! 1.64486e-05 <= 1.63903e-05
+! 1.64486e-05 <= 1.63903e-05
+VECShellSort : orig = 0.499989, opt = 0.157579
+VECShellSort : sum orig = 669671, sum opt = 669671
+VECShellSort : pm_sum orig = -0.563654, pm_sum opt = -0.563654
+VECShellSort : speedup = 68.4835%
+------------------------------------------------
+VECShellSort : test begin 1350000
+! 3.5062e-05 <= 2.93553e-06
+! 3.5062e-05 <= 2.93553e-06
+VECShellSort : orig = 0.493636, opt = 0.151752
+VECShellSort : sum orig = 675067, sum opt = 675067
+VECShellSort : pm_sum orig = -0.48964, pm_sum opt = -0.48964
+VECShellSort : speedup = 69.2583%
+------------------------------------------------
+VECShellSort : test begin 1360000
+! 1.65137e-05 <= 1.58036e-05
+! 1.65137e-05 <= 1.58036e-05
+VECShellSort : orig = 0.54428, opt = 0.202822
+VECShellSort : sum orig = 680217, sum opt = 680217
+VECShellSort : pm_sum orig = -0.514775, pm_sum opt = -0.514775
+VECShellSort : speedup = 62.7357%
+------------------------------------------------
+VECShellSort : test begin 1370000
+! 3.48319e-05 <= 1.53137e-05
+! 3.48319e-05 <= 1.53137e-05
+VECShellSort : orig = 0.527902, opt = 0.157035
+VECShellSort : sum orig = 684715, sum opt = 684715
+VECShellSort : pm_sum orig = -0.482255, pm_sum opt = -0.482255
+VECShellSort : speedup = 70.253%
+------------------------------------------------
+VECShellSort : test begin 1380000
+! 1.80122e-05 <= 1.38697e-05
+! 1.80122e-05 <= 1.38697e-05
+VECShellSort : orig = 0.498126, opt = 0.154395
+VECShellSort : sum orig = 689643, sum opt = 689643
+VECShellSort : pm_sum orig = -0.511161, pm_sum opt = -0.511161
+VECShellSort : speedup = 69.0049%
+------------------------------------------------
+VECShellSort : test begin 1390000
+! 3.8357e-05 <= 2.46116e-05
+! 3.8357e-05 <= 2.46116e-05
+VECShellSort : orig = 0.505488, opt = 0.153308
+VECShellSort : sum orig = 694680, sum opt = 694680
+VECShellSort : pm_sum orig = -0.493108, pm_sum opt = -0.493108
+VECShellSort : speedup = 69.6713%
+------------------------------------------------
+VECShellSort : test begin 1400000
+! 3.03267e-05 <= 6.63148e-06
+! 3.03267e-05 <= 6.63148e-06
+VECShellSort : orig = 0.540354, opt = 0.170085
+VECShellSort : sum orig = 700337, sum opt = 700337
+VECShellSort : pm_sum orig = -0.507154, pm_sum opt = -0.507154
+VECShellSort : speedup = 68.5234%
+------------------------------------------------
+VECShellSort : test begin 1410000
+! 3.28859e-05 <= 1.33831e-06
+! 3.28859e-05 <= 1.33831e-06
+VECShellSort : orig = 0.537793, opt = 0.181043
+VECShellSort : sum orig = 705106, sum opt = 705106
+VECShellSort : pm_sum orig = -0.504346, pm_sum opt = -0.504346
+VECShellSort : speedup = 66.3359%
+------------------------------------------------
+VECShellSort : test begin 1420000
+! 3.8743e-06 <= 1.3737e-06
+! 3.8743e-06 <= 1.3737e-06
+VECShellSort : orig = 0.556132, opt = 0.173472
+VECShellSort : sum orig = 710218, sum opt = 710218
+VECShellSort : pm_sum orig = -0.495099, pm_sum opt = -0.495099
+VECShellSort : speedup = 68.8074%
+------------------------------------------------
+VECShellSort : test begin 1430000
+! 1.97631e-05 <= 1.75959e-05
+! 1.97631e-05 <= 1.75959e-05
+VECShellSort : orig = 0.540585, opt = 0.168227
+VECShellSort : sum orig = 715417, sum opt = 715417
+VECShellSort : pm_sum orig = -0.49408, pm_sum opt = -0.49408
+VECShellSort : speedup = 68.8806%
+------------------------------------------------
+VECShellSort : test begin 1440000
+! 2.09478e-05 <= 8.88994e-06
+! 2.09478e-05 <= 8.88994e-06
+VECShellSort : orig = 0.581425, opt = 0.189384
+VECShellSort : sum orig = 719737, sum opt = 719737
+VECShellSort : pm_sum orig = -0.498069, pm_sum opt = -0.498069
+VECShellSort : speedup = 67.4276%
+------------------------------------------------
+VECShellSort : test begin 1450000
+! 2.81655e-05 <= 1.01002e-05
+! 2.81655e-05 <= 1.01002e-05
+VECShellSort : orig = 0.589175, opt = 0.245812
+VECShellSort : sum orig = 725422, sum opt = 725422
+VECShellSort : pm_sum orig = -0.42884, pm_sum opt = -0.42884
+VECShellSort : speedup = 58.2786%
+------------------------------------------------
+VECShellSort : test begin 1460000
+! 2.5156e-05 <= 4.53927e-06
+! 2.5156e-05 <= 4.53927e-06
+VECShellSort : orig = 0.532397, opt = 0.169538
+VECShellSort : sum orig = 729860, sum opt = 729860
+VECShellSort : pm_sum orig = -0.497488, pm_sum opt = -0.497488
+VECShellSort : speedup = 68.1557%
+------------------------------------------------
+VECShellSort : test begin 1470000
+! 4.82453e-05 <= 6.16815e-06
+! 4.82453e-05 <= 6.16815e-06
+VECShellSort : orig = 0.556184, opt = 0.172276
+VECShellSort : sum orig = 735307, sum opt = 735307
+VECShellSort : pm_sum orig = -0.481368, pm_sum opt = -0.481368
+VECShellSort : speedup = 69.0254%
+------------------------------------------------
+VECShellSort : test begin 1480000
+! 4.17018e-05 <= 1.00122e-05
+! 4.17018e-05 <= 1.00122e-05
+VECShellSort : orig = 0.563705, opt = 0.181104
+VECShellSort : sum orig = 740158, sum opt = 740158
+VECShellSort : pm_sum orig = -0.509148, pm_sum opt = -0.509148
+VECShellSort : speedup = 67.8726%
+------------------------------------------------
+VECShellSort : test begin 1490000
+! 2.30898e-05 <= 1.41906e-05
+! 2.30898e-05 <= 1.41906e-05
+VECShellSort : orig = 0.602823, opt = 0.173131
+VECShellSort : sum orig = 745477, sum opt = 745477
+VECShellSort : pm_sum orig = -0.490979, pm_sum opt = -0.490979
+VECShellSort : speedup = 71.28%
+------------------------------------------------
+VECShellSort : test begin 1500000
+! 2.06516e-05 <= 6.17187e-06
+! 2.06516e-05 <= 6.17187e-06
+VECShellSort : orig = 0.59843, opt = 0.190525
+VECShellSort : sum orig = 750080, sum opt = 750080
+VECShellSort : pm_sum orig = -0.513522, pm_sum opt = -0.513522
+VECShellSort : speedup = 68.1626%
+------------------------------------------------
+VECShellSort : test begin 1510000
+! 3.06079e-06 <= 9.96981e-07
+! 3.06079e-06 <= 9.96981e-07
+VECShellSort : orig = 0.538976, opt = 0.172727
+VECShellSort : sum orig = 754820, sum opt = 754820
+VECShellSort : pm_sum orig = -0.521073, pm_sum opt = -0.521073
+VECShellSort : speedup = 67.9527%
+------------------------------------------------
+VECShellSort : test begin 1520000
+! 6.20447e-06 <= 4.25614e-07
+! 6.20447e-06 <= 4.25614e-07
+VECShellSort : orig = 0.57175, opt = 0.18493
+VECShellSort : sum orig = 760267, sum opt = 760267
+VECShellSort : pm_sum orig = -0.493348, pm_sum opt = -0.493348
+VECShellSort : speedup = 67.6555%
+------------------------------------------------
+VECShellSort : test begin 1530000
+! 4.64637e-06 <= 4.44893e-06
+! 4.64637e-06 <= 4.44893e-06
+VECShellSort : orig = 0.569618, opt = 0.183951
+VECShellSort : sum orig = 764777, sum opt = 764777
+VECShellSort : pm_sum orig = -0.511331, pm_sum opt = -0.511331
+VECShellSort : speedup = 67.7063%
+------------------------------------------------
+VECShellSort : test begin 1540000
+! 1.07614e-05 <= 3.336e-06
+! 1.07614e-05 <= 3.336e-06
+VECShellSort : orig = 0.606284, opt = 0.175672
+VECShellSort : sum orig = 769531, sum opt = 769531
+VECShellSort : pm_sum orig = -0.47961, pm_sum opt = -0.47961
+VECShellSort : speedup = 71.0248%
+------------------------------------------------
+VECShellSort : test begin 1550000
+! 1.42567e-05 <= 6.50994e-06
+! 1.42567e-05 <= 6.50994e-06
+VECShellSort : orig = 0.577148, opt = 0.178573
+VECShellSort : sum orig = 775183, sum opt = 775183
+VECShellSort : pm_sum orig = -0.507097, pm_sum opt = -0.507097
+VECShellSort : speedup = 69.0594%
+------------------------------------------------
+VECShellSort : test begin 1560000
+! 3.07644e-05 <= 2.14158e-05
+! 3.07644e-05 <= 2.14158e-05
+VECShellSort : orig = 0.618864, opt = 0.195616
+VECShellSort : sum orig = 780245, sum opt = 780245
+VECShellSort : pm_sum orig = -0.483757, pm_sum opt = -0.483757
+VECShellSort : speedup = 68.3911%
+------------------------------------------------
+VECShellSort : test begin 1570000
+! 2.27164e-05 <= 1.42585e-05
+! 2.27164e-05 <= 1.42585e-05
+VECShellSort : orig = 0.613561, opt = 0.192453
+VECShellSort : sum orig = 785016, sum opt = 785016
+VECShellSort : pm_sum orig = -0.483808, pm_sum opt = -0.483808
+VECShellSort : speedup = 68.6334%
+------------------------------------------------
+VECShellSort : test begin 1580000
+! 9.85246e-06 <= 8.20961e-07
+! 9.85246e-06 <= 8.20961e-07
+VECShellSort : orig = 0.573604, opt = 0.172672
+VECShellSort : sum orig = 789893, sum opt = 789893
+VECShellSort : pm_sum orig = -0.376647, pm_sum opt = -0.376647
+VECShellSort : speedup = 69.897%
+------------------------------------------------
+VECShellSort : test begin 1590000
+! 1.49533e-05 <= 3.19909e-07
+! 1.49533e-05 <= 3.19909e-07
+VECShellSort : orig = 0.591857, opt = 0.189497
+VECShellSort : sum orig = 794936, sum opt = 794936
+VECShellSort : pm_sum orig = -0.430384, pm_sum opt = -0.430384
+VECShellSort : speedup = 67.9826%
+------------------------------------------------
+VECShellSort : test begin 1600000
+! 1.01435e-05 <= 8.46107e-07
+! 1.01435e-05 <= 8.46107e-07
+VECShellSort : orig = 0.644474, opt = 0.223265
+VECShellSort : sum orig = 799511, sum opt = 799511
+VECShellSort : pm_sum orig = -0.510649, pm_sum opt = -0.510649
+VECShellSort : speedup = 65.357%
+------------------------------------------------
+VECShellSort : test begin 1610000
+! 1.96029e-05 <= 4.50993e-06
+! 1.96029e-05 <= 4.50993e-06
+VECShellSort : orig = 0.621682, opt = 0.197628
+VECShellSort : sum orig = 805218, sum opt = 805218
+VECShellSort : pm_sum orig = -0.492693, pm_sum opt = -0.492693
+VECShellSort : speedup = 68.2108%
+------------------------------------------------
+VECShellSort : test begin 1620000
+! 7.54278e-06 <= 5.18374e-06
+! 7.54278e-06 <= 5.18374e-06
+VECShellSort : orig = 0.656016, opt = 0.221828
+VECShellSort : sum orig = 810034, sum opt = 810034
+VECShellSort : pm_sum orig = -0.492422, pm_sum opt = -0.492422
+VECShellSort : speedup = 66.1856%
+------------------------------------------------
+VECShellSort : test begin 1630000
+! 2.00663e-05 <= 5.77886e-07
+! 2.00663e-05 <= 5.77886e-07
+VECShellSort : orig = 0.636252, opt = 0.188389
+VECShellSort : sum orig = 814753, sum opt = 814753
+VECShellSort : pm_sum orig = -0.496263, pm_sum opt = -0.496263
+VECShellSort : speedup = 70.3908%
+------------------------------------------------
+VECShellSort : test begin 1640000
+! 4.77852e-05 <= 4.53694e-06
+! 4.77852e-05 <= 4.53694e-06
+VECShellSort : orig = 0.60462, opt = 0.203634
+VECShellSort : sum orig = 819234, sum opt = 819234
+VECShellSort : pm_sum orig = -0.488414, pm_sum opt = -0.488414
+VECShellSort : speedup = 66.3203%
+------------------------------------------------
+VECShellSort : test begin 1650000
+! 9.27038e-06 <= 4.01679e-06
+! 9.27038e-06 <= 4.01679e-06
+VECShellSort : orig = 0.602624, opt = 0.180672
+VECShellSort : sum orig = 824556, sum opt = 824556
+VECShellSort : pm_sum orig = -0.500873, pm_sum opt = -0.500873
+VECShellSort : speedup = 70.0191%
+------------------------------------------------
+VECShellSort : test begin 1660000
+! 1.45072e-05 <= 1.0571e-05
+! 1.45072e-05 <= 1.0571e-05
+VECShellSort : orig = 0.613937, opt = 0.195695
+VECShellSort : sum orig = 829923, sum opt = 829923
+VECShellSort : pm_sum orig = -0.491527, pm_sum opt = -0.491527
+VECShellSort : speedup = 68.1245%
+------------------------------------------------
+VECShellSort : test begin 1670000
+! 1.57985e-05 <= 5.33182e-07
+! 1.57985e-05 <= 5.33182e-07
+VECShellSort : orig = 0.627524, opt = 0.18367
+VECShellSort : sum orig = 834803, sum opt = 834803
+VECShellSort : pm_sum orig = -0.512252, pm_sum opt = -0.512252
+VECShellSort : speedup = 70.731%
+------------------------------------------------
+VECShellSort : test begin 1680000
+! 2.95509e-06 <= 2.7935e-06
+! 2.95509e-06 <= 2.7935e-06
+VECShellSort : orig = 0.661543, opt = 0.222107
+VECShellSort : sum orig = 839935, sum opt = 839935
+VECShellSort : pm_sum orig = -0.49512, pm_sum opt = -0.49512
+VECShellSort : speedup = 66.4259%
+------------------------------------------------
+VECShellSort : test begin 1690000
+! 2.94023e-05 <= 2.64961e-07
+! 2.94023e-05 <= 2.64961e-07
+VECShellSort : orig = 0.640958, opt = 0.206453
+VECShellSort : sum orig = 845447, sum opt = 845447
+VECShellSort : pm_sum orig = -0.504295, pm_sum opt = -0.504295
+VECShellSort : speedup = 67.7899%
+------------------------------------------------
+VECShellSort : test begin 1700000
+! 5.2657e-06 <= 4.5686e-06
+! 5.2657e-06 <= 4.5686e-06
+VECShellSort : orig = 0.676863, opt = 0.227275
+VECShellSort : sum orig = 850032, sum opt = 850032
+VECShellSort : pm_sum orig = -0.495628, pm_sum opt = -0.495628
+VECShellSort : speedup = 66.4223%
+------------------------------------------------
+VECShellSort : test begin 1710000
+! 2.61622e-05 <= 2.29692e-05
+! 2.61622e-05 <= 2.29692e-05
+VECShellSort : orig = 0.60543, opt = 0.182534
+VECShellSort : sum orig = 854014, sum opt = 854014
+VECShellSort : pm_sum orig = -0.789004, pm_sum opt = -0.789004
+VECShellSort : speedup = 69.8505%
+------------------------------------------------
+VECShellSort : test begin 1720000
+! 2.96617e-05 <= 8.15187e-06
+! 2.96617e-05 <= 8.15187e-06
+VECShellSort : orig = 0.655613, opt = 0.202893
+VECShellSort : sum orig = 859730, sum opt = 859730
+VECShellSort : pm_sum orig = -0.340196, pm_sum opt = -0.340196
+VECShellSort : speedup = 69.0529%
+------------------------------------------------
+VECShellSort : test begin 1730000
+! 3.81661e-05 <= 3.45949e-05
+! 3.81661e-05 <= 3.45949e-05
+VECShellSort : orig = 0.649755, opt = 0.204416
+VECShellSort : sum orig = 864920, sum opt = 864920
+VECShellSort : pm_sum orig = -0.515749, pm_sum opt = -0.515749
+VECShellSort : speedup = 68.5395%
+------------------------------------------------
+VECShellSort : test begin 1740000
+! 6.27013e-06 <= 5.58794e-09
+! 6.27013e-06 <= 5.58794e-09
+VECShellSort : orig = 0.681951, opt = 0.22078
+VECShellSort : sum orig = 870818, sum opt = 870818
+VECShellSort : pm_sum orig = -0.536424, pm_sum opt = -0.536424
+VECShellSort : speedup = 67.6253%
+------------------------------------------------
+VECShellSort : test begin 1750000
+! 1.01412e-05 <= 7.91159e-07
+! 1.01412e-05 <= 7.91159e-07
+VECShellSort : orig = 0.666576, opt = 0.203288
+VECShellSort : sum orig = 875113, sum opt = 875113
+VECShellSort : pm_sum orig = -0.476883, pm_sum opt = -0.476883
+VECShellSort : speedup = 69.5026%
+------------------------------------------------
+VECShellSort : test begin 1760000
+! 2.45175e-05 <= 9.40356e-06
+! 2.45175e-05 <= 9.40356e-06
+VECShellSort : orig = 0.712483, opt = 0.230755
+VECShellSort : sum orig = 879822, sum opt = 879822
+VECShellSort : pm_sum orig = -0.50294, pm_sum opt = -0.50294
+VECShellSort : speedup = 67.6126%
+------------------------------------------------
+VECShellSort : test begin 1770000
+! 4.04404e-05 <= 6.86385e-06
+! 4.04404e-05 <= 6.86385e-06
+VECShellSort : orig = 0.639929, opt = 0.223851
+VECShellSort : sum orig = 885073, sum opt = 885073
+VECShellSort : pm_sum orig = -0.474588, pm_sum opt = -0.474588
+VECShellSort : speedup = 65.0194%
+------------------------------------------------
+VECShellSort : test begin 1780000
+! 1.57217e-05 <= 2.97884e-06
+! 1.57217e-05 <= 2.97884e-06
+VECShellSort : orig = 0.657309, opt = 0.209009
+VECShellSort : sum orig = 889472, sum opt = 889472
+VECShellSort : pm_sum orig = -0.498235, pm_sum opt = -0.498235
+VECShellSort : speedup = 68.2023%
+------------------------------------------------
+VECShellSort : test begin 1790000
+! 9.43104e-06 <= 3.11388e-06
+! 9.43104e-06 <= 3.11388e-06
+VECShellSort : orig = 0.68672, opt = 0.242732
+VECShellSort : sum orig = 895331, sum opt = 895331
+VECShellSort : pm_sum orig = -0.48989, pm_sum opt = -0.48989
+VECShellSort : speedup = 64.6534%
+------------------------------------------------
+VECShellSort : test begin 1800000
+! 1.58418e-05 <= 2.66684e-06
+! 1.58418e-05 <= 2.66684e-06
+VECShellSort : orig = 0.721268, opt = 0.221223
+VECShellSort : sum orig = 899460, sum opt = 899460
+VECShellSort : pm_sum orig = -0.519738, pm_sum opt = -0.519738
+VECShellSort : speedup = 69.3286%
+------------------------------------------------
+VECShellSort : test begin 1810000
+! 2.40342e-05 <= 4.25847e-06
+! 2.40342e-05 <= 4.25847e-06
+VECShellSort : orig = 0.681504, opt = 0.207256
+VECShellSort : sum orig = 905256, sum opt = 905256
+VECShellSort : pm_sum orig = -0.514963, pm_sum opt = -0.514963
+VECShellSort : speedup = 69.5884%
+------------------------------------------------
+VECShellSort : test begin 1820000
+! 1.92057e-05 <= 4.56348e-07
+! 1.92057e-05 <= 4.56348e-07
+VECShellSort : orig = 0.722674, opt = 0.237865
+VECShellSort : sum orig = 909685, sum opt = 909685
+VECShellSort : pm_sum orig = -0.484473, pm_sum opt = -0.484473
+VECShellSort : speedup = 67.0854%
+------------------------------------------------
+VECShellSort : test begin 1830000
+! 3.94043e-06 <= 2.36556e-07
+! 3.94043e-06 <= 2.36556e-07
+VECShellSort : orig = 0.711536, opt = 0.224038
+VECShellSort : sum orig = 914600, sum opt = 914600
+VECShellSort : pm_sum orig = -0.512509, pm_sum opt = -0.512509
+VECShellSort : speedup = 68.5134%
+------------------------------------------------
+VECShellSort : test begin 1840000
+! 3.355e-05 <= 1.50995e-05
+! 3.355e-05 <= 1.50995e-05
+VECShellSort : orig = 0.685983, opt = 0.221771
+VECShellSort : sum orig = 919768, sum opt = 919768
+VECShellSort : pm_sum orig = -0.375792, pm_sum opt = -0.375792
+VECShellSort : speedup = 67.6711%
+------------------------------------------------
+VECShellSort : test begin 1850000
+! 4.52069e-05 <= 7.9521e-06
+! 4.52069e-05 <= 7.9521e-06
+VECShellSort : orig = 0.668858, opt = 0.201658
+VECShellSort : sum orig = 924873, sum opt = 924873
+VECShellSort : pm_sum orig = -0.464872, pm_sum opt = -0.464872
+VECShellSort : speedup = 69.8504%
+------------------------------------------------
+VECShellSort : test begin 1860000
+! 2.50638e-05 <= 8.47736e-06
+! 2.50638e-05 <= 8.47736e-06
+VECShellSort : orig = 0.689929, opt = 0.228117
+VECShellSort : sum orig = 930256, sum opt = 930256
+VECShellSort : pm_sum orig = -0.545489, pm_sum opt = -0.545489
+VECShellSort : speedup = 66.9362%
+------------------------------------------------
+VECShellSort : test begin 1870000
+! 2.09515e-05 <= 1.11992e-05
+! 2.09515e-05 <= 1.11992e-05
+VECShellSort : orig = 0.697692, opt = 0.229661
+VECShellSort : sum orig = 934931, sum opt = 934931
+VECShellSort : pm_sum orig = -0.498393, pm_sum opt = -0.498393
+VECShellSort : speedup = 67.0828%
+------------------------------------------------
+VECShellSort : test begin 1880000
+! 3.53474e-05 <= 1.22772e-05
+! 3.53474e-05 <= 1.22772e-05
+VECShellSort : orig = 0.738944, opt = 0.228344
+VECShellSort : sum orig = 940629, sum opt = 940629
+VECShellSort : pm_sum orig = -0.508956, pm_sum opt = -0.508956
+VECShellSort : speedup = 69.0986%
+------------------------------------------------
+VECShellSort : test begin 1890000
+! 5.3627e-05 <= 2.87411e-05
+! 5.3627e-05 <= 2.87411e-05
+VECShellSort : orig = 0.739372, opt = 0.227759
+VECShellSort : sum orig = 944671, sum opt = 944671
+VECShellSort : pm_sum orig = -0.494323, pm_sum opt = -0.494323
+VECShellSort : speedup = 69.1956%
+------------------------------------------------
+VECShellSort : test begin 1900000
+! 3.36934e-05 <= 3.2885e-06
+! 3.36934e-05 <= 3.2885e-06
+VECShellSort : orig = 0.773462, opt = 0.226419
+VECShellSort : sum orig = 949825, sum opt = 949825
+VECShellSort : pm_sum orig = -0.538224, pm_sum opt = -0.538224
+VECShellSort : speedup = 70.7266%
+------------------------------------------------
+VECShellSort : test begin 1910000
+! 1.01733e-05 <= 7.74022e-06
+! 1.01733e-05 <= 7.74022e-06
+VECShellSort : orig = 0.696418, opt = 0.212005
+VECShellSort : sum orig = 954405, sum opt = 954405
+VECShellSort : pm_sum orig = -0.503257, pm_sum opt = -0.503257
+VECShellSort : speedup = 69.5578%
+------------------------------------------------
+VECShellSort : test begin 1920000
+! 1.29198e-05 <= 2.67942e-06
+! 1.29198e-05 <= 2.67942e-06
+VECShellSort : orig = 0.806678, opt = 0.290158
+VECShellSort : sum orig = 959697, sum opt = 959697
+VECShellSort : pm_sum orig = -0.501517, pm_sum opt = -0.501517
+VECShellSort : speedup = 64.0305%
+------------------------------------------------
+VECShellSort : test begin 1930000
+! 5.62705e-06 <= 1.5283e-06
+! 5.62705e-06 <= 1.5283e-06
+VECShellSort : orig = 0.724166, opt = 0.227818
+VECShellSort : sum orig = 965218, sum opt = 965218
+VECShellSort : pm_sum orig = -0.507481, pm_sum opt = -0.507481
+VECShellSort : speedup = 68.5406%
+------------------------------------------------
+VECShellSort : test begin 1940000
+! 3.34834e-05 <= 7.28434e-06
+! 3.34834e-05 <= 7.28434e-06
+VECShellSort : orig = 0.756253, opt = 0.238691
+VECShellSort : sum orig = 969961, sum opt = 969961
+VECShellSort : pm_sum orig = -0.491234, pm_sum opt = -0.491234
+VECShellSort : speedup = 68.4377%
+------------------------------------------------
+VECShellSort : test begin 1950000
+! 3.26042e-05 <= 7.07014e-06
+! 3.26042e-05 <= 7.07014e-06
+VECShellSort : orig = 0.775111, opt = 0.273915
+VECShellSort : sum orig = 974966, sum opt = 974966
+VECShellSort : pm_sum orig = -0.501305, pm_sum opt = -0.501305
+VECShellSort : speedup = 64.6612%
+------------------------------------------------
+VECShellSort : test begin 1960000
+! 1.61496e-05 <= 4.28595e-06
+! 1.61496e-05 <= 4.28595e-06
+VECShellSort : orig = 0.788733, opt = 0.257459
+VECShellSort : sum orig = 980058, sum opt = 980058
+VECShellSort : pm_sum orig = -0.492029, pm_sum opt = -0.492029
+VECShellSort : speedup = 67.3579%
+------------------------------------------------
+VECShellSort : test begin 1970000
+! 2.72635e-05 <= 2.72132e-06
+! 2.72635e-05 <= 2.72132e-06
+VECShellSort : orig = 0.718042, opt = 0.22058
+VECShellSort : sum orig = 984608, sum opt = 984608
+VECShellSort : pm_sum orig = -0.767282, pm_sum opt = -0.767282
+VECShellSort : speedup = 69.2804%
+------------------------------------------------
+VECShellSort : test begin 1980000
+! 1.14245e-05 <= 3.93018e-07
+! 1.14245e-05 <= 3.93018e-07
+VECShellSort : orig = 0.736108, opt = 0.22551
+VECShellSort : sum orig = 990018, sum opt = 990018
+VECShellSort : pm_sum orig = -0.427576, pm_sum opt = -0.427576
+VECShellSort : speedup = 69.3645%
+------------------------------------------------
+VECShellSort : test begin 1990000
+! 2.50824e-05 <= 5.00912e-06
+! 2.50824e-05 <= 5.00912e-06
+VECShellSort : orig = 0.758222, opt = 0.230718
+VECShellSort : sum orig = 995031, sum opt = 995031
+VECShellSort : pm_sum orig = -0.441009, pm_sum opt = -0.441009
+VECShellSort : speedup = 69.5712%
+------------------------------------------------
+VECShellSort : test begin 2000000
+! 9.34536e-06 <= 5.01797e-06
+! 9.34536e-06 <= 5.01797e-06
+VECShellSort : orig = 0.817516, opt = 0.2891
+VECShellSort : sum orig = 999790, sum opt = 999790
+VECShellSort : pm_sum orig = -0.461143, pm_sum opt = -0.461143
+VECShellSort : speedup = 64.6368%
+------------------------------------------------
