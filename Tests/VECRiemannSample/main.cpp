@@ -11,7 +11,7 @@
 #include "riemann.h"
 
 // \brief Repeats count.
-#define REPEATS_COUNT 1
+#define REPEATS_COUNT 10
 
 using namespace Utils;
 
@@ -217,6 +217,7 @@ int main(int argc, char **argv)
 
     cout << "VECRiemannSample : test begin " << endl;
     cout << "VECRiemannSample : TESTS_COUNT = " << TESTS_COUNT << endl;
+    cout << "VECRiemannSample : REPEATS_COUNT = " << REPEATS_COUNT << endl;
 
     Timer *timer = new Timer(Timer::OMP);
     double time_orig, time_opt;

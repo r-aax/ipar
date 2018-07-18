@@ -166,24 +166,20 @@ static void sample_opt(float dl, float ul, float pl, float cl,
 {
     float c, cml, cmr, pml, pmr, shl, shr, sl, sr, stl, str;
 
-    return;
-
-    if (0.0 <= um)
+    if (0.0 <= um)        
     {
+        // 2 cases.
+        d = dl;
+        u = ul;
+        p = pl;
+
         // Sampling point lies to the left of the contact discontinuity.
         if (pm <= pl)
         {
             // Left rarefaction.
             shl = ul - cl;
 
-            if (0.0 <= shl)
-            {
-                // Sampled point is left data state.
-                d = dl;
-                u = ul;
-                p = pl;
-            }
-            else
+            if (!(0.0 <= shl))
             {
                 cml = cl * pow(pm / pl, G1);
                 stl = um - cml;
@@ -211,14 +207,7 @@ static void sample_opt(float dl, float ul, float pl, float cl,
             pml = pm / pl;
             sl = ul - cl * sqrt(G2 * pml + G1);
 
-            if (0.0 <= sl)
-            {
-                // Sampled point is left data state.
-                d = dl;
-                u = ul;
-                p = pl;
-            }
-            else
+            if (!(0.0 <= sl))
             {
                 // Sampled point is star left state.
                 d = dl * (pml + G6) / (pml * G6 + 1.0);
@@ -229,6 +218,11 @@ static void sample_opt(float dl, float ul, float pl, float cl,
     }
     else
     {
+        // 2 cases.
+        d = dr;
+        u = ur;
+        p = pr;
+
         // Sampling point lies to the right of the contact discontinuity.
         if (pm > pr)
         {
@@ -236,14 +230,7 @@ static void sample_opt(float dl, float ul, float pl, float cl,
             pmr = pm / pr;
             sr  = ur + cr * sqrt(G2 * pmr + G1);
 
-            if (0.0 >= sr)
-            {
-                // Sampled point is right data state.
-                d = dr;
-                u = ur;
-                p = pr;
-            }
-            else
+            if (!(0.0 >= sr))
             {
                 // Sampled point is star right state.
                 d = dr * (pmr + G6) / (pmr * G6 + 1.0);
@@ -255,14 +242,8 @@ static void sample_opt(float dl, float ul, float pl, float cl,
         {
             // Right rarefaction.
             shr = ur + cr;
-            if (0.0 >= shr)
-            {
-                // Sampled point is right data state.
-                d = dr;
-                u = ur;
-                p = pr;
-            }
-            else
+
+            if (!(0.0 >= shr))
             {
                 cmr = cr * pow(pm / pr, G1);
                 str = um + cmr;
