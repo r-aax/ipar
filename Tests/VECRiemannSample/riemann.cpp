@@ -289,21 +289,115 @@ void samples_orig(float *dls, float *uls, float *pls, float *cls,
 }
 
 // \brief 16 samples.
-static void samples_16_opt(float *dls, float *uls, float *pls, float *cls,
-                           float *drs, float *urs, float *prs, float *crs,
-                           float *pms, float *ums,
-                           float *ds, float *us, float *ps)
+static void samples_16_opt(float *dl, float *ul, float *pl, float *cl,
+                           float *dr, float *ur, float *pr, float *cr,
+                           float *pm, float *um,
+                           float *d, float *u, float *p)
 {
-    float d, u, p;
+    float c[16], cml[16], cmr[16], pml[16], pmr[16], shl[16], shr[16], sl[16], sr[16], stl[16], str[16];
 
     for (int i = 0; i < 16; i++)
     {
-        sample_opt(dls[i], uls[i], pls[i], cls[i],
-                   drs[i], urs[i], prs[i], crs[i],
-                   pms[i], ums[i], d, u, p);
-        ds[i] = d;
-        us[i] = u;
-        ps[i] = p;
+        if (0.0 <= um[i])        
+        {
+            // 2 cases.
+            d[i] = dl[i];
+            u[i] = ul[i];
+            p[i] = pl[i];
+
+            // Sampling point lies to the left of the contact discontinuity.
+            if (pm[i] <= pl[i])
+            {
+                // Left rarefaction.
+                shl[i] = ul[i] - cl[i];
+
+                if (!(0.0 <= shl[i]))
+                {
+                    cml[i] = cl[i] * pow(pm[i] / pl[i], G1);
+                    stl[i] = um[i] - cml[i];
+
+                    if (0.0 > stl[i])
+                    {
+                        // Sampled point is star left state.
+                        d[i] = dl[i] * pow(pm[i] / pl[i], 1.0 / GAMA);
+                        u[i] = um[i];
+                        p[i] = pm[i];
+                    }
+                    else
+                    {
+                        // Sampled point is inside left fan.
+                        u[i] = G5 * (cl[i] + G7 * ul[i]);
+                        c[i] = G5 * (cl[i] + G7 * ul[i]);
+                        d[i] = dl[i] * pow(c[i] / cl[i], G4);
+                        p[i] = pl[i] * pow(c[i] / cl[i], G3);
+                    }
+                }
+            }
+            else
+            {
+                // Left shock.
+                pml[i] = pm[i] / pl[i];
+                sl[i] = ul[i] - cl[i] * sqrt(G2 * pml[i] + G1);
+ 
+                if (!(0.0 <= sl[i]))
+                {
+                    // Sampled point is star left state.
+                    d[i] = dl[i] * (pml[i] + G6) / (pml[i] * G6 + 1.0);
+                    u[i] = um[i];
+                    p[i] = pm[i];
+                }
+            }
+        }
+        else
+        {
+            // 2 cases.
+            d[i] = dr[i];
+            u[i] = ur[i];
+            p[i] = pr[i];
+
+            // Sampling point lies to the right of the contact discontinuity.
+            if (pm[i] > pr[i])
+            {
+                // Right shock.
+                pmr[i] = pm[i] / pr[i];
+                sr[i]  = ur[i] + cr[i] * sqrt(G2 * pmr[i] + G1);
+
+                if (!(0.0 >= sr[i]))
+                {
+                    // Sampled point is star right state.
+                    d[i] = dr[i] * (pmr[i] + G6) / (pmr[i] * G6 + 1.0);
+                    u[i] = um[i];
+                    p[i] = pm[i];
+                }
+            }
+            else
+            {
+                // Right rarefaction.
+                shr[i] = ur[i] + cr[i];
+
+                if (!(0.0 >= shr[i]))
+                {
+                    cmr[i] = cr[i] * pow(pm[i] / pr[i], G1);
+                    str[i] = um[i] + cmr[i];
+
+                    if (0.0 <= str[i])
+                    {
+                        // Sampled point is star right state.
+                        d[i] = dr[i] * pow(pm[i] / pr[i], 1.0 / GAMA);
+                        u[i] = um[i];
+                        p[i] = pm[i];
+                    }
+                    else
+                    {
+                        // Sampled point is inside left fan.
+                        u[i] = G5 * (-cr[i] + G7 * ur[i]);
+                        c[i] = G5 * (cr[i] - G7 * ur[i]);
+                        d[i] = dr[i] * pow(c[i] / cr[i], G4);
+                        p[i] = pr[i] * pow(c[i] / cr[i], G3);
+                    }
+                }
+            }
+        }
     }
 }
 
