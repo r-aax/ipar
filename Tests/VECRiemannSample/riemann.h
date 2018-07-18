@@ -4,8 +4,18 @@
 #ifndef RIEMANN_H
 #define RIEMANN_H
 
+// \brief Test mode.
+//
+// 0 - small test,
+// 1 - big test.
+#define TEST_MODE 0
+
 // \brief Tests count.
-#define TESTS_COUNT 222640
+#if TEST_MODE == 0
+#define TESTS_COUNT 32
+#else
+#define TESTS_COUNT 419984
+#endif
 
 /// \brief Gama value.
 #define GAMA 1.4
@@ -35,14 +45,6 @@
 #define G8 ((GAMA) - 1.0)
 
 // Sample functions prototypes.
-void sample_orig(float dl, float ul, float pl, float cl,
-                 float dr, float ur, float pr, float cr,
-                 const float pm, const float um,
-                 float &d, float &u, float &p);
-void sample_opt(float dl, float ul, float pl, float cl,
-                float dr, float ur, float pr, float cr,
-                const float pm, const float um,
-                float &d, float &u, float &p);
 void samples_orig(float *dls, float *uls, float *pls, float *cls,
                   float *drs, float *urs, float *prs, float *crs,
                   float *pms, float *ums,

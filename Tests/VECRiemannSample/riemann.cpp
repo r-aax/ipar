@@ -24,10 +24,10 @@ using namespace std;
 /// values are d, u, p.
 ///
 /// TODO:
-void sample_orig(float dl, float ul, float pl, float cl,
-                 float dr, float ur, float pr, float cr,
-                 const float pm, const float um,
-                 float &d, float &u, float &p)
+static void sample_orig(float dl, float ul, float pl, float cl,
+                        float dr, float ur, float pr, float cr,
+                        const float pm, const float um,
+                        float &d, float &u, float &p)
 {
     float c, cml, cmr, pml, pmr, shl, shr, sl, sr, stl, str;
 
@@ -159,12 +159,14 @@ void sample_orig(float dl, float ul, float pl, float cl,
 /// values are d, u, p.
 ///
 /// TODO:
-void sample_opt(float dl, float ul, float pl, float cl,
-                float dr, float ur, float pr, float cr,
-                const float pm, const float um,
-                float &d, float &u, float &p)
+static void sample_opt(float dl, float ul, float pl, float cl,
+                       float dr, float ur, float pr, float cr,
+                       const float pm, const float um,
+                       float &d, float &u, float &p)
 {
     float c, cml, cmr, pml, pmr, shl, shr, sl, sr, stl, str;
+
+    return;
 
     if (0.0 <= um)
     {
@@ -305,6 +307,25 @@ void samples_orig(float *dls, float *uls, float *pls, float *cls,
     }
 }
 
+// \brief 16 samples.
+static void samples_16_opt(float *dls, float *uls, float *pls, float *cls,
+                           float *drs, float *urs, float *prs, float *crs,
+                           float *pms, float *ums,
+                           float *ds, float *us, float *ps)
+{
+    float d, u, p;
+
+    for (int i = 0; i < 16; i++)
+    {
+        sample_opt(dls[i], uls[i], pls[i], cls[i],
+                   drs[i], urs[i], prs[i], crs[i],
+                   pms[i], ums[i], d, u, p);
+        ds[i] = d;
+        us[i] = u;
+        ps[i] = p;
+    }
+}
+
 // \brief All samples.
 void samples_opt(float *dls, float *uls, float *pls, float *cls,
                  float *drs, float *urs, float *prs, float *crs,
@@ -313,14 +334,11 @@ void samples_opt(float *dls, float *uls, float *pls, float *cls,
 {
     float d, u, p;
 
-    for (int i = 0; i < TESTS_COUNT; i++)
+    for (int i = 0; i < TESTS_COUNT; i += 16)
     {
-        sample_opt(dls[i], uls[i], pls[i], cls[i],
-                   drs[i], urs[i], prs[i], crs[i],
-                   pms[i], ums[i],
-                   d, u, p);
-        ds[i] = d;
-        us[i] = u;
-        ps[i] = p;
+        samples_16_opt(&dls[i], &uls[i], &pls[i], &cls[i],
+                       &drs[i], &urs[i], &prs[i], &crs[i],
+                       &pms[i], &ums[i],
+                       &ds[i], &us[i], &ps[i]);
     }
 }

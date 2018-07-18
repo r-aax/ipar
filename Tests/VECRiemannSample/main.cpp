@@ -11,7 +11,7 @@
 #include "riemann.h"
 
 // \brief Repeats count.
-#define REPEATS_COUNT 50
+#define REPEATS_COUNT 1
 
 using namespace Utils;
 
@@ -21,7 +21,11 @@ using namespace Utils;
 float dls[] =
 {
 
-#include "test_data_dl.inc"
+#if TEST_MODE == 0
+#include "data/small/dl.txt"
+#else
+#include "data/big/dl.txt"
+#endif
 
 };
 
@@ -29,7 +33,11 @@ float dls[] =
 float uls[] =
 {
 
-#include "test_data_ul.inc"
+#if TEST_MODE == 0
+#include "data/small/ul.txt"
+#else
+#include "data/big/ul.txt"
+#endif
 
 };
 
@@ -37,7 +45,11 @@ float uls[] =
 float pls[] =
 {
 
-#include "test_data_pl.inc"
+#if TEST_MODE == 0
+#include "data/small/pl.txt"
+#else
+#include "data/big/pl.txt"
+#endif
 
 };
 
@@ -45,7 +57,11 @@ float pls[] =
 float cls[] =
 {
 
-#include "test_data_cl.inc"
+#if TEST_MODE == 0
+#include "data/small/cl.txt"
+#else
+#include "data/big/cl.txt"
+#endif
 
 };
 
@@ -53,7 +69,11 @@ float cls[] =
 float drs[] =
 {
 
-#include "test_data_dr.inc"
+#if TEST_MODE == 0
+#include "data/small/dr.txt"
+#else
+#include "data/big/dr.txt"
+#endif
 
 };
 
@@ -61,7 +81,11 @@ float drs[] =
 float urs[] =
 {
 
-#include "test_data_ur.inc"
+#if TEST_MODE == 0
+#include "data/small/ur.txt"
+#else
+#include "data/big/ur.txt"
+#endif
 
 };
 
@@ -69,7 +93,11 @@ float urs[] =
 float prs[] =
 {
 
-#include "test_data_pr.inc"
+#if TEST_MODE == 0
+#include "data/small/pr.txt"
+#else
+#include "data/big/pr.txt"
+#endif
 
 };
 
@@ -77,7 +105,11 @@ float prs[] =
 float crs[] =
 {
 
-#include "test_data_cr.inc"
+#if TEST_MODE == 0
+#include "data/small/cr.txt"
+#else
+#include "data/big/cr.txt"
+#endif
 
 };
 
@@ -85,7 +117,11 @@ float crs[] =
 float pms[] =
 {
 
-#include "test_data_pm.inc"
+#if TEST_MODE == 0
+#include "data/small/pm.txt"
+#else
+#include "data/big/pm.txt"
+#endif
 
 };
 
@@ -93,7 +129,11 @@ float pms[] =
 float ums[] =
 {
 
-#include "test_data_um.inc"
+#if TEST_MODE == 0
+#include "data/small/um.txt"
+#else
+#include "data/big/um.txt"
+#endif
 
 };
 
@@ -176,6 +216,7 @@ int main(int argc, char **argv)
     }
 
     cout << "VECRiemannSample : test begin " << endl;
+    cout << "VECRiemannSample : TESTS_COUNT = " << TESTS_COUNT << endl;
 
     Timer *timer = new Timer(Timer::OMP);
     double time_orig, time_opt;
