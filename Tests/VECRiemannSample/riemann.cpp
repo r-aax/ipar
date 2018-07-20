@@ -383,18 +383,98 @@ static void samples_16_opt(float *dl, float *ul, float *pl, float *cl,
 }
 
 // \brief All samples.
-void samples_opt(float *dls, float *uls, float *pls, float *cls,
-                 float *drs, float *urs, float *prs, float *crs,
-                 float *pms, float *ums,
-                 float *ds, float *us, float *ps)
+void samples_opt(float *dl, float *ul, float *pl, float *cl,
+                 float *dr, float *ur, float *pr, float *cr,
+                 float *pm, float *um,
+                 float *od, float *ou, float *op)
 {
-    float d, u, p;
+    float igama = 1.0 / GAMA;
+    float ouc;
+    float d[16], u[16], p[16], c[16], sh[16], st[16], s[16], pms[16], ums[16];
+    int m[16];
 
-    for (int i = 0; i < TESTS_COUNT; i += 16)
+    for (int j = 0; j < TESTS_COUNT; j += 16)
     {
-        samples_16_opt(&dls[i], &uls[i], &pls[i], &cls[i],
-                       &drs[i], &urs[i], &prs[i], &crs[i],
-                       &pms[i], &ums[i],
-                       &ds[i], &us[i], &ps[i]);
+        for (int i = 0; i < 16; i++)
+        {
+            m[i] = 0;
+        }
+
+        for (int i = 0; i < 16; i++)
+        {
+            // Init side values.
+            if (um[j + i] >= 0.0)
+            {
+                d[i] = dl[j + i];
+                u[i] = ul[j + i];
+                p[i] = pl[j + i];
+                c[i] = cl[j + i];
+                ums[i] = um[j + i];
+            }
+            else
+            {
+                d[i] = dr[j + i];
+                u[i] = -ur[j + i];
+                p[i] = pr[j + i];
+                c[i] = cr[j + i];
+                ums[i] = -um[j + i];
+            }
+
+            // 4 cases (values on the left side or on the right side).
+            od[j + i] = d[i];
+            ou[j + i] = u[i];
+            op[j + i] = p[i];
+
+            pms[i] = pm[j + i] / p[i];
+            sh[i] = u[i] - c[i];
+            st[i] = ums[i] - c[i] * powf(pms[i], G1);
+            s[i] = u[i] - c[i] * sqrtf(G2 * pms[i] + G1);
+
+            if (pm[j + i] <= p[i])
+            {
+                if (sh[i] < 0.0)
+                {
+                    if (st[i] < 0.0)
+                    {
+                        od[j + i] = d[i] * powf(pms[i], igama);
+                        ou[j + i] = ums[i];
+                        op[j + i] = pm[j + i];
+                    }
+                    else
+                    {
+                        m[i] = 1;
+                    }                
+                }
+            }
+            else
+            {
+                if (s[i] < 0.0)
+                {
+                    od[j + i] = d[i] * (pms[i] + G6) / (pms[i] * G6 + 1.0);
+                    ou[j + i] = ums[i];
+                    op[j + i] = pm[j + i];
+                }            
+            }
+        }
+
+        // Low prob - ignnore it.
+        for (int i = 0; i < 16; i++)
+        {
+            if (m[i] == 1)
+            {
+                ou[j + i] = G5 * (c[i] + G7 * u[i]);
+                ouc = ou[j + i] / c[i];
+                od[j + i] = d[i] * powf(ouc, G4);
+                op[j + i] = p[i] * powf(ouc, G3);
+            }
+        } 
+
+        for (int i = 0; i < 16; i++)
+        {
+            if (um[j + i] < 0.0)
+            {
+                ou[j + i] = -ou[j + i];
+            }
+        }
     }
 }
