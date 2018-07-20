@@ -296,16 +296,31 @@ static void samples_16_opt(float *dl, float *ul, float *pl, float *cl,
 {
     float c[16], cml[16], cmr[16], pml[16], pmr[16], shl[16], shr[16], sl[16], sr[16], stl[16], str[16];
     float igama = 1.0 / GAMA;
+    float d_side[16], u_side[16], p_side[16];
 
     for (int i = 0; i < 16; i++)
     {
+        // Init side values.
+        if (0.0 <= um[i])
+        {
+            d_side[i] = dl[i];
+            u_side[i] = ul[i];
+            p_side[i] = pl[i];
+        }
+        else
+        {
+            d_side[i] = dr[i];
+            u_side[i] = ur[i];
+            p_side[i] = pr[i];
+        }
+
+        // 4 cases (values on the left side or on the right side).
+        d[i] = d_side[i];
+        u[i] = u_side[i];
+        p[i] = p_side[i];
+
         if (0.0 <= um[i])        
         {
-            // 2 cases.
-            d[i] = dl[i];
-            u[i] = ul[i];
-            p[i] = pl[i];
-
             // Sampling point lies to the left of the contact discontinuity.
             if (pm[i] <= pl[i])
             {
@@ -351,11 +366,6 @@ static void samples_16_opt(float *dl, float *ul, float *pl, float *cl,
         }
         else
         {
-            // 2 cases.
-            d[i] = dr[i];
-            u[i] = ur[i];
-            p[i] = pr[i];
-
             // Sampling point lies to the right of the contact discontinuity.
             if (pm[i] > pr[i])
             {
