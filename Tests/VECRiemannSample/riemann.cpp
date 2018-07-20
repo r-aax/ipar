@@ -294,10 +294,10 @@ static void samples_16_opt(float *dl, float *ul, float *pl, float *cl,
                            float *pm, float *um,
                            float *d, float *u, float *p)
 {
-    float cml[16], cmr[16], shl[16], shr[16], sl[16], sr[16], stl[16], str[16];
+    float cml[16], cmr[16], sl[16], sr[16], stl[16], str[16];
     float igama = 1.0 / GAMA;
     float d_side[16], u_side[16], p_side[16], c_side[16];
-    float pm_side[16];
+    float pm_side[16], sh_side[16];
 
     for (int i = 0; i < 16; i++)
     {
@@ -326,9 +326,9 @@ static void samples_16_opt(float *dl, float *ul, float *pl, float *cl,
         {
             if (pm[i] <= p_side[i])
             {
-                shl[i] = u_side[i] - c_side[i];
+                sh_side[i] = u_side[i] - c_side[i];
 
-                if (!(0.0 <= shl[i]))
+                if (!(0.0 <= sh_side[i]))
                 {
                     cml[i] = c_side[i] * powf(pm[i] / p_side[i], G1);
                     stl[i] = um[i] - cml[i];
@@ -364,9 +364,9 @@ static void samples_16_opt(float *dl, float *ul, float *pl, float *cl,
         {
             if (pm[i] <= p_side[i])
             {
-                shr[i] = ur[i] - c_side[i];
+                sh_side[i] = ur[i] - c_side[i];
 
-                if (!(0.0 >= shr[i]))
+                if (!(0.0 >= sh_side[i]))
                 {
                     cmr[i] = -c_side[i] * powf(pm[i] / p_side[i], G1);
                     str[i] = um[i] + cmr[i];
