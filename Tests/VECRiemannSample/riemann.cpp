@@ -294,7 +294,7 @@ static void samples_16_opt(float *dl, float *ul, float *pl, float *cl,
                            float *pm, float *um,
                            float *d, float *u, float *p)
 {
-    float c[16], cml[16], cmr[16], pml[16], pmr[16], shl[16], shr[16], sl[16], sr[16], stl[16], str[16];
+    float cml[16], cmr[16], pml[16], pmr[16], shl[16], shr[16], sl[16], sr[16], stl[16], str[16];
     float igama = 1.0 / GAMA;
     float d_side[16], u_side[16], p_side[16];
 
@@ -343,9 +343,8 @@ static void samples_16_opt(float *dl, float *ul, float *pl, float *cl,
                     {
                         // Sampled point is inside left fan.
                         u[i] = G5 * (cl[i] + G7 * ul[i]);
-                        c[i] = G5 * (cl[i] + G7 * ul[i]);
-                        d[i] = dl[i] * powf(c[i] / cl[i], G4);
-                        p[i] = pl[i] * powf(c[i] / cl[i], G3);
+                        d[i] = dl[i] * powf(u[i] / cl[i], G4);
+                        p[i] = pl[i] * powf(u[i] / cl[i], G3);
                     }
                 }
             }
@@ -402,9 +401,8 @@ static void samples_16_opt(float *dl, float *ul, float *pl, float *cl,
                     {
                         // Sampled point is inside left fan.
                         u[i] = G5 * (-cr[i] + G7 * ur[i]);
-                        c[i] = G5 * (cr[i] - G7 * ur[i]);
-                        d[i] = dr[i] * powf(c[i] / cr[i], G4);
-                        p[i] = pr[i] * powf(c[i] / cr[i], G3);
+                        d[i] = dr[i] * powf(-u[i] / cr[i], G4);
+                        p[i] = pr[i] * powf(-u[i] / cr[i], G3);
                     }
                 }
             }
