@@ -320,12 +320,20 @@ static void samples_16_opt(float *dl, float *ul, float *pl, float *cl,
         ou[i] = u[i];
         op[i] = p[i];
 
+        if (pm[i] <= p[i])
+        {
+            sh[i] = u[i] - c[i];
+        }
+        else
+        {
+            pms[i] = pm[i] / p[i];
+            s[i] = u[i] - c[i] * sqrtf(G2 * pms[i] + G1);
+        }
+
         if (0.0 <= um[i])        
         {
             if (pm[i] <= p[i])
             {
-                sh[i] = u[i] - c[i];
-
                 if (!(0.0 <= sh[i]))
                 {
                     cm[i] = c[i] * powf(pm[i] / p[i], G1);
@@ -347,9 +355,6 @@ static void samples_16_opt(float *dl, float *ul, float *pl, float *cl,
             }
             else
             {
-                pms[i] = pm[i] / p[i];
-                s[i] = u[i] - c[i] * sqrtf(G2 * pms[i] + G1);
-
                 if (!(0.0 <= s[i]))
                 {
                     od[i] = d[i] * (pms[i] + G6) / (pms[i] * G6 + 1.0);
@@ -362,8 +367,6 @@ static void samples_16_opt(float *dl, float *ul, float *pl, float *cl,
         {
             if (pm[i] <= p[i])
             {
-                sh[i] = ur[i] - c[i];
-
                 if (!(0.0 >= sh[i]))
                 {
                     cm[i] = -c[i] * powf(pm[i] / p[i], G1);
@@ -385,9 +388,6 @@ static void samples_16_opt(float *dl, float *ul, float *pl, float *cl,
             }
             else
             {
-                pms[i] = pm[i] / p[i];
-                s[i] = u[i] - c[i] * sqrtf(G2 * pms[i] + G1);
-
                 if (!(0.0 >= s[i]))
                 {
                     od[i] = d[i] * (pms[i] + G6) / (pms[i] * G6 + 1.0);
