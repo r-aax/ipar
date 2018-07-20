@@ -300,7 +300,7 @@ static void samples_16_opt(float *dl, float *ul, float *pl, float *cl,
     for (int i = 0; i < 16; i++)
     {
         // Init side values.
-        if (0.0 <= um[i])
+        if (um[i] >= 0.0)
         {
             d[i] = dl[i];
             u[i] = ul[i];
@@ -330,16 +330,16 @@ static void samples_16_opt(float *dl, float *ul, float *pl, float *cl,
             s[i] = u[i] - c[i] * sqrtf(G2 * pms[i] + G1);
         }
 
-        if (0.0 <= um[i])        
+        if (um[i] >= 0.0)        
         {
             if (pm[i] <= p[i])
             {
-                if (!(0.0 <= sh[i]))
+                if (sh[i] < 0.0)
                 {
                     cm[i] = c[i] * powf(pm[i] / p[i], G1);
                     st[i] = um[i] - cm[i];
 
-                    if (0.0 > st[i])
+                    if (st[i] < 0.0)
                     {
                         od[i] = d[i] * powf(pm[i] / p[i], igama);
                         ou[i] = um[i];
@@ -355,7 +355,7 @@ static void samples_16_opt(float *dl, float *ul, float *pl, float *cl,
             }
             else
             {
-                if (!(0.0 <= s[i]))
+                if (s[i] < 0.0)
                 {
                     od[i] = d[i] * (pms[i] + G6) / (pms[i] * G6 + 1.0);
                     ou[i] = um[i];
@@ -367,12 +367,12 @@ static void samples_16_opt(float *dl, float *ul, float *pl, float *cl,
         {
             if (pm[i] <= p[i])
             {
-                if (!(0.0 >= sh[i]))
+                if (sh[i] > 0.0)
                 {
-                    cm[i] = -c[i] * powf(pm[i] / p[i], G1);
-                    st[i] = um[i] + cm[i];
+                    cm[i] = c[i] * powf(pm[i] / p[i], G1);
+                    st[i] = um[i] - cm[i];
 
-                    if (0.0 <= st[i])
+                    if (st[i] >= 0.0)
                     {
                         od[i] = d[i] * powf(pm[i] / p[i], igama);
                         ou[i] = um[i];
@@ -388,7 +388,7 @@ static void samples_16_opt(float *dl, float *ul, float *pl, float *cl,
             }
             else
             {
-                if (!(0.0 >= s[i]))
+                if (s[i] > 0.0)
                 {
                     od[i] = d[i] * (pms[i] + G6) / (pms[i] * G6 + 1.0);
                     ou[i] = um[i];
