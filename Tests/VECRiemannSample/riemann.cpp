@@ -297,6 +297,12 @@ static void samples_16_opt(float *dl, float *ul, float *pl, float *cl,
     float igama = 1.0 / GAMA;
     float k, pmp, ouc;
     float d[16], u[16], p[16], c[16], cm[16], sh[16], st[16], s[16], pms[16];
+    int m[16];
+
+    for (int i = 0; i < 16; i++)
+    {
+        m[i] = 0;
+    }
 
     for (int i = 0; i < 16; i++)
     {
@@ -341,10 +347,7 @@ static void samples_16_opt(float *dl, float *ul, float *pl, float *cl,
                 }
                 else
                 {
-                    ou[i] = G5 * (c[i] + G7 * u[i]);
-                    ouc = ou[i] / c[i];
-                    od[i] = d[i] * powf(ouc, G4);
-                    op[i] = p[i] * powf(ouc, G3);
+                    m[i] = 1;
                 }                
             }
         }
@@ -359,6 +362,17 @@ static void samples_16_opt(float *dl, float *ul, float *pl, float *cl,
                 ou[i] = um[i];
                 op[i] = pm[i];
             }            
+        }
+    }
+
+    for (int i = 0; i < 16; i++)
+    {
+        if (m[i] == 1)
+        {
+            ou[i] = G5 * (c[i] + G7 * u[i]);
+            ouc = ou[i] / c[i];
+            od[i] = d[i] * powf(ouc, G4);
+            op[i] = p[i] * powf(ouc, G3);
         }
     } 
 }
