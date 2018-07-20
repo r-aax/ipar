@@ -295,7 +295,7 @@ static void samples_16_opt(float *dl, float *ul, float *pl, float *cl,
                            float *od, float *ou, float *op)
 {
     float igama = 1.0 / GAMA;
-    float k, pmp, ouc;
+    float k, ouc;
     float d[16], u[16], p[16], c[16], cm[16], sh[16], st[16], s[16], pms[16];
     int m[16];
 
@@ -329,19 +329,20 @@ static void samples_16_opt(float *dl, float *ul, float *pl, float *cl,
         ou[i] = u[i];
         op[i] = p[i];
 
+        pms[i] = pm[i] / p[i];
+
         if (pm[i] <= p[i])
         {
             sh[i] = (u[i] - c[i]) * k;
 
             if (sh[i] < 0.0)
             {
-                pmp = pm[i] / p[i];
-                cm[i] = c[i] * powf(pmp, G1);
+                cm[i] = c[i] * powf(pms[i], G1);
                 st[i] = (um[i] - cm[i]) * k;
 
                 if (st[i] < 0.0)
                 {
-                    od[i] = d[i] * powf(pmp, igama);
+                    od[i] = d[i] * powf(pms[i], igama);
                     ou[i] = um[i];
                     op[i] = pm[i];
                 }
@@ -353,7 +354,6 @@ static void samples_16_opt(float *dl, float *ul, float *pl, float *cl,
         }
         else
         {
-            pms[i] = pm[i] / p[i];
             s[i] = (u[i] - c[i] * sqrtf(G2 * pms[i] + G1)) * k;
 
             if (s[i] < 0.0)
