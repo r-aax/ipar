@@ -295,8 +295,7 @@ static void samples_16_opt(float *dl, float *ul, float *pl, float *cl,
                            float *od, float *ou, float *op)
 {
     float igama = 1.0 / GAMA;
-    float d[16], u[16], p[16], c[16], sh[16], cm[16], s[16], st[16];
-    float pm_side[16];
+    float d[16], u[16], p[16], c[16], cm[16], sh[16], st[16], s[16], pms[16];
 
     for (int i = 0; i < 16; i++)
     {
@@ -348,12 +347,12 @@ static void samples_16_opt(float *dl, float *ul, float *pl, float *cl,
             }
             else
             {
-                pm_side[i] = pm[i] / p[i];
-                s[i] = u[i] - c[i] * sqrtf(G2 * pm_side[i] + G1);
+                pms[i] = pm[i] / p[i];
+                s[i] = u[i] - c[i] * sqrtf(G2 * pms[i] + G1);
 
                 if (!(0.0 <= s[i]))
                 {
-                    od[i] = d[i] * (pm_side[i] + G6) / (pm_side[i] * G6 + 1.0);
+                    od[i] = d[i] * (pms[i] + G6) / (pms[i] * G6 + 1.0);
                     ou[i] = um[i];
                     op[i] = pm[i];
                 }
@@ -386,12 +385,12 @@ static void samples_16_opt(float *dl, float *ul, float *pl, float *cl,
             }
             else
             {
-                pm_side[i] = pm[i] / p[i];
-                s[i] = u[i] - c[i] * sqrtf(G2 * pm_side[i] + G1);
+                pms[i] = pm[i] / p[i];
+                s[i] = u[i] - c[i] * sqrtf(G2 * pms[i] + G1);
 
                 if (!(0.0 >= s[i]))
                 {
-                    od[i] = d[i] * (pm_side[i] + G6) / (pm_side[i] * G6 + 1.0);
+                    od[i] = d[i] * (pms[i] + G6) / (pms[i] * G6 + 1.0);
                     ou[i] = um[i];
                     op[i] = pm[i];
                 }
