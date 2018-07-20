@@ -295,8 +295,8 @@ static void samples_16_opt(float *dl, float *ul, float *pl, float *cl,
                            float *od, float *ou, float *op)
 {
     float igama = 1.0 / GAMA;
-    float k, ouc;
-    float d[16], u[16], p[16], c[16], cm[16], sh[16], st[16], s[16], pms[16];
+    float ouc;
+    float d[16], u[16], p[16], c[16], sh[16], st[16], s[16], pms[16], ums[16];
     int m[16];
 
     for (int i = 0; i < 16; i++)
@@ -313,15 +313,15 @@ static void samples_16_opt(float *dl, float *ul, float *pl, float *cl,
             u[i] = ul[i];
             p[i] = pl[i];
             c[i] = cl[i];
-            k = 1.0;
+            ums[i] = um[i];
         }
         else
         {
             d[i] = dr[i];
-            u[i] = ur[i];
+            u[i] = -ur[i];
             p[i] = pr[i];
-            c[i] = -cr[i];
-            k = -1.0;
+            c[i] = cr[i];
+            ums[i] = -um[i];
         }
 
         // 4 cases (values on the left side or on the right side).
@@ -330,20 +330,18 @@ static void samples_16_opt(float *dl, float *ul, float *pl, float *cl,
         op[i] = p[i];
 
         pms[i] = pm[i] / p[i];
+        sh[i] = u[i] - c[i];
+        st[i] = ums[i] - c[i] * powf(pms[i], G1);
+        s[i] = u[i] - c[i] * sqrtf(G2 * pms[i] + G1);
 
         if (pm[i] <= p[i])
         {
-            sh[i] = (u[i] - c[i]) * k;
-
             if (sh[i] < 0.0)
             {
-                cm[i] = c[i] * powf(pms[i], G1);
-                st[i] = (um[i] - cm[i]) * k;
-
                 if (st[i] < 0.0)
                 {
                     od[i] = d[i] * powf(pms[i], igama);
-                    ou[i] = um[i];
+                    ou[i] = ums[i];
                     op[i] = pm[i];
                 }
                 else
@@ -354,17 +352,16 @@ static void samples_16_opt(float *dl, float *ul, float *pl, float *cl,
         }
         else
         {
-            s[i] = (u[i] - c[i] * sqrtf(G2 * pms[i] + G1)) * k;
-
             if (s[i] < 0.0)
             {
                 od[i] = d[i] * (pms[i] + G6) / (pms[i] * G6 + 1.0);
-                ou[i] = um[i];
+                ou[i] = ums[i];
                 op[i] = pm[i];
             }            
         }
     }
 
+    // Low prob - ignnore it.
     for (int i = 0; i < 16; i++)
     {
         if (m[i] == 1)
@@ -375,6 +372,14 @@ static void samples_16_opt(float *dl, float *ul, float *pl, float *cl,
             op[i] = p[i] * powf(ouc, G3);
         }
     } 
+
+    for (int i = 0; i < 16; i++)
+    {
+        if (um[i] < 0.0)
+        {
+            ou[i] = -ou[i];
+        }
+    }
 }
 
 // \brief All samples.
