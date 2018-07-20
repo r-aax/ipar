@@ -323,10 +323,8 @@ static void samples_16_opt(float *dl, float *ul, float *pl, float *cl,
 
         if (0.0 <= um[i])        
         {
-            // Sampling point lies to the left of the contact discontinuity.
             if (pm[i] <= p_side[i])
             {
-                // Left rarefaction.
                 shl[i] = u_side[i] - c_side[i];
 
                 if (!(0.0 <= shl[i]))
@@ -336,14 +334,12 @@ static void samples_16_opt(float *dl, float *ul, float *pl, float *cl,
 
                     if (0.0 > stl[i])
                     {
-                        // Sampled point is star left state.
                         d[i] = d_side[i] * powf(pm[i] / p_side[i], igama);
                         u[i] = um[i];
                         p[i] = pm[i];
                     }
                     else
                     {
-                        // Sampled point is inside left fan.
                         u[i] = G5 * (c_side[i] + G7 * u_side[i]);
                         d[i] = d_side[i] * powf(u[i] / c_side[i], G4);
                         p[i] = p_side[i] * powf(u[i] / c_side[i], G3);
@@ -352,13 +348,11 @@ static void samples_16_opt(float *dl, float *ul, float *pl, float *cl,
             }
             else
             {
-                // Left shock.
                 pml[i] = pm[i] / p_side[i];
                 sl[i] = u_side[i] - c_side[i] * sqrtf(G2 * pml[i] + G1);
 
                 if (!(0.0 <= sl[i]))
                 {
-                    // Sampled point is star left state.
                     d[i] = d_side[i] * (pml[i] + G6) / (pml[i] * G6 + 1.0);
                     u[i] = um[i];
                     p[i] = pm[i];
@@ -367,24 +361,8 @@ static void samples_16_opt(float *dl, float *ul, float *pl, float *cl,
         }
         else
         {
-            // Sampling point lies to the right of the contact discontinuity.
-            if (pm[i] > p_side[i])
+            if (pm[i] <= p_side[i])
             {
-                // Right shock.
-                pmr[i] = pm[i] / p_side[i];
-                sr[i]  = u_side[i] + c_side[i] * sqrtf(G2 * pmr[i] + G1);
-
-                if (!(0.0 >= sr[i]))
-                {
-                    // Sampled point is star right state.
-                    d[i] = d_side[i] * (pmr[i] + G6) / (pmr[i] * G6 + 1.0);
-                    u[i] = um[i];
-                    p[i] = pm[i];
-                }
-            }
-            else
-            {
-                // Right rarefaction.
                 shr[i] = ur[i] + c_side[i];
 
                 if (!(0.0 >= shr[i]))
@@ -394,18 +372,28 @@ static void samples_16_opt(float *dl, float *ul, float *pl, float *cl,
 
                     if (0.0 <= str[i])
                     {
-                        // Sampled point is star right state.
                         d[i] = d_side[i] * powf(pm[i] / p_side[i], igama);
                         u[i] = um[i];
                         p[i] = pm[i];
                     }
                     else
                     {
-                        // Sampled point is inside left fan.
                         u[i] = G5 * (-c_side[i] + G7 * u_side[i]);
                         d[i] = d_side[i] * powf(-u[i] / c_side[i], G4);
                         p[i] = p_side[i] * powf(-u[i] / c_side[i], G3);
                     }
+                }
+            }
+            else
+            {
+                pmr[i] = pm[i] / p_side[i];
+                sr[i]  = u_side[i] + c_side[i] * sqrtf(G2 * pmr[i] + G1);
+
+                if (!(0.0 >= sr[i]))
+                {
+                    d[i] = d_side[i] * (pmr[i] + G6) / (pmr[i] * G6 + 1.0);
+                    u[i] = um[i];
+                    p[i] = pm[i];
                 }
             }
         }
