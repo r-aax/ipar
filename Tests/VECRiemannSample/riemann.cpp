@@ -292,108 +292,108 @@ void samples_orig(float *dls, float *uls, float *pls, float *cls,
 static void samples_16_opt(float *dl, float *ul, float *pl, float *cl,
                            float *dr, float *ur, float *pr, float *cr,
                            float *pm, float *um,
-                           float *d, float *u, float *p)
+                           float *od, float *ou, float *op)
 {
     float igama = 1.0 / GAMA;
-    float d_side[16], u_side[16], p_side[16], c_side[16];
-    float pm_side[16], sh_side[16], cm_side[16], s_side[16], st_side[16];
+    float d[16], u[16], p[16], c[16], sh[16], cm[16], s[16], st[16];
+    float pm_side[16];
 
     for (int i = 0; i < 16; i++)
     {
         // Init side values.
         if (0.0 <= um[i])
         {
-            d_side[i] = dl[i];
-            u_side[i] = ul[i];
-            p_side[i] = pl[i];
-            c_side[i] = cl[i];
+            d[i] = dl[i];
+            u[i] = ul[i];
+            p[i] = pl[i];
+            c[i] = cl[i];
         }
         else
         {
-            d_side[i] = dr[i];
-            u_side[i] = ur[i];
-            p_side[i] = pr[i];
-            c_side[i] = -cr[i];
+            d[i] = dr[i];
+            u[i] = ur[i];
+            p[i] = pr[i];
+            c[i] = -cr[i];
         }
 
         // 4 cases (values on the left side or on the right side).
-        d[i] = d_side[i];
-        u[i] = u_side[i];
-        p[i] = p_side[i];
+        od[i] = d[i];
+        ou[i] = u[i];
+        op[i] = p[i];
 
         if (0.0 <= um[i])        
         {
-            if (pm[i] <= p_side[i])
+            if (pm[i] <= p[i])
             {
-                sh_side[i] = u_side[i] - c_side[i];
+                sh[i] = u[i] - c[i];
 
-                if (!(0.0 <= sh_side[i]))
+                if (!(0.0 <= sh[i]))
                 {
-                    cm_side[i] = c_side[i] * powf(pm[i] / p_side[i], G1);
-                    st_side[i] = um[i] - cm_side[i];
+                    cm[i] = c[i] * powf(pm[i] / p[i], G1);
+                    st[i] = um[i] - cm[i];
 
-                    if (0.0 > st_side[i])
+                    if (0.0 > st[i])
                     {
-                        d[i] = d_side[i] * powf(pm[i] / p_side[i], igama);
-                        u[i] = um[i];
-                        p[i] = pm[i];
+                        od[i] = d[i] * powf(pm[i] / p[i], igama);
+                        ou[i] = um[i];
+                        op[i] = pm[i];
                     }
                     else
                     {
-                        u[i] = G5 * (c_side[i] + G7 * u_side[i]);
-                        d[i] = d_side[i] * powf(u[i] / c_side[i], G4);
-                        p[i] = p_side[i] * powf(u[i] / c_side[i], G3);
+                        ou[i] = G5 * (c[i] + G7 * u[i]);
+                        od[i] = d[i] * powf(ou[i] / c[i], G4);
+                        op[i] = p[i] * powf(ou[i] / c[i], G3);
                     }
                 }
             }
             else
             {
-                pm_side[i] = pm[i] / p_side[i];
-                s_side[i] = u_side[i] - c_side[i] * sqrtf(G2 * pm_side[i] + G1);
+                pm_side[i] = pm[i] / p[i];
+                s[i] = u[i] - c[i] * sqrtf(G2 * pm_side[i] + G1);
 
-                if (!(0.0 <= s_side[i]))
+                if (!(0.0 <= s[i]))
                 {
-                    d[i] = d_side[i] * (pm_side[i] + G6) / (pm_side[i] * G6 + 1.0);
-                    u[i] = um[i];
-                    p[i] = pm[i];
+                    od[i] = d[i] * (pm_side[i] + G6) / (pm_side[i] * G6 + 1.0);
+                    ou[i] = um[i];
+                    op[i] = pm[i];
                 }
             }
         }
         else
         {
-            if (pm[i] <= p_side[i])
+            if (pm[i] <= p[i])
             {
-                sh_side[i] = ur[i] - c_side[i];
+                sh[i] = ur[i] - c[i];
 
-                if (!(0.0 >= sh_side[i]))
+                if (!(0.0 >= sh[i]))
                 {
-                    cm_side[i] = -c_side[i] * powf(pm[i] / p_side[i], G1);
-                    st_side[i] = um[i] + cm_side[i];
+                    cm[i] = -c[i] * powf(pm[i] / p[i], G1);
+                    st[i] = um[i] + cm[i];
 
-                    if (0.0 <= st_side[i])
+                    if (0.0 <= st[i])
                     {
-                        d[i] = d_side[i] * powf(pm[i] / p_side[i], igama);
-                        u[i] = um[i];
-                        p[i] = pm[i];
+                        od[i] = d[i] * powf(pm[i] / p[i], igama);
+                        ou[i] = um[i];
+                        op[i] = pm[i];
                     }
                     else
                     {
-                        u[i] = G5 * (c_side[i] + G7 * u_side[i]);
-                        d[i] = d_side[i] * powf(u[i] / c_side[i], G4);
-                        p[i] = p_side[i] * powf(u[i] / c_side[i], G3);
+                        ou[i] = G5 * (c[i] + G7 * u[i]);
+                        od[i] = d[i] * powf(ou[i] / c[i], G4);
+                        op[i] = p[i] * powf(ou[i] / c[i], G3);
                     }
                 }
             }
             else
             {
-                pm_side[i] = pm[i] / p_side[i];
-                s_side[i]  = u_side[i] - c_side[i] * sqrtf(G2 * pm_side[i] + G1);
+                pm_side[i] = pm[i] / p[i];
+                s[i] = u[i] - c[i] * sqrtf(G2 * pm_side[i] + G1);
 
-                if (!(0.0 >= s_side[i]))
+                if (!(0.0 >= s[i]))
                 {
-                    d[i] = d_side[i] * (pm_side[i] + G6) / (pm_side[i] * G6 + 1.0);
-                    u[i] = um[i];
-                    p[i] = pm[i];
+                    od[i] = d[i] * (pm_side[i] + G6) / (pm_side[i] * G6 + 1.0);
+                    ou[i] = um[i];
+                    op[i] = pm[i];
                 }
             }
         }
