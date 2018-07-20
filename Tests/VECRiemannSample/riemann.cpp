@@ -296,7 +296,7 @@ static void samples_16_opt(float *dl, float *ul, float *pl, float *cl,
 {
     float cml[16], cmr[16], pml[16], pmr[16], shl[16], shr[16], sl[16], sr[16], stl[16], str[16];
     float igama = 1.0 / GAMA;
-    float d_side[16], u_side[16], p_side[16];
+    float d_side[16], u_side[16], p_side[16], c_side[16];
 
     for (int i = 0; i < 16; i++)
     {
@@ -306,12 +306,14 @@ static void samples_16_opt(float *dl, float *ul, float *pl, float *cl,
             d_side[i] = dl[i];
             u_side[i] = ul[i];
             p_side[i] = pl[i];
+            c_side[i] = cl[i];
         }
         else
         {
             d_side[i] = dr[i];
             u_side[i] = ur[i];
             p_side[i] = pr[i];
+            c_side[i] = cr[i];
         }
 
         // 4 cases (values on the left side or on the right side).
@@ -325,11 +327,11 @@ static void samples_16_opt(float *dl, float *ul, float *pl, float *cl,
             if (pm[i] <= pl[i])
             {
                 // Left rarefaction.
-                shl[i] = ul[i] - cl[i];
+                shl[i] = ul[i] - c_side[i];
 
                 if (!(0.0 <= shl[i]))
                 {
-                    cml[i] = cl[i] * powf(pm[i] / pl[i], G1);
+                    cml[i] = c_side[i] * powf(pm[i] / pl[i], G1);
                     stl[i] = um[i] - cml[i];
 
                     if (0.0 > stl[i])
@@ -342,9 +344,9 @@ static void samples_16_opt(float *dl, float *ul, float *pl, float *cl,
                     else
                     {
                         // Sampled point is inside left fan.
-                        u[i] = G5 * (cl[i] + G7 * ul[i]);
-                        d[i] = dl[i] * powf(u[i] / cl[i], G4);
-                        p[i] = pl[i] * powf(u[i] / cl[i], G3);
+                        u[i] = G5 * (c_side[i] + G7 * ul[i]);
+                        d[i] = dl[i] * powf(u[i] / c_side[i], G4);
+                        p[i] = pl[i] * powf(u[i] / c_side[i], G3);
                     }
                 }
             }
@@ -352,7 +354,7 @@ static void samples_16_opt(float *dl, float *ul, float *pl, float *cl,
             {
                 // Left shock.
                 pml[i] = pm[i] / pl[i];
-                sl[i] = ul[i] - cl[i] * sqrtf(G2 * pml[i] + G1);
+                sl[i] = ul[i] - c_side[i] * sqrtf(G2 * pml[i] + G1);
 
                 if (!(0.0 <= sl[i]))
                 {
@@ -370,7 +372,7 @@ static void samples_16_opt(float *dl, float *ul, float *pl, float *cl,
             {
                 // Right shock.
                 pmr[i] = pm[i] / pr[i];
-                sr[i]  = ur[i] + cr[i] * sqrtf(G2 * pmr[i] + G1);
+                sr[i]  = ur[i] + c_side[i] * sqrtf(G2 * pmr[i] + G1);
 
                 if (!(0.0 >= sr[i]))
                 {
@@ -383,11 +385,11 @@ static void samples_16_opt(float *dl, float *ul, float *pl, float *cl,
             else
             {
                 // Right rarefaction.
-                shr[i] = ur[i] + cr[i];
+                shr[i] = ur[i] + c_side[i];
 
                 if (!(0.0 >= shr[i]))
                 {
-                    cmr[i] = cr[i] * powf(pm[i] / pr[i], G1);
+                    cmr[i] = c_side[i] * powf(pm[i] / pr[i], G1);
                     str[i] = um[i] + cmr[i];
 
                     if (0.0 <= str[i])
@@ -400,9 +402,9 @@ static void samples_16_opt(float *dl, float *ul, float *pl, float *cl,
                     else
                     {
                         // Sampled point is inside left fan.
-                        u[i] = G5 * (-cr[i] + G7 * ur[i]);
-                        d[i] = dr[i] * powf(-u[i] / cr[i], G4);
-                        p[i] = pr[i] * powf(-u[i] / cr[i], G3);
+                        u[i] = G5 * (-c_side[i] + G7 * ur[i]);
+                        d[i] = dr[i] * powf(-u[i] / c_side[i], G4);
+                        p[i] = pr[i] * powf(-u[i] / c_side[i], G3);
                     }
                 }
             }
