@@ -174,21 +174,21 @@ static bool check()
 {
     for (int i = 0; i < TESTS_COUNT; i++)
     {
-        if (!MATHS_IS_EQ(ds_orig[i], ds_opt[i]))
+        if (!MATHS_IS_NEAR(ds_orig[i], ds_opt[i], 1.0e-3))
         {
             cout << "error : ds, i = " << i << " [" << ds_orig[i] << " != " << ds_opt[i] << "]" << endl;
 
             return false;
         }
 
-        if (!MATHS_IS_EQ(us_orig[i], us_opt[i]))
+        if (!MATHS_IS_NEAR(us_orig[i], us_opt[i], 1.0e-3))
         {
             cout << "error : us, i = " << i << " [" << us_orig[i] << " != " << us_opt[i] << "]" << endl;
                 
             return false;
         }
 
-        if (!MATHS_IS_EQ(ps_orig[i], ps_opt[i]))
+        if (!MATHS_IS_NEAR(ps_orig[i], ps_opt[i], 1.0e-3))
         {
             cout << "error : ps, i = " << i << " [" << ps_orig[i] << " != " << ps_opt[i] << "]" << endl;
                 
