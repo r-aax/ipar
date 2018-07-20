@@ -176,21 +176,21 @@ static bool check()
     {
         if (!MATHS_IS_EQ(ds_orig[i], ds_opt[i]))
         {
-            cout << "error : ds, i = " << i << " [" << ds_orig[i] << ", " << ds_opt[i] << endl;
+            cout << "error : ds, i = " << i << " [" << ds_orig[i] << " != " << ds_opt[i] << "]" << endl;
 
             return false;
         }
 
         if (!MATHS_IS_EQ(us_orig[i], us_opt[i]))
         {
-            cout << "error : us, i = " << i << " [" << us_orig[i] << ", " << us_opt[i] << endl;
+            cout << "error : us, i = " << i << " [" << us_orig[i] << " != " << us_opt[i] << "]" << endl;
                 
             return false;
         }
 
         if (!MATHS_IS_EQ(ps_orig[i], ps_opt[i]))
         {
-            cout << "error : ps, i = " << i << " [" << ps_orig[i] << ", " << ps_opt[i] << endl;
+            cout << "error : ps, i = " << i << " [" << ps_orig[i] << " != " << ps_opt[i] << "]" << endl;
                 
             return false;
         }        

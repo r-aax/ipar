@@ -295,15 +295,6 @@ static void samples_16_opt(float *dl, float *ul, float *pl, float *cl,
                            float *d, float *u, float *p)
 {
     float c[16], cml[16], cmr[16], pml[16], pmr[16], shl[16], shr[16], sl[16], sr[16], stl[16], str[16];
-    int m1[16];
-    int m2[16];
-    float igama = 1.0 / GAMA;
-
-    for (int i = 0; i < 16; i++)
-    {
-        m1[i] = 0;
-        m2[i] = 0;
-    }
 
     for (int i = 0; i < 16; i++)
     {
@@ -322,20 +313,23 @@ static void samples_16_opt(float *dl, float *ul, float *pl, float *cl,
 
                 if (!(0.0 <= shl[i]))
                 {
-                    pml[i] = pm[i] / pl[i];
-                    cml[i] = cl[i] * pow(pml[i], G1);
+                    cml[i] = cl[i] * pow(pm[i] / pl[i], G1);
                     stl[i] = um[i] - cml[i];
 
                     if (0.0 > stl[i])
                     {
                         // Sampled point is star left state.
-                        d[i] = dl[i] * pow(pml[i], igama);
+                        d[i] = dl[i] * pow(pm[i] / pl[i], 1.0 / GAMA);
                         u[i] = um[i];
                         p[i] = pm[i];
                     }
                     else
                     {
-                        m1[i] = 1;
+                        // Sampled point is inside left fan.
+                        u[i] = G5 * (cl[i] + G7 * ul[i]);
+                        c[i] = G5 * (cl[i] + G7 * ul[i]);
+                        d[i] = dl[i] * pow(c[i] / cl[i], G4);
+                        p[i] = pl[i] * pow(c[i] / cl[i], G3);
                     }
                 }
             }
@@ -344,7 +338,7 @@ static void samples_16_opt(float *dl, float *ul, float *pl, float *cl,
                 // Left shock.
                 pml[i] = pm[i] / pl[i];
                 sl[i] = ul[i] - cl[i] * sqrt(G2 * pml[i] + G1);
- 
+
                 if (!(0.0 <= sl[i]))
                 {
                     // Sampled point is star left state.
@@ -383,47 +377,28 @@ static void samples_16_opt(float *dl, float *ul, float *pl, float *cl,
 
                 if (!(0.0 >= shr[i]))
                 {
-                    pmr[i] = pm[i] / pr[i];
-                    cmr[i] = cr[i] * pow(pmr[i], G1);
+                    cmr[i] = cr[i] * pow(pm[i] / pr[i], G1);
                     str[i] = um[i] + cmr[i];
 
                     if (0.0 <= str[i])
                     {
                         // Sampled point is star right state.
-                        d[i] = dr[i] * pow(pmr[i], igama);
+                        d[i] = dr[i] * pow(pm[i] / pr[i], 1.0 / GAMA);
                         u[i] = um[i];
                         p[i] = pm[i];
                     }
                     else
                     {
-                        m2[i] = 1;
+                        // Sampled point is inside left fan.
+                        u[i] = G5 * (-cr[i] + G7 * ur[i]);
+                        c[i] = G5 * (cr[i] - G7 * ur[i]);
+                        d[i] = dr[i] * pow(c[i] / cr[i], G4);
+                        p[i] = pr[i] * pow(c[i] / cr[i], G3);
                     }
                 }
             }
         }
-    }
-
-    for (int i = 0; i < 16; i++)
-    {
-        if (m1[i] == 1)
-        {
-            u[i] = G5 * (cl[i] + G7 * ul[i]);
-            c[i] = G5 * (cl[i] + G7 * ul[i]);
-            d[i] = dl[i] * pow(c[i] / cl[i], G4);
-            p[i] = pl[i] * pow(c[i] / cl[i], G3);
-        }
-    }
-
-    for (int i = 0; i < 16; i++)
-    {
-        if (m2[i] == 1)
-        {
-            u[i] = G5 * (-cr[i] + G7 * ur[i]);
-            c[i] = G5 * (cr[i] - G7 * ur[i]);
-            d[i] = dr[i] * pow(c[i] / cr[i], G4);
-            p[i] = pr[i] * pow(c[i] / cr[i], G3);
-        }
-    }    
+    } 
 }
 
 // \brief All samples.
