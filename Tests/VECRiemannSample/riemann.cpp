@@ -324,42 +324,42 @@ static void samples_16_opt(float *dl, float *ul, float *pl, float *cl,
         if (0.0 <= um[i])        
         {
             // Sampling point lies to the left of the contact discontinuity.
-            if (pm[i] <= pl[i])
+            if (pm[i] <= p_side[i])
             {
                 // Left rarefaction.
-                shl[i] = ul[i] - c_side[i];
+                shl[i] = u_side[i] - c_side[i];
 
                 if (!(0.0 <= shl[i]))
                 {
-                    cml[i] = c_side[i] * powf(pm[i] / pl[i], G1);
+                    cml[i] = c_side[i] * powf(pm[i] / p_side[i], G1);
                     stl[i] = um[i] - cml[i];
 
                     if (0.0 > stl[i])
                     {
                         // Sampled point is star left state.
-                        d[i] = dl[i] * powf(pm[i] / pl[i], igama);
+                        d[i] = d_side[i] * powf(pm[i] / p_side[i], igama);
                         u[i] = um[i];
                         p[i] = pm[i];
                     }
                     else
                     {
                         // Sampled point is inside left fan.
-                        u[i] = G5 * (c_side[i] + G7 * ul[i]);
-                        d[i] = dl[i] * powf(u[i] / c_side[i], G4);
-                        p[i] = pl[i] * powf(u[i] / c_side[i], G3);
+                        u[i] = G5 * (c_side[i] + G7 * u_side[i]);
+                        d[i] = d_side[i] * powf(u[i] / c_side[i], G4);
+                        p[i] = p_side[i] * powf(u[i] / c_side[i], G3);
                     }
                 }
             }
             else
             {
                 // Left shock.
-                pml[i] = pm[i] / pl[i];
-                sl[i] = ul[i] - c_side[i] * sqrtf(G2 * pml[i] + G1);
+                pml[i] = pm[i] / p_side[i];
+                sl[i] = u_side[i] - c_side[i] * sqrtf(G2 * pml[i] + G1);
 
                 if (!(0.0 <= sl[i]))
                 {
                     // Sampled point is star left state.
-                    d[i] = dl[i] * (pml[i] + G6) / (pml[i] * G6 + 1.0);
+                    d[i] = d_side[i] * (pml[i] + G6) / (pml[i] * G6 + 1.0);
                     u[i] = um[i];
                     p[i] = pm[i];
                 }
@@ -368,16 +368,16 @@ static void samples_16_opt(float *dl, float *ul, float *pl, float *cl,
         else
         {
             // Sampling point lies to the right of the contact discontinuity.
-            if (pm[i] > pr[i])
+            if (pm[i] > p_side[i])
             {
                 // Right shock.
-                pmr[i] = pm[i] / pr[i];
-                sr[i]  = ur[i] + c_side[i] * sqrtf(G2 * pmr[i] + G1);
+                pmr[i] = pm[i] / p_side[i];
+                sr[i]  = u_side[i] + c_side[i] * sqrtf(G2 * pmr[i] + G1);
 
                 if (!(0.0 >= sr[i]))
                 {
                     // Sampled point is star right state.
-                    d[i] = dr[i] * (pmr[i] + G6) / (pmr[i] * G6 + 1.0);
+                    d[i] = d_side[i] * (pmr[i] + G6) / (pmr[i] * G6 + 1.0);
                     u[i] = um[i];
                     p[i] = pm[i];
                 }
@@ -389,22 +389,22 @@ static void samples_16_opt(float *dl, float *ul, float *pl, float *cl,
 
                 if (!(0.0 >= shr[i]))
                 {
-                    cmr[i] = c_side[i] * powf(pm[i] / pr[i], G1);
+                    cmr[i] = c_side[i] * powf(pm[i] / p_side[i], G1);
                     str[i] = um[i] + cmr[i];
 
                     if (0.0 <= str[i])
                     {
                         // Sampled point is star right state.
-                        d[i] = dr[i] * powf(pm[i] / pr[i], igama);
+                        d[i] = d_side[i] * powf(pm[i] / p_side[i], igama);
                         u[i] = um[i];
                         p[i] = pm[i];
                     }
                     else
                     {
                         // Sampled point is inside left fan.
-                        u[i] = G5 * (-c_side[i] + G7 * ur[i]);
-                        d[i] = dr[i] * powf(-u[i] / c_side[i], G4);
-                        p[i] = pr[i] * powf(-u[i] / c_side[i], G3);
+                        u[i] = G5 * (-c_side[i] + G7 * u_side[i]);
+                        d[i] = d_side[i] * powf(-u[i] / c_side[i], G4);
+                        p[i] = p_side[i] * powf(-u[i] / c_side[i], G3);
                     }
                 }
             }
