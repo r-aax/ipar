@@ -314,7 +314,7 @@ static void samples_16_opt(float *dl, float *ul, float *pl, float *cl,
             d_side[i] = dr[i];
             u_side[i] = ur[i];
             p_side[i] = pr[i];
-            c_side[i] = cr[i];
+            c_side[i] = -cr[i];
         }
 
         // 4 cases (values on the left side or on the right side).
@@ -364,11 +364,11 @@ static void samples_16_opt(float *dl, float *ul, float *pl, float *cl,
         {
             if (pm[i] <= p_side[i])
             {
-                shr[i] = ur[i] + c_side[i];
+                shr[i] = ur[i] - c_side[i];
 
                 if (!(0.0 >= shr[i]))
                 {
-                    cmr[i] = c_side[i] * powf(pm[i] / p_side[i], G1);
+                    cmr[i] = -c_side[i] * powf(pm[i] / p_side[i], G1);
                     str[i] = um[i] + cmr[i];
 
                     if (0.0 <= str[i])
@@ -379,16 +379,16 @@ static void samples_16_opt(float *dl, float *ul, float *pl, float *cl,
                     }
                     else
                     {
-                        u[i] = G5 * (-c_side[i] + G7 * u_side[i]);
-                        d[i] = d_side[i] * powf(-u[i] / c_side[i], G4);
-                        p[i] = p_side[i] * powf(-u[i] / c_side[i], G3);
+                        u[i] = G5 * (c_side[i] + G7 * u_side[i]);
+                        d[i] = d_side[i] * powf(u[i] / c_side[i], G4);
+                        p[i] = p_side[i] * powf(u[i] / c_side[i], G3);
                     }
                 }
             }
             else
             {
                 pm_side[i] = pm[i] / p_side[i];
-                sr[i]  = u_side[i] + c_side[i] * sqrtf(G2 * pm_side[i] + G1);
+                sr[i]  = u_side[i] - c_side[i] * sqrtf(G2 * pm_side[i] + G1);
 
                 if (!(0.0 >= sr[i]))
                 {
