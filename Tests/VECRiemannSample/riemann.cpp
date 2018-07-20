@@ -350,37 +350,13 @@ static void samples_16_opt(float *dl, float *ul, float *pl, float *cl,
         {
             pms[i] = pm[i] / p[i];
             s[i] = u[i] - c[i] * sqrtf(G2 * pms[i] + G1);
-        }
 
-        if (um[i] >= 0.0)        
-        {
-            if (pm[i] <= p[i])
+            if (s[i] * k < 0.0)
             {
-            }
-            else
-            {
-                if (s[i] < 0.0)
-                {
-                    od[i] = d[i] * (pms[i] + G6) / (pms[i] * G6 + 1.0);
-                    ou[i] = um[i];
-                    op[i] = pm[i];
-                }
-            }
-        }
-        else
-        {
-            if (pm[i] <= p[i])
-            {
-            }
-            else
-            {
-                if (s[i] > 0.0)
-                {
-                    od[i] = d[i] * (pms[i] + G6) / (pms[i] * G6 + 1.0);
-                    ou[i] = um[i];
-                    op[i] = pm[i];
-                }
-            }
+                od[i] = d[i] * (pms[i] + G6) / (pms[i] * G6 + 1.0);
+                ou[i] = um[i];
+                op[i] = pm[i];
+            }            
         }
     } 
 }
