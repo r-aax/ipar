@@ -404,6 +404,9 @@ void samples_opt(float * __restrict__ dl,
 
 #ifdef INTEL
 
+#define LD(ADDR) _mm512_load_ps(ADDR)
+#define ST(ADDR, VAL) _mm512_store_ps(ADDR, VAL)
+
     __assume_aligned(dl, 64);
     __assume_aligned(ul, 64);
     __assume_aligned(pl, 64);
@@ -436,16 +439,16 @@ void samples_opt(float * __restrict__ dl,
     for (int j = 0; j < TESTS_COUNT; j += 16)
     {
 	// Load.
-	v_pm = _mm512_load_ps(&pm[j]);
-	v_um = _mm512_load_ps(&um[j]);
+	v_pm = LD(&pm[j]);
+	v_um = LD(&um[j]);
 
 	// d/u/p/c/ums
 	cond_um = _mm512_cmp_ps_mask(v_um, z, _MM_CMPINT_LT);
-	d = _mm512_mask_blend_ps(cond_um, _mm512_load_ps(&dl[j]), _mm512_load_ps(&dr[j]));
-	u = _mm512_mask_blend_ps(cond_um, _mm512_load_ps(&ul[j]), _mm512_load_ps(&ur[j]));
-	p = _mm512_mask_blend_ps(cond_um, _mm512_load_ps(&pl[j]), _mm512_load_ps(&pr[j]));
-	c = _mm512_mask_blend_ps(cond_um, _mm512_load_ps(&cl[j]), _mm512_load_ps(&cr[j]));
-	ums = _mm512_load_ps(&um[j]);
+	d = _mm512_mask_blend_ps(cond_um, LD(&dl[j]), LD(&dr[j]));
+	u = _mm512_mask_blend_ps(cond_um, LD(&ul[j]), LD(&ur[j]));
+	p = _mm512_mask_blend_ps(cond_um, LD(&pl[j]), LD(&pr[j]));
+	c = _mm512_mask_blend_ps(cond_um, LD(&cl[j]), LD(&cr[j]));
+	ums = LD(&um[j]);
 	u = _mm512_mask_sub_ps(u, cond_um, z, u);
 	ums = _mm512_mask_sub_ps(ums, cond_um, z, ums);
 
@@ -470,13 +473,11 @@ void samples_opt(float * __restrict__ dl,
 	// Store.
 	tmp = _mm512_pow_ps(pms, igama);
 	v_od = _mm512_mask_mov_ps(v_od, cond_st_1, _mm512_mul_ps(d, tmp));
-	v_ou = _mm512_mask_mov_ps(v_ou, cond_st_1, ums);
-	v_op = _mm512_mask_mov_ps(v_op, cond_st_1, v_pm);
 	tmp = _mm512_fmadd_ps(pms, g6, v1);
-	tmp = _mm512_div_ps(_mm512_fmadd_ps(pms, g6, v1), tmp);
+	tmp = _mm512_div_ps(_mm512_add_ps(pms, g6), tmp);
 	v_od = _mm512_mask_mov_ps(v_od, cond_s, _mm512_mul_ps(d, tmp));
-	v_ou = _mm512_mask_mov_ps(v_ou, cond_s, ums);
-	v_op = _mm512_mask_mov_ps(v_op, cond_s, v_pm);
+	v_ou = _mm512_mask_mov_ps(v_ou, cond_st_1 | cond_s, ums);
+	v_op = _mm512_mask_mov_ps(v_op, cond_st_1 | cond_s, v_pm);
 
         // Low prob - ignnore it.
         if (cond_st_2)
@@ -492,9 +493,9 @@ void samples_opt(float * __restrict__ dl,
 
 	// Final store.
 	v_ou = _mm512_mask_sub_ps(v_ou, cond_um, z, v_ou);
-	_mm512_store_ps(&od[j], v_od);
-	_mm512_store_ps(&ou[j], v_ou);
-	_mm512_store_ps(&op[j], v_op);
+	ST(&od[j], v_od);
+	ST(&ou[j], v_ou);
+	ST(&op[j], v_op);
     }
 
 #else
