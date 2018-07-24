@@ -470,6 +470,16 @@ void samples_opt(float * __restrict__ dl,
 	v_s = _mm512_fnmadd_ps(v_c, _t1, v_u);
 	_mm512_store_ps(&s[0], v_s);
 
+	__m512 v_pm = _mm512_load_ps(&pm[j]);
+	__mmask16 cond_pm = _mm512_cmp_ps_mask(v_pm, v_p, _MM_CMPINT_LE);
+	__mmask16 cond_sh = _mm512_mask_cmp_ps_mask(cond_pm, v_sh, v_z, _MM_CMPINT_LT);
+	__mmask16 cond_sh_1 = _mm512_mask_cmp_ps_mask(cond_sh, v_st, v_z, _MM_CMPINT_LT);
+	__mmask16 cond_sh_2 = _mm512_mask_cmp_ps_mask(cond_sh, v_st, v_z, _MM_CMPINT_GE);
+	__mmask16 cond_s = _mm512_mask_cmp_ps_mask(~cond_pm, v_s, v_z, _MM_CMPINT_LT);
+	
+	_mm512_mask_store_ps(&ou[j], cond_sh_1, v_ums);
+	_mm512_mask_store_ps(&op[j], cond_sh_1, v_pm);
+
         for (int i = 0; i < 16; i++)
         {
             if (pm[j + i] <= p[i])
@@ -479,8 +489,8 @@ void samples_opt(float * __restrict__ dl,
                     if (st[i] < 0.0)
                     {
                         od[j + i] = d[i] * powf(pms[i], igama);
-                        ou[j + i] = ums[i];
-                        op[j + i] = pm[j + i];
+//                        ou[j + i] = ums[i];
+//                        op[j + i] = pm[j + i];
                     }
                     else
                     {
@@ -509,15 +519,8 @@ void samples_opt(float * __restrict__ dl,
                 od[j + i] = d[i] * powf(ouc, G4);
                 op[j + i] = p[i] * powf(ouc, G3);
             }
-        } 
+        }
 
-//        for (int i = 0; i < 16; i++)
-//        {
-//            if (um[j + i] < 0.0)
-//            {
-//                ou[j + i] = -ou[j + i];
-//            }
-//        }
 	__m512 v_ou = _mm512_load_ps(&ou[j]);
 	v_ou = _mm512_mask_sub_ps(v_ou, um_neg, v_z, v_ou);
 	_mm512_store_ps(&ou[j], v_ou);
