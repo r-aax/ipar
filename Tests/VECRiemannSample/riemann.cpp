@@ -423,9 +423,11 @@ void samples_opt(float * __restrict__ dl,
     float d[16], u[16], p[16], c[16], sh[16], st[16], s[16], pms[16], ums[16];
     int m[16];
 
-    __m512 v_um, v_d, v_u, v_p, v_c, v_ums;
+    __m512 v_um, v_d, v_u, v_p, v_c, v_ums, v_pms, v_sh, v_st, v_s;
     __mmask16 um_neg;
     __m512 v_z = _mm512_setzero_ps();
+    __m512 v_G1 = _mm512_set1_ps(G1);
+    __m512 v_G2 = _mm512_set1_ps(G2);
 
     for (int j = 0; j < TESTS_COUNT; j += 16)
     {
@@ -450,18 +452,26 @@ void samples_opt(float * __restrict__ dl,
 	_mm512_store_ps(&c[0], v_c);
 	_mm512_store_ps(&ums[0], v_ums);
 
+	// 4 branches.
+	_mm512_store_ps(&od[j], v_d);
+	_mm512_store_ps(&ou[j], v_u);
+	_mm512_store_ps(&op[j], v_p);
+
+	// Calculate main values.
+	v_pms = _mm512_div_ps(_mm512_load_ps(&pm[j]), v_p);
+	_mm512_store_ps(&pms[0], v_pms);
+	v_sh = _mm512_sub_ps(v_u, v_c);
+	_mm512_store_ps(&sh[0], v_sh);
+	__m512 _t1 = _mm512_pow_ps(v_pms, v_G1);
+	v_st = _mm512_fnmadd_ps(_t1, v_c, v_ums);
+	_mm512_store_ps(&st[0], v_st);
+	_t1 = _mm512_fmadd_ps(v_G2, v_pms, v_G1);
+	_t1 = _mm512_sqrt_ps(_t1);
+	v_s = _mm512_fnmadd_ps(v_c, _t1, v_u);
+	_mm512_store_ps(&s[0], v_s);
+
         for (int i = 0; i < 16; i++)
         {
-            // 4 cases (values on the left side or on the right side).
-            od[j + i] = d[i];
-            ou[j + i] = u[i];
-            op[j + i] = p[i];
-
-            pms[i] = pm[j + i] / p[i];
-            sh[i] = u[i] - c[i];
-            st[i] = ums[i] - c[i] * powf(pms[i], G1);
-            s[i] = u[i] - c[i] * sqrtf(G2 * pms[i] + G1);
-
             if (pm[j + i] <= p[i])
             {
                 if (sh[i] < 0.0)
@@ -501,13 +511,16 @@ void samples_opt(float * __restrict__ dl,
             }
         } 
 
-        for (int i = 0; i < 16; i++)
-        {
-            if (um[j + i] < 0.0)
-            {
-                ou[j + i] = -ou[j + i];
-            }
-        }
+//        for (int i = 0; i < 16; i++)
+//        {
+//            if (um[j + i] < 0.0)
+//            {
+//                ou[j + i] = -ou[j + i];
+//            }
+//        }
+	__m512 v_ou = _mm512_load_ps(&ou[j]);
+	v_ou = _mm512_mask_sub_ps(v_ou, um_neg, v_z, v_ou);
+	_mm512_store_ps(&ou[j], v_ou);
     }
 
 #else

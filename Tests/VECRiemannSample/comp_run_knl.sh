@@ -2,5 +2,9 @@
 
 set -x
 
+rm -f VECRiemannSample.exe
 ./comp.sh
-./run_knl.sh $1
+if [ -f VECRiemannSample.out ]
+then
+    ./run_knl.sh $1
+fi
