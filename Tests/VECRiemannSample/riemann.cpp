@@ -15,6 +15,10 @@
 #include "riemann.h"
 using namespace std;
 
+#ifdef INTEL
+#include <immintrin.h>
+#endif
+
 /// \brief
 ///
 /// Purpose is to sample the solution throughout the wave
@@ -383,11 +387,131 @@ static void samples_16_opt(float *dl, float *ul, float *pl, float *cl,
 }
 
 // \brief All samples.
-void samples_opt(float *dl, float *ul, float *pl, float *cl,
-                 float *dr, float *ur, float *pr, float *cr,
-                 float *pm, float *um,
-                 float *od, float *ou, float *op)
+void samples_opt(float * __restrict__ dl,
+                 float * __restrict__ ul,
+                 float * __restrict__ pl,
+                 float * __restrict__ cl,
+                 float * __restrict__ dr,
+                 float * __restrict__ ur,
+                 float * __restrict__ pr,
+                 float * __restrict__ cr,
+                 float * __restrict__ pm,
+                 float * __restrict__ um,
+                 float * __restrict__ od,
+                 float * __restrict__ ou,
+                 float * __restrict__ op)
 {
+
+#ifdef INTEL
+
+    __assume_aligned(dl, 64);
+    __assume_aligned(ul, 64);
+    __assume_aligned(pl, 64);
+    __assume_aligned(cl, 64);
+    __assume_aligned(dr, 64);
+    __assume_aligned(ur, 64);
+    __assume_aligned(pr, 64);
+    __assume_aligned(cr, 64);
+    __assume_aligned(pm, 64);
+    __assume_aligned(um, 64);
+    __assume_aligned(od, 64);
+    __assume_aligned(ou, 64);
+    __assume_aligned(op, 64);
+
+    float igama = 1.0 / GAMA;
+    float ouc;
+    float d[16], u[16], p[16], c[16], sh[16], st[16], s[16], pms[16], ums[16];
+    int m[16];
+
+    __m512 v_um, v_d, v_u, v_p, v_c, v_ums;
+    __mmask16 um_neg;
+    __m512 v_z = _mm512_setzero_ps();
+
+    for (int j = 0; j < TESTS_COUNT; j += 16)
+    {
+        for (int i = 0; i < 16; i++)
+        {
+            m[i] = 0;
+        }
+
+	// Values from left/right sides.
+	v_um = _mm512_load_ps(&um[j]);
+	um_neg = _mm512_cmp_ps_mask(v_um, v_z, _MM_CMPINT_LT);
+	v_d = _mm512_mask_blend_ps(um_neg, _mm512_load_ps(&dl[j]), _mm512_load_ps(&dr[j]));
+	v_u = _mm512_mask_blend_ps(um_neg, _mm512_load_ps(&ul[j]), _mm512_load_ps(&ur[j]));
+	v_p = _mm512_mask_blend_ps(um_neg, _mm512_load_ps(&pl[j]), _mm512_load_ps(&pr[j]));
+	v_c = _mm512_mask_blend_ps(um_neg, _mm512_load_ps(&cl[j]), _mm512_load_ps(&cr[j]));
+	v_ums = _mm512_load_ps(&um[j]);
+	v_u = _mm512_mask_sub_ps(v_u, um_neg, v_z, v_u);
+	v_ums = _mm512_mask_sub_ps(v_ums, um_neg, v_z, v_ums);
+	_mm512_store_ps(&d[0], v_d);
+	_mm512_store_ps(&u[0], v_u);
+	_mm512_store_ps(&p[0], v_p);
+	_mm512_store_ps(&c[0], v_c);
+	_mm512_store_ps(&ums[0], v_ums);
+
+        for (int i = 0; i < 16; i++)
+        {
+            // 4 cases (values on the left side or on the right side).
+            od[j + i] = d[i];
+            ou[j + i] = u[i];
+            op[j + i] = p[i];
+
+            pms[i] = pm[j + i] / p[i];
+            sh[i] = u[i] - c[i];
+            st[i] = ums[i] - c[i] * powf(pms[i], G1);
+            s[i] = u[i] - c[i] * sqrtf(G2 * pms[i] + G1);
+
+            if (pm[j + i] <= p[i])
+            {
+                if (sh[i] < 0.0)
+                {
+                    if (st[i] < 0.0)
+                    {
+                        od[j + i] = d[i] * powf(pms[i], igama);
+                        ou[j + i] = ums[i];
+                        op[j + i] = pm[j + i];
+                    }
+                    else
+                    {
+                        m[i] = 1;
+                    }
+                }
+            }
+            else
+            {
+                if (s[i] < 0.0)
+                {
+                    od[j + i] = d[i] * (pms[i] + G6) / (pms[i] * G6 + 1.0);
+                    ou[j + i] = ums[i];
+                    op[j + i] = pm[j + i];
+                }
+            }
+        }
+
+        // Low prob - ignnore it.
+        for (int i = 0; i < 16; i++)
+        {
+            if (m[i] == 1)
+            {
+                ou[j + i] = G5 * (c[i] + G7 * u[i]);
+                ouc = ou[j + i] / c[i];
+                od[j + i] = d[i] * powf(ouc, G4);
+                op[j + i] = p[i] * powf(ouc, G3);
+            }
+        } 
+
+        for (int i = 0; i < 16; i++)
+        {
+            if (um[j + i] < 0.0)
+            {
+                ou[j + i] = -ou[j + i];
+            }
+        }
+    }
+
+#else
+
     float igama = 1.0 / GAMA;
     float ouc;
     float d[16], u[16], p[16], c[16], sh[16], st[16], s[16], pms[16], ums[16];
@@ -477,4 +601,7 @@ void samples_opt(float *dl, float *ul, float *pl, float *cl,
             }
         }
     }
+
+#endif
+
 }
