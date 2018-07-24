@@ -418,109 +418,90 @@ void samples_opt(float * __restrict__ dl,
     __assume_aligned(ou, 64);
     __assume_aligned(op, 64);
 
-    float igama = 1.0 / GAMA;
-    float ouc;
-    float d[16], u[16], p[16], c[16], sh[16], st[16], s[16], pms[16], ums[16];
+    // Constants.
+    __m512 z = _mm512_setzero_ps();
+    __m512 v1 = _mm512_set1_ps(1.0);
+    __m512 g1 = _mm512_set1_ps(G1);
+    __m512 g2 = _mm512_set1_ps(G2);
+    __m512 g3 = _mm512_set1_ps(G3);
+    __m512 g4 = _mm512_set1_ps(G4);
+    __m512 g5 = _mm512_set1_ps(G5);
+    __m512 g6 = _mm512_set1_ps(G6);
+    __m512 g7 = _mm512_set1_ps(G7);
+    __m512 igama = _mm512_set1_ps(1.0 / GAMA);
 
-    __m512 v_um, v_d, v_u, v_p, v_c, v_ums, v_pms, v_sh, v_st, v_s;
+    float ouc;
+    float sh[16], st[16], s[16], pms[16], ums[16];
+
+    __m512 v_um, d, u, p, c, v_ums, v_pms, v_sh, v_st, v_s;
     __mmask16 um_neg;
-    __m512 v_z = _mm512_setzero_ps();
-    __m512 v_G1 = _mm512_set1_ps(G1);
-    __m512 v_G2 = _mm512_set1_ps(G2);
-    __m512 v_igama = _mm512_set1_ps(igama);
 
     for (int j = 0; j < TESTS_COUNT; j += 16)
     {
 	// Values from left/right sides.
 	v_um = _mm512_load_ps(&um[j]);
-	um_neg = _mm512_cmp_ps_mask(v_um, v_z, _MM_CMPINT_LT);
-	v_d = _mm512_mask_blend_ps(um_neg, _mm512_load_ps(&dl[j]), _mm512_load_ps(&dr[j]));
-	v_u = _mm512_mask_blend_ps(um_neg, _mm512_load_ps(&ul[j]), _mm512_load_ps(&ur[j]));
-	v_p = _mm512_mask_blend_ps(um_neg, _mm512_load_ps(&pl[j]), _mm512_load_ps(&pr[j]));
-	v_c = _mm512_mask_blend_ps(um_neg, _mm512_load_ps(&cl[j]), _mm512_load_ps(&cr[j]));
+	um_neg = _mm512_cmp_ps_mask(v_um, z, _MM_CMPINT_LT);
+	d = _mm512_mask_blend_ps(um_neg, _mm512_load_ps(&dl[j]), _mm512_load_ps(&dr[j]));
+	u = _mm512_mask_blend_ps(um_neg, _mm512_load_ps(&ul[j]), _mm512_load_ps(&ur[j]));
+	p = _mm512_mask_blend_ps(um_neg, _mm512_load_ps(&pl[j]), _mm512_load_ps(&pr[j]));
+	c = _mm512_mask_blend_ps(um_neg, _mm512_load_ps(&cl[j]), _mm512_load_ps(&cr[j]));
 	v_ums = _mm512_load_ps(&um[j]);
-	v_u = _mm512_mask_sub_ps(v_u, um_neg, v_z, v_u);
-	v_ums = _mm512_mask_sub_ps(v_ums, um_neg, v_z, v_ums);
-	_mm512_store_ps(&d[0], v_d);
-	_mm512_store_ps(&u[0], v_u);
-	_mm512_store_ps(&p[0], v_p);
-	_mm512_store_ps(&c[0], v_c);
+	u = _mm512_mask_sub_ps(u, um_neg, z, u);
+	v_ums = _mm512_mask_sub_ps(v_ums, um_neg, z, v_ums);
 	_mm512_store_ps(&ums[0], v_ums);
 
 	// 4 branches.
-	_mm512_store_ps(&od[j], v_d);
-	_mm512_store_ps(&ou[j], v_u);
-	_mm512_store_ps(&op[j], v_p);
+	_mm512_store_ps(&od[j], d);
+	_mm512_store_ps(&ou[j], u);
+	_mm512_store_ps(&op[j], p);
 
 	// Calculate main values.
-	v_pms = _mm512_div_ps(_mm512_load_ps(&pm[j]), v_p);
+	v_pms = _mm512_div_ps(_mm512_load_ps(&pm[j]), p);
 	_mm512_store_ps(&pms[0], v_pms);
-	v_sh = _mm512_sub_ps(v_u, v_c);
+	v_sh = _mm512_sub_ps(u, c);
 	_mm512_store_ps(&sh[0], v_sh);
-	__m512 _t1 = _mm512_pow_ps(v_pms, v_G1);
-	v_st = _mm512_fnmadd_ps(_t1, v_c, v_ums);
+	__m512 _t1 = _mm512_pow_ps(v_pms, g1);
+	v_st = _mm512_fnmadd_ps(_t1, c, v_ums);
 	_mm512_store_ps(&st[0], v_st);
-	_t1 = _mm512_fmadd_ps(v_G2, v_pms, v_G1);
+	_t1 = _mm512_fmadd_ps(g2, v_pms, g1);
 	_t1 = _mm512_sqrt_ps(_t1);
-	v_s = _mm512_fnmadd_ps(v_c, _t1, v_u);
+	v_s = _mm512_fnmadd_ps(c, _t1, u);
 	_mm512_store_ps(&s[0], v_s);
 
 	__m512 v_pm = _mm512_load_ps(&pm[j]);
-	__mmask16 cond_pm = _mm512_cmp_ps_mask(v_pm, v_p, _MM_CMPINT_LE);
-	__mmask16 cond_sh = _mm512_mask_cmp_ps_mask(cond_pm, v_sh, v_z, _MM_CMPINT_LT);
-	__mmask16 cond_st_1 = _mm512_mask_cmp_ps_mask(cond_sh, v_st, v_z, _MM_CMPINT_LT);
-	__mmask16 cond_st_2 = _mm512_mask_cmp_ps_mask(cond_sh, v_st, v_z, _MM_CMPINT_GE);
-	__mmask16 cond_s = _mm512_mask_cmp_ps_mask(~cond_pm, v_s, v_z, _MM_CMPINT_LT);
+	__mmask16 cond_pm = _mm512_cmp_ps_mask(v_pm, p, _MM_CMPINT_LE);
+	__mmask16 cond_sh = _mm512_mask_cmp_ps_mask(cond_pm, v_sh, z, _MM_CMPINT_LT);
+	__mmask16 cond_st_1 = _mm512_mask_cmp_ps_mask(cond_sh, v_st, z, _MM_CMPINT_LT);
+	__mmask16 cond_st_2 = _mm512_mask_cmp_ps_mask(cond_sh, v_st, z, _MM_CMPINT_GE);
+	__mmask16 cond_s = _mm512_mask_cmp_ps_mask(~cond_pm, v_s, z, _MM_CMPINT_LT);
 	
-	_t1 = _mm512_pow_ps(v_pms, v_igama);
-	_mm512_mask_store_ps(&od[j], cond_st_1, _mm512_mul_ps(v_d, _t1));
+	_t1 = _mm512_pow_ps(v_pms, igama);
+	_mm512_mask_store_ps(&od[j], cond_st_1, _mm512_mul_ps(d, _t1));
 	_mm512_mask_store_ps(&ou[j], cond_st_1, v_ums);
 	_mm512_mask_store_ps(&op[j], cond_st_1, v_pm);
 
 
-	__m512 v_G6 = _mm512_set1_ps(G6);
-	__m512 v_1 = _mm512_set1_ps(1.0);
-	_t1 = _mm512_fmadd_ps(v_pms, v_G6, v_1);
-	__m512 _t2 = _mm512_add_ps(v_pms, v_G6);
+	_t1 = _mm512_fmadd_ps(v_pms, g6, v1);
+	__m512 _t2 = _mm512_add_ps(v_pms, g6);
 	_t1 = _mm512_div_ps(_t2, _t1);
-	_mm512_mask_store_ps(&od[j], cond_s, _mm512_mul_ps(v_d, _t1));
+	_mm512_mask_store_ps(&od[j], cond_s, _mm512_mul_ps(d, _t1));
 	_mm512_mask_store_ps(&ou[j], cond_s, v_ums);
 	_mm512_mask_store_ps(&op[j], cond_s, v_pm);
-
-//        for (int i = 0; i < 16; i++)
-//        {
-//            if (pm[j + i] <= p[i])
-//            {
-//            }
-//            else
-//            {
-//                if (s[i] < 0.0)
-//                {
-//                    od[j + i] = d[i] * (pms[i] + G6) / (pms[i] * G6 + 1.0);
-//                    ou[j + i] = ums[i];
-//                    op[j + i] = pm[j + i];
-//                }
-//            }
-//        }
 
         // Low prob - ignnore it.
         if (cond_st_2)
         {
-	    __m512 v_G3 = _mm512_set1_ps(G3);
-	    __m512 v_G4 = _mm512_set1_ps(G4);
-	    __m512 v_G5 = _mm512_set1_ps(G5);
-	    __m512 v_G7 = _mm512_set1_ps(G7);
-	    __m512 tmp = _mm512_fmadd_ps(v_G7, v_u, v_c);
-	    _mm512_mask_store_ps(&ou[j], cond_st_2, _mm512_mul_ps(v_G5, tmp));
-	    __m512 v_ouc = _mm512_div_ps(_mm512_load_ps(&ou[j]), v_c);
-	    tmp = _mm512_pow_ps(v_ouc, v_G4);
-	    _mm512_mask_store_ps(&od[j], cond_st_2, _mm512_mul_ps(v_d, tmp));
-	    tmp = _mm512_pow_ps(v_ouc, v_G3);
-	    _mm512_mask_store_ps(&op[j], cond_st_2, _mm512_mul_ps(v_p, tmp));
+	    __m512 tmp = _mm512_fmadd_ps(g7, u, c);
+	    _mm512_mask_store_ps(&ou[j], cond_st_2, _mm512_mul_ps(g5, tmp));
+	    __m512 v_ouc = _mm512_div_ps(_mm512_load_ps(&ou[j]), c);
+	    tmp = _mm512_pow_ps(v_ouc, g4);
+	    _mm512_mask_store_ps(&od[j], cond_st_2, _mm512_mul_ps(d, tmp));
+	    tmp = _mm512_pow_ps(v_ouc, g3);
+	    _mm512_mask_store_ps(&op[j], cond_st_2, _mm512_mul_ps(p, tmp));
 	}
 
 	__m512 v_ou = _mm512_load_ps(&ou[j]);
-	v_ou = _mm512_mask_sub_ps(v_ou, um_neg, v_z, v_ou);
+	v_ou = _mm512_mask_sub_ps(v_ou, um_neg, z, v_ou);
 	_mm512_store_ps(&ou[j], v_ou);
     }
 
