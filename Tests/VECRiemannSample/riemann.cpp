@@ -406,6 +406,10 @@ void samples_opt(float * __restrict__ dl,
 
 #define LD(ADDR) _mm512_load_ps(ADDR)
 #define ST(ADDR, VAL) _mm512_store_ps(ADDR, VAL)
+#define ADD(va, vb) _mm512_add_ps(va, vb)
+#define MUL(va, vb) _mm512_mul_ps(va, vb)
+#define SUB(va, vb) _mm512_sub_ps(va, vb)
+#define DIV(va, vb) _mm512_div_ps(va, vb)
 
     __assume_aligned(dl, 64);
     __assume_aligned(ul, 64);
@@ -433,8 +437,8 @@ void samples_opt(float * __restrict__ dl,
     __m512 g7 = _mm512_set1_ps(G7);
     __m512 igama = _mm512_set1_ps(1.0 / GAMA);
 
-    __m512 d, u, p, c, v_pm, v_um, ums, pms, sh, st, s, tmp, v_od, v_ou, v_op;
-    __mmask16 cond_um, cond_pm, cond_sh, cond_st_1, cond_st_2, cond_s;
+    __m512 d, u, p, c, v_pm, v_um, ums, pms, sh, st, s, tmp;
+    __mmask16 cond_um, cond_pm, cond_sh, cond_st, cond_s;
 
     for (int j = 0; j < TESTS_COUNT; j += 16)
     {
@@ -452,11 +456,6 @@ void samples_opt(float * __restrict__ dl,
 	u = _mm512_mask_sub_ps(u, cond_um, z, u);
 	ums = _mm512_mask_sub_ps(ums, cond_um, z, ums);
 
-	// 4 branches.
-	v_od = d;
-	v_ou = u;
-	v_op = p;
-
 	// Calculate main values.
 	pms = _mm512_div_ps(v_pm, p);
 	sh = _mm512_sub_ps(u, c);
@@ -466,36 +465,32 @@ void samples_opt(float * __restrict__ dl,
 	// Conditions.
 	cond_pm = _mm512_cmp_ps_mask(v_pm, p, _MM_CMPINT_LE);
 	cond_sh = _mm512_mask_cmp_ps_mask(cond_pm, sh, z, _MM_CMPINT_LT);
-	cond_st_1 = _mm512_mask_cmp_ps_mask(cond_sh, st, z, _MM_CMPINT_LT);
-	cond_st_2 = _mm512_mask_cmp_ps_mask(cond_sh, st, z, _MM_CMPINT_GE);
+	cond_st = _mm512_mask_cmp_ps_mask(cond_sh, st, z, _MM_CMPINT_LT);
 	cond_s = _mm512_mask_cmp_ps_mask(~cond_pm, s, z, _MM_CMPINT_LT);
 	
 	// Store.
-	tmp = _mm512_pow_ps(pms, igama);
-	v_od = _mm512_mask_mov_ps(v_od, cond_st_1, _mm512_mul_ps(d, tmp));
-	tmp = _mm512_fmadd_ps(pms, g6, v1);
-	tmp = _mm512_div_ps(_mm512_add_ps(pms, g6), tmp);
-	v_od = _mm512_mask_mov_ps(v_od, cond_s, _mm512_mul_ps(d, tmp));
-	v_ou = _mm512_mask_mov_ps(v_ou, cond_st_1 | cond_s, ums);
-	v_op = _mm512_mask_mov_ps(v_op, cond_st_1 | cond_s, v_pm);
+	d = _mm512_mask_mov_ps(d, cond_st, _mm512_mul_ps(d, _mm512_pow_ps(pms, igama)));
+	d = _mm512_mask_mov_ps(d, cond_s, _mm512_mul_ps(d, _mm512_div_ps(_mm512_add_ps(pms, g6), _mm512_fmadd_ps(pms, g6, v1))));
+	u = _mm512_mask_mov_ps(u, cond_st | cond_s, ums);
+	p = _mm512_mask_mov_ps(p, cond_st | cond_s, v_pm);
 
         // Low prob - ignnore it.
-        if (cond_st_2)
+        if (cond_sh & ~cond_st)
         {
 	    tmp = _mm512_fmadd_ps(g7, u, c);
-	    v_ou = _mm512_mask_mov_ps(v_ou, cond_st_2, _mm512_mul_ps(g5, tmp));
-	    __m512 v_ouc = _mm512_div_ps(v_ou, c);
+	    u = _mm512_mask_mov_ps(u, cond_sh & ~cond_st, _mm512_mul_ps(g5, tmp));
+	    __m512 v_ouc = _mm512_div_ps(u, c);
 	    tmp = _mm512_pow_ps(v_ouc, g4);
-	    v_od = _mm512_mask_mov_ps(v_od, cond_st_2, _mm512_mul_ps(d, tmp));
+	    d = _mm512_mask_mov_ps(d, cond_sh & ~cond_st, _mm512_mul_ps(d, tmp));
 	    tmp = _mm512_pow_ps(v_ouc, g3);
-	    v_op = _mm512_mask_mov_ps(v_op, cond_st_2, _mm512_mul_ps(p, tmp));
+	    p = _mm512_mask_mov_ps(p, cond_sh & ~cond_st, _mm512_mul_ps(p, tmp));
 	}
 
 	// Final store.
-	v_ou = _mm512_mask_sub_ps(v_ou, cond_um, z, v_ou);
-	ST(&od[j], v_od);
-	ST(&ou[j], v_ou);
-	ST(&op[j], v_op);
+	u = _mm512_mask_sub_ps(u, cond_um, z, u);
+	ST(&od[j], d);
+	ST(&ou[j], u);
+	ST(&op[j], p);
     }
 
 #else

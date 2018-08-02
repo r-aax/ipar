@@ -8,7 +8,7 @@
 //
 // 0 - small test,
 // 1 - big test.
-#define TEST_MODE 0
+#define TEST_MODE 1
 
 // \brief Tests count.
 #if TEST_MODE == 0
