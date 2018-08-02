@@ -440,7 +440,7 @@ void samples_opt(float * __restrict__ dl,
     __m512 igama = _mm512_set1_ps(1.0 / GAMA);
 
     __m512 d, u, p, c, v_pm, v_um, ums, pms, sh, st, s, tmp;
-    __mmask16 cond_um, cond_pm, cond_sh, cond_st, cond_s;
+    __mmask16 cond_um, cond_pm, cond_sh, cond_st, cond_s, cond_sh_st;
 
     for (int j = 0; j < TESTS_COUNT; j += 16)
     {
@@ -477,15 +477,16 @@ void samples_opt(float * __restrict__ dl,
 	p = _mm512_mask_mov_ps(p, cond_st | cond_s, v_pm);
 
         // Low prob - ignnore it.
-        if (cond_sh & ~cond_st)
+        cond_sh_st = cond_sh & ~cond_st;
+        if (cond_sh_st)
         {
 	    tmp = _mm512_fmadd_ps(g7, u, c);
-	    u = _mm512_mask_mov_ps(u, cond_sh & ~cond_st, MUL(g5, tmp));
+	    u = _mm512_mask_mov_ps(u, cond_sh_st, MUL(g5, tmp));
 	    __m512 v_ouc = DIV(u, c);
 	    tmp = POW(v_ouc, g4);
-	    d = _mm512_mask_mov_ps(d, cond_sh & ~cond_st, MUL(d, tmp));
+	    d = _mm512_mask_mov_ps(d, cond_sh_st, MUL(d, tmp));
 	    tmp = POW(v_ouc, g3);
-	    p = _mm512_mask_mov_ps(p, cond_sh & ~cond_st, MUL(p, tmp));
+	    p = _mm512_mask_mov_ps(p, cond_sh_st, MUL(p, tmp));
 	}
 
 	// Final store.
