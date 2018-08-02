@@ -410,6 +410,8 @@ void samples_opt(float * __restrict__ dl,
 #define MUL(va, vb) _mm512_mul_ps(va, vb)
 #define SUB(va, vb) _mm512_sub_ps(va, vb)
 #define DIV(va, vb) _mm512_div_ps(va, vb)
+#define POW(va, vb) _mm512_pow_ps(va, vb)
+#define SQRT(va) _mm512_sqrt_ps(va)
 
     __assume_aligned(dl, 64);
     __assume_aligned(ul, 64);
@@ -457,10 +459,10 @@ void samples_opt(float * __restrict__ dl,
 	ums = _mm512_mask_sub_ps(ums, cond_um, z, ums);
 
 	// Calculate main values.
-	pms = _mm512_div_ps(v_pm, p);
-	sh = _mm512_sub_ps(u, c);
-	st = _mm512_fnmadd_ps(_mm512_pow_ps(pms, g1), c, ums);
-	s = _mm512_fnmadd_ps(c, _mm512_sqrt_ps(_mm512_fmadd_ps(g2, pms, g1)), u);
+	pms = DIV(v_pm, p);
+	sh = SUB(u, c);
+	st = _mm512_fnmadd_ps(POW(pms, g1), c, ums);
+	s = _mm512_fnmadd_ps(c, SQRT(_mm512_fmadd_ps(g2, pms, g1)), u);
 
 	// Conditions.
 	cond_pm = _mm512_cmp_ps_mask(v_pm, p, _MM_CMPINT_LE);
@@ -469,8 +471,8 @@ void samples_opt(float * __restrict__ dl,
 	cond_s = _mm512_mask_cmp_ps_mask(~cond_pm, s, z, _MM_CMPINT_LT);
 	
 	// Store.
-	d = _mm512_mask_mov_ps(d, cond_st, _mm512_mul_ps(d, _mm512_pow_ps(pms, igama)));
-	d = _mm512_mask_mov_ps(d, cond_s, _mm512_mul_ps(d, _mm512_div_ps(_mm512_add_ps(pms, g6), _mm512_fmadd_ps(pms, g6, v1))));
+	d = _mm512_mask_mov_ps(d, cond_st, MUL(d, POW(pms, igama)));
+	d = _mm512_mask_mov_ps(d, cond_s, MUL(d, DIV(ADD(pms, g6), _mm512_fmadd_ps(pms, g6, v1))));
 	u = _mm512_mask_mov_ps(u, cond_st | cond_s, ums);
 	p = _mm512_mask_mov_ps(p, cond_st | cond_s, v_pm);
 
@@ -478,12 +480,12 @@ void samples_opt(float * __restrict__ dl,
         if (cond_sh & ~cond_st)
         {
 	    tmp = _mm512_fmadd_ps(g7, u, c);
-	    u = _mm512_mask_mov_ps(u, cond_sh & ~cond_st, _mm512_mul_ps(g5, tmp));
-	    __m512 v_ouc = _mm512_div_ps(u, c);
-	    tmp = _mm512_pow_ps(v_ouc, g4);
-	    d = _mm512_mask_mov_ps(d, cond_sh & ~cond_st, _mm512_mul_ps(d, tmp));
-	    tmp = _mm512_pow_ps(v_ouc, g3);
-	    p = _mm512_mask_mov_ps(p, cond_sh & ~cond_st, _mm512_mul_ps(p, tmp));
+	    u = _mm512_mask_mov_ps(u, cond_sh & ~cond_st, MUL(g5, tmp));
+	    __m512 v_ouc = DIV(u, c);
+	    tmp = POW(v_ouc, g4);
+	    d = _mm512_mask_mov_ps(d, cond_sh & ~cond_st, MUL(d, tmp));
+	    tmp = POW(v_ouc, g3);
+	    p = _mm512_mask_mov_ps(p, cond_sh & ~cond_st, MUL(p, tmp));
 	}
 
 	// Final store.
