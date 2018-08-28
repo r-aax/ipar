@@ -15,10 +15,10 @@
 #define MIN_ARRAY_SIZE 10000
 
 /// \brief Max array size.
-#define MAX_ARRAY_SIZE 2000000
+#define MAX_ARRAY_SIZE 100000
 
 /// \brief Array size step.
-#define ARRAY_SIZE_STEP 10000
+#define ARRAY_SIZE_STEP 7777
 
 /// \brief Align.
 #ifdef INTEL
@@ -147,8 +147,6 @@ int main(int argc, char **argv)
 
     for (int AA = MIN_ARRAY_SIZE; AA <= MAX_ARRAY_SIZE; AA += ARRAY_SIZE_STEP)
     {
-    //int AA = MAX_ARRAY_SIZE;
-
     int repeats_count = 1;
 
     // Parse repeats count if given.
@@ -194,8 +192,8 @@ int main(int argc, char **argv)
     pm_sum_opt = array_pm_sum(m_opt, AA);
 
     cout << "VECShellSort : orig = " << time_orig << ", opt = " << time_opt << endl;
-    //DEBUG_CHECK(check_orig, "orig checAk failed");
-    //DEBUG_CHECK(check_opt, "opt check failed");
+    DEBUG_CHECK(check_orig, "orig check failed");
+    DEBUG_CHECK(check_opt, "opt check failed");
     cout << "VECShellSort : sum orig = " << sum_orig << ", sum opt = " << sum_opt << endl;
     cout << "VECShellSort : pm_sum orig = " << pm_sum_orig << ", pm_sum opt = " << pm_sum_opt << endl;
     cout << "VECShellSort : speedup = " << ((time_orig - time_opt) / time_orig) * 100.0 << "%" << endl;
