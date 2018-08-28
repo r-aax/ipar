@@ -14,12 +14,12 @@ EXE="VECRiemannSample.out"
 
 rm -f $EXE
 
-$COMP \
-    -DDEBUG \
-    *.cpp ../../Utils/*.cpp \
-    $FLAGS $INFO_FLAGS \
-    -lm -fopenmp \
-    -S
+#$COMP \
+#    -DDEBUG \
+#    *.cpp ../../Utils/*.cpp \
+#    $FLAGS $INFO_FLAGS \
+#    -lm -fopenmp \
+#    -S
 $COMP \
     -DDEBUG \
     *.cpp ../../Utils/*.cpp \

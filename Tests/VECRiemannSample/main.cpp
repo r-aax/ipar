@@ -11,7 +11,7 @@
 #include "riemann.h"
 
 // \brief Repeats count.
-#define REPEATS_COUNT 10
+#define REPEATS_COUNT 1000
 
 using namespace Utils;
 
