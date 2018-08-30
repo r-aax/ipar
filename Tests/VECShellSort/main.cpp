@@ -15,10 +15,10 @@
 #define MIN_ARRAY_SIZE 10000
 
 /// \brief Max array size.
-#define MAX_ARRAY_SIZE 100000
+#define MAX_ARRAY_SIZE 2000000
 
 /// \brief Array size step.
-#define ARRAY_SIZE_STEP 7777
+#define ARRAY_SIZE_STEP 10000
 
 /// \brief Align.
 #ifdef INTEL
@@ -137,6 +137,12 @@ static void arrays_copy(float *from, float *to, int c)
     }
 }
 
+/// \brief Alias for shell sort orig.
+#define SHELL_SORT_ORIG shell_sort_fib_orig
+
+/// \brief ALias for shell sort opt.
+#define SHELL_SORT_OPT shell_sort_fib_opt
+
 /// \brief Main function.
 ///
 /// \param argc - arguments count
@@ -167,10 +173,10 @@ int main(int argc, char **argv)
     // Original.
     arrays_copy(m, m_orig, AA);
     timer->Init();
-    shell_sort_orig(m_orig, AA);
+    SHELL_SORT_ORIG(m_orig, AA);
     arrays_copy(m, m_orig, AA);
     timer->Start();
-    shell_sort_orig(m_orig, AA);
+    SHELL_SORT_ORIG(m_orig, AA);
     timer->Stop();
     time_orig = timer->Time();
     check_orig = is_array_sorted(m_orig, AA);
@@ -181,10 +187,10 @@ int main(int argc, char **argv)
     shell_sort_opt_prepare();
     arrays_copy(m, m_opt, AA);
     timer->Init();
-    shell_sort_opt(m_opt, AA);
+    SHELL_SORT_OPT(m_opt, AA);
     arrays_copy(m, m_opt, AA);
     timer->Start();
-    shell_sort_opt(m_opt, AA);
+    SHELL_SORT_OPT(m_opt, AA);
     timer->Stop();
     time_opt = timer->Time();
     check_opt = is_array_sorted(m_opt, AA);
@@ -196,7 +202,8 @@ int main(int argc, char **argv)
     DEBUG_CHECK(check_opt, "opt check failed");
     cout << "VECShellSort : sum orig = " << sum_orig << ", sum opt = " << sum_opt << endl;
     cout << "VECShellSort : pm_sum orig = " << pm_sum_orig << ", pm_sum opt = " << pm_sum_opt << endl;
-    cout << "VECShellSort : speedup = " << ((time_orig - time_opt) / time_orig) * 100.0 << "%" << endl;
+    //cout << "VECShellSort : speedup = " << ((time_orig - time_opt) / time_orig) * 100.0 << "%" << endl;
+    cout << "VECShellSort : speedup = " << time_orig / time_opt << " times" << endl;
     cout << "------------------------------------------------" << endl;
 
     delete timer;
