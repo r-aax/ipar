@@ -1,6 +1,6 @@
 #!/bin/bash
 
-EXE="VECMatrices.out"
+EXE="VECRiemannSample.out"
 
 if [[ -f "$EXE" ]]
 then
