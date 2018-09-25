@@ -139,9 +139,9 @@ int main(int argc, char **argv)
     random_array(a, COUNT * V64);
     random_array(b, COUNT * V64);
 
-    // *---------*
-    // | matmat8 |
-    // *---------*
+    // *----------------*
+    // | om_mult_mm_8x8 |
+    // *----------------*
 
     if (COUNT > 0)
     {
@@ -170,6 +170,108 @@ int main(int argc, char **argv)
              << ", speedup = " << time_orig / time_opt  << endl;
         DEBUG_CHECK(MATHS_IS_NEAR(check_orig, check_opt, 0.01), "om_mult_mm_8x8 check failed");
         cout << "VECMatrices5678 : om_mult_mm_8x8 check : " << check_orig << endl;
+        cout << "------------------------------" << endl;
+    }
+
+    // *----------------*
+    // | om_mult_mm_7x7 |
+    // *----------------*
+
+    if (COUNT > 0)
+    {
+        // Original.
+        clean_res();
+        timer->Init();
+        run3(repeats_count, COUNT, om_mult_mm_7x7_orig, a, b, r, V64, V64, V64);
+        timer->Start();
+        run3(repeats_count, COUNT, om_mult_mm_7x7_orig, a, b, r, V64, V64, V64);
+        timer->Stop();
+        time_orig = timer->Time();
+        check_orig = array_sum(r, COUNT * V64);
+
+        // Optimized.
+        clean_res();
+        timer->Init();
+        run3(repeats_count, COUNT, om_mult_mm_7x7_opt, a, b, r, V64, V64, V64);
+        timer->Start();
+        run3(repeats_count, COUNT, om_mult_mm_7x7_opt, a, b, r, V64, V64, V64);
+        timer->Stop();
+        time_opt = timer->Time();
+        check_opt = array_sum(r, COUNT * V64);
+
+        cout << "VECMatrices5678 : om_mult_mm_7x7 : orig = " << time_orig
+             << ", opt = " << time_opt 
+             << ", speedup = " << time_orig / time_opt  << endl;
+        DEBUG_CHECK(MATHS_IS_NEAR(check_orig, check_opt, 0.01), "om_mult_mm_7x7 check failed");
+        cout << "VECMatrices5678 : om_mult_mm_7x7 check : " << check_orig << endl;
+        cout << "------------------------------" << endl;
+    }
+
+    // *----------------*
+    // | om_mult_mm_6x6 |
+    // *----------------*
+
+    if (COUNT > 0)
+    {
+        // Original.
+        clean_res();
+        timer->Init();
+        run3(repeats_count, COUNT, om_mult_mm_6x6_orig, a, b, r, V64, V64, V64);
+        timer->Start();
+        run3(repeats_count, COUNT, om_mult_mm_6x6_orig, a, b, r, V64, V64, V64);
+        timer->Stop();
+        time_orig = timer->Time();
+        check_orig = array_sum(r, COUNT * V64);
+
+        // Optimized.
+        clean_res();
+        timer->Init();
+        run3(repeats_count, COUNT, om_mult_mm_6x6_opt, a, b, r, V64, V64, V64);
+        timer->Start();
+        run3(repeats_count, COUNT, om_mult_mm_6x6_opt, a, b, r, V64, V64, V64);
+        timer->Stop();
+        time_opt = timer->Time();
+        check_opt = array_sum(r, COUNT * V64);
+
+        cout << "VECMatrices5678 : om_mult_mm_6x6 : orig = " << time_orig
+             << ", opt = " << time_opt 
+             << ", speedup = " << time_orig / time_opt  << endl;
+        DEBUG_CHECK(MATHS_IS_NEAR(check_orig, check_opt, 0.01), "om_mult_mm_6x6 check failed");
+        cout << "VECMatrices5678 : om_mult_mm_6x6 check : " << check_orig << endl;
+        cout << "------------------------------" << endl;
+    }
+
+    // *----------------*
+    // | om_mult_mm_5x5 |
+    // *----------------*
+
+    if (COUNT > 0)
+    {
+        // Original.
+        clean_res();
+        timer->Init();
+        run3(repeats_count, COUNT, om_mult_mm_5x5_orig, a, b, r, V64, V64, V64);
+        timer->Start();
+        run3(repeats_count, COUNT, om_mult_mm_5x5_orig, a, b, r, V64, V64, V64);
+        timer->Stop();
+        time_orig = timer->Time();
+        check_orig = array_sum(r, COUNT * V64);
+
+        // Optimized.
+        clean_res();
+        timer->Init();
+        run3(repeats_count, COUNT, om_mult_mm_5x5_opt, a, b, r, V64, V64, V64);
+        timer->Start();
+        run3(repeats_count, COUNT, om_mult_mm_5x5_opt, a, b, r, V64, V64, V64);
+        timer->Stop();
+        time_opt = timer->Time();
+        check_opt = array_sum(r, COUNT * V64);
+
+        cout << "VECMatrices5678 : om_mult_mm_5x5 : orig = " << time_orig
+             << ", opt = " << time_opt 
+             << ", speedup = " << time_orig / time_opt  << endl;
+        DEBUG_CHECK(MATHS_IS_NEAR(check_orig, check_opt, 0.01), "om_mult_mm_5x5 check failed");
+        cout << "VECMatrices5678 : om_mult_mm_5x5 check : " << check_orig << endl;
         cout << "------------------------------" << endl;
     }
 
