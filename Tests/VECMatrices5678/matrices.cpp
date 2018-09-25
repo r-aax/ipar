@@ -106,13 +106,15 @@ void om_mult_mm_8x8_opt(float * __restrict a,
                         float * __restrict r)
 {
 
-//#ifndef INTEL
+#ifndef INTEL
 
-//    om_mult_mm_8x8_orig(a, b, r);
+    om_mult_mm_8x8_orig(a, b, r);
 
-//#else
+#else
 
 #if 0
+
+    // Old version of vectorization with gather/scatter.
 
     __assume_aligned(a, 64);
     __assume_aligned(b, 64);
@@ -165,152 +167,303 @@ void om_mult_mm_8x8_opt(float * __restrict a,
         _mm512_i32scatter_ps(&r[j], ind_st, m2, _MM_SCALE_4);
     }
 
-#else
+#endif
 
-//    __assume_aligned(a, 64);
-//    __assume_aligned(b, 64);
-//    __assume_aligned(r, 64);
+#if 0
+
+    // Full unroll.
+
+    __assume_aligned(a, 64);
+    __assume_aligned(b, 64);
+    __assume_aligned(r, 64);
 
 
-r[ADR(0, 0)] = a[ADR(0,0)]*b[ADR(0,0)]+a[ADR(0,1)]*b[ADR(1,0)]+a[ADR(0,2)]*b[ADR(2,0)]+a[ADR(0,3)]*b[ADR(3,0)]
-             + a[ADR(0,4)]*b[ADR(4,0)]+a[ADR(0,5)]*b[ADR(5,0)]+a[ADR(0,6)]*b[ADR(6,0)]+a[ADR(0,7)]*b[ADR(7,0)];
-r[ADR(0, 1)] = a[ADR(0,0)]*b[ADR(0,1)]+a[ADR(0,1)]*b[ADR(1,1)]+a[ADR(0,2)]*b[ADR(2,1)]+a[ADR(0,3)]*b[ADR(3,1)]
-             + a[ADR(0,4)]*b[ADR(4,1)]+a[ADR(0,5)]*b[ADR(5,1)]+a[ADR(0,6)]*b[ADR(6,1)]+a[ADR(0,7)]*b[ADR(7,1)];
-r[ADR(0, 2)] = a[ADR(0,0)]*b[ADR(0,2)]+a[ADR(0,1)]*b[ADR(1,2)]+a[ADR(0,2)]*b[ADR(2,2)]+a[ADR(0,3)]*b[ADR(3,2)]
-             + a[ADR(0,4)]*b[ADR(4,2)]+a[ADR(0,5)]*b[ADR(5,2)]+a[ADR(0,6)]*b[ADR(6,2)]+a[ADR(0,7)]*b[ADR(7,2)];
-r[ADR(0, 3)] = a[ADR(0,0)]*b[ADR(0,3)]+a[ADR(0,1)]*b[ADR(1,3)]+a[ADR(0,2)]*b[ADR(2,3)]+a[ADR(0,3)]*b[ADR(3,3)]
-             + a[ADR(0,4)]*b[ADR(4,3)]+a[ADR(0,5)]*b[ADR(5,3)]+a[ADR(0,6)]*b[ADR(6,3)]+a[ADR(0,7)]*b[ADR(7,3)];
-r[ADR(0, 4)] = a[ADR(0,0)]*b[ADR(0,4)]+a[ADR(0,1)]*b[ADR(1,4)]+a[ADR(0,2)]*b[ADR(2,4)]+a[ADR(0,3)]*b[ADR(3,4)]
-             + a[ADR(0,4)]*b[ADR(4,4)]+a[ADR(0,5)]*b[ADR(5,4)]+a[ADR(0,6)]*b[ADR(6,4)]+a[ADR(0,7)]*b[ADR(7,4)];
-r[ADR(0, 5)] = a[ADR(0,0)]*b[ADR(0,5)]+a[ADR(0,1)]*b[ADR(1,5)]+a[ADR(0,2)]*b[ADR(2,5)]+a[ADR(0,3)]*b[ADR(3,5)]
-             + a[ADR(0,4)]*b[ADR(4,5)]+a[ADR(0,5)]*b[ADR(5,5)]+a[ADR(0,6)]*b[ADR(6,5)]+a[ADR(0,7)]*b[ADR(7,5)];
-r[ADR(0, 6)] = a[ADR(0,0)]*b[ADR(0,6)]+a[ADR(0,1)]*b[ADR(1,6)]+a[ADR(0,2)]*b[ADR(2,6)]+a[ADR(0,3)]*b[ADR(3,6)]
-             + a[ADR(0,4)]*b[ADR(4,6)]+a[ADR(0,5)]*b[ADR(5,6)]+a[ADR(0,6)]*b[ADR(6,6)]+a[ADR(0,7)]*b[ADR(7,6)];
-r[ADR(0, 7)] = a[ADR(0,0)]*b[ADR(0,7)]+a[ADR(0,1)]*b[ADR(1,7)]+a[ADR(0,2)]*b[ADR(2,7)]+a[ADR(0,3)]*b[ADR(3,7)]
-             + a[ADR(0,4)]*b[ADR(4,7)]+a[ADR(0,5)]*b[ADR(5,7)]+a[ADR(0,6)]*b[ADR(6,7)]+a[ADR(0,7)]*b[ADR(7,7)];
+    r[ADR(0, 0)] = a[ADR(0,0)]*b[ADR(0,0)]+a[ADR(0,1)]*b[ADR(1,0)]+a[ADR(0,2)]*b[ADR(2,0)]+a[ADR(0,3)]*b[ADR(3,0)]
+                 + a[ADR(0,4)]*b[ADR(4,0)]+a[ADR(0,5)]*b[ADR(5,0)]+a[ADR(0,6)]*b[ADR(6,0)]+a[ADR(0,7)]*b[ADR(7,0)];
+    r[ADR(0, 1)] = a[ADR(0,0)]*b[ADR(0,1)]+a[ADR(0,1)]*b[ADR(1,1)]+a[ADR(0,2)]*b[ADR(2,1)]+a[ADR(0,3)]*b[ADR(3,1)]
+                 + a[ADR(0,4)]*b[ADR(4,1)]+a[ADR(0,5)]*b[ADR(5,1)]+a[ADR(0,6)]*b[ADR(6,1)]+a[ADR(0,7)]*b[ADR(7,1)];
+    r[ADR(0, 2)] = a[ADR(0,0)]*b[ADR(0,2)]+a[ADR(0,1)]*b[ADR(1,2)]+a[ADR(0,2)]*b[ADR(2,2)]+a[ADR(0,3)]*b[ADR(3,2)]
+                 + a[ADR(0,4)]*b[ADR(4,2)]+a[ADR(0,5)]*b[ADR(5,2)]+a[ADR(0,6)]*b[ADR(6,2)]+a[ADR(0,7)]*b[ADR(7,2)];
+    r[ADR(0, 3)] = a[ADR(0,0)]*b[ADR(0,3)]+a[ADR(0,1)]*b[ADR(1,3)]+a[ADR(0,2)]*b[ADR(2,3)]+a[ADR(0,3)]*b[ADR(3,3)]
+                 + a[ADR(0,4)]*b[ADR(4,3)]+a[ADR(0,5)]*b[ADR(5,3)]+a[ADR(0,6)]*b[ADR(6,3)]+a[ADR(0,7)]*b[ADR(7,3)];
+    r[ADR(0, 4)] = a[ADR(0,0)]*b[ADR(0,4)]+a[ADR(0,1)]*b[ADR(1,4)]+a[ADR(0,2)]*b[ADR(2,4)]+a[ADR(0,3)]*b[ADR(3,4)]
+                 + a[ADR(0,4)]*b[ADR(4,4)]+a[ADR(0,5)]*b[ADR(5,4)]+a[ADR(0,6)]*b[ADR(6,4)]+a[ADR(0,7)]*b[ADR(7,4)];
+    r[ADR(0, 5)] = a[ADR(0,0)]*b[ADR(0,5)]+a[ADR(0,1)]*b[ADR(1,5)]+a[ADR(0,2)]*b[ADR(2,5)]+a[ADR(0,3)]*b[ADR(3,5)]
+                 + a[ADR(0,4)]*b[ADR(4,5)]+a[ADR(0,5)]*b[ADR(5,5)]+a[ADR(0,6)]*b[ADR(6,5)]+a[ADR(0,7)]*b[ADR(7,5)];
+    r[ADR(0, 6)] = a[ADR(0,0)]*b[ADR(0,6)]+a[ADR(0,1)]*b[ADR(1,6)]+a[ADR(0,2)]*b[ADR(2,6)]+a[ADR(0,3)]*b[ADR(3,6)]
+                 + a[ADR(0,4)]*b[ADR(4,6)]+a[ADR(0,5)]*b[ADR(5,6)]+a[ADR(0,6)]*b[ADR(6,6)]+a[ADR(0,7)]*b[ADR(7,6)];
+    r[ADR(0, 7)] = a[ADR(0,0)]*b[ADR(0,7)]+a[ADR(0,1)]*b[ADR(1,7)]+a[ADR(0,2)]*b[ADR(2,7)]+a[ADR(0,3)]*b[ADR(3,7)]
+                 + a[ADR(0,4)]*b[ADR(4,7)]+a[ADR(0,5)]*b[ADR(5,7)]+a[ADR(0,6)]*b[ADR(6,7)]+a[ADR(0,7)]*b[ADR(7,7)];
 
-r[ADR(1, 0)] = a[ADR(1,0)]*b[ADR(0,0)]+a[ADR(1,1)]*b[ADR(1,0)]+a[ADR(1,2)]*b[ADR(2,0)]+a[ADR(1,3)]*b[ADR(3,0)]
-             + a[ADR(1,4)]*b[ADR(4,0)]+a[ADR(1,5)]*b[ADR(5,0)]+a[ADR(1,6)]*b[ADR(6,0)]+a[ADR(1,7)]*b[ADR(7,0)];
-r[ADR(1, 1)] = a[ADR(1,0)]*b[ADR(0,1)]+a[ADR(1,1)]*b[ADR(1,1)]+a[ADR(1,2)]*b[ADR(2,1)]+a[ADR(1,3)]*b[ADR(3,1)]
-             + a[ADR(1,4)]*b[ADR(4,1)]+a[ADR(1,5)]*b[ADR(5,1)]+a[ADR(1,6)]*b[ADR(6,1)]+a[ADR(1,7)]*b[ADR(7,1)];
-r[ADR(1, 2)] = a[ADR(1,0)]*b[ADR(0,2)]+a[ADR(1,1)]*b[ADR(1,2)]+a[ADR(1,2)]*b[ADR(2,2)]+a[ADR(1,3)]*b[ADR(3,2)]
-             + a[ADR(1,4)]*b[ADR(4,2)]+a[ADR(1,5)]*b[ADR(5,2)]+a[ADR(1,6)]*b[ADR(6,2)]+a[ADR(1,7)]*b[ADR(7,2)];
-r[ADR(1, 3)] = a[ADR(1,0)]*b[ADR(0,3)]+a[ADR(1,1)]*b[ADR(1,3)]+a[ADR(1,2)]*b[ADR(2,3)]+a[ADR(1,3)]*b[ADR(3,3)]
-             + a[ADR(1,4)]*b[ADR(4,3)]+a[ADR(1,5)]*b[ADR(5,3)]+a[ADR(1,6)]*b[ADR(6,3)]+a[ADR(1,7)]*b[ADR(7,3)];
-r[ADR(1, 4)] = a[ADR(1,0)]*b[ADR(0,4)]+a[ADR(1,1)]*b[ADR(1,4)]+a[ADR(1,2)]*b[ADR(2,4)]+a[ADR(1,3)]*b[ADR(3,4)]
-             + a[ADR(1,4)]*b[ADR(4,4)]+a[ADR(1,5)]*b[ADR(5,4)]+a[ADR(1,6)]*b[ADR(6,4)]+a[ADR(1,7)]*b[ADR(7,4)];
-r[ADR(1, 5)] = a[ADR(1,0)]*b[ADR(0,5)]+a[ADR(1,1)]*b[ADR(1,5)]+a[ADR(1,2)]*b[ADR(2,5)]+a[ADR(1,3)]*b[ADR(3,5)]
-             + a[ADR(1,4)]*b[ADR(4,5)]+a[ADR(1,5)]*b[ADR(5,5)]+a[ADR(1,6)]*b[ADR(6,5)]+a[ADR(1,7)]*b[ADR(7,5)];
-r[ADR(1, 6)] = a[ADR(1,0)]*b[ADR(0,6)]+a[ADR(1,1)]*b[ADR(1,6)]+a[ADR(1,2)]*b[ADR(2,6)]+a[ADR(1,3)]*b[ADR(3,6)]
-             + a[ADR(1,4)]*b[ADR(4,6)]+a[ADR(1,5)]*b[ADR(5,6)]+a[ADR(1,6)]*b[ADR(6,6)]+a[ADR(1,7)]*b[ADR(7,6)];
-r[ADR(1, 7)] = a[ADR(1,0)]*b[ADR(0,7)]+a[ADR(1,1)]*b[ADR(1,7)]+a[ADR(1,2)]*b[ADR(2,7)]+a[ADR(1,3)]*b[ADR(3,7)]
-             + a[ADR(1,4)]*b[ADR(4,7)]+a[ADR(1,5)]*b[ADR(5,7)]+a[ADR(1,6)]*b[ADR(6,7)]+a[ADR(1,7)]*b[ADR(7,7)];
+    r[ADR(1, 0)] = a[ADR(1,0)]*b[ADR(0,0)]+a[ADR(1,1)]*b[ADR(1,0)]+a[ADR(1,2)]*b[ADR(2,0)]+a[ADR(1,3)]*b[ADR(3,0)]
+                 + a[ADR(1,4)]*b[ADR(4,0)]+a[ADR(1,5)]*b[ADR(5,0)]+a[ADR(1,6)]*b[ADR(6,0)]+a[ADR(1,7)]*b[ADR(7,0)];
+    r[ADR(1, 1)] = a[ADR(1,0)]*b[ADR(0,1)]+a[ADR(1,1)]*b[ADR(1,1)]+a[ADR(1,2)]*b[ADR(2,1)]+a[ADR(1,3)]*b[ADR(3,1)]
+                 + a[ADR(1,4)]*b[ADR(4,1)]+a[ADR(1,5)]*b[ADR(5,1)]+a[ADR(1,6)]*b[ADR(6,1)]+a[ADR(1,7)]*b[ADR(7,1)];
+    r[ADR(1, 2)] = a[ADR(1,0)]*b[ADR(0,2)]+a[ADR(1,1)]*b[ADR(1,2)]+a[ADR(1,2)]*b[ADR(2,2)]+a[ADR(1,3)]*b[ADR(3,2)]
+                 + a[ADR(1,4)]*b[ADR(4,2)]+a[ADR(1,5)]*b[ADR(5,2)]+a[ADR(1,6)]*b[ADR(6,2)]+a[ADR(1,7)]*b[ADR(7,2)];
+    r[ADR(1, 3)] = a[ADR(1,0)]*b[ADR(0,3)]+a[ADR(1,1)]*b[ADR(1,3)]+a[ADR(1,2)]*b[ADR(2,3)]+a[ADR(1,3)]*b[ADR(3,3)]
+                 + a[ADR(1,4)]*b[ADR(4,3)]+a[ADR(1,5)]*b[ADR(5,3)]+a[ADR(1,6)]*b[ADR(6,3)]+a[ADR(1,7)]*b[ADR(7,3)];
+    r[ADR(1, 4)] = a[ADR(1,0)]*b[ADR(0,4)]+a[ADR(1,1)]*b[ADR(1,4)]+a[ADR(1,2)]*b[ADR(2,4)]+a[ADR(1,3)]*b[ADR(3,4)]
+                 + a[ADR(1,4)]*b[ADR(4,4)]+a[ADR(1,5)]*b[ADR(5,4)]+a[ADR(1,6)]*b[ADR(6,4)]+a[ADR(1,7)]*b[ADR(7,4)];
+    r[ADR(1, 5)] = a[ADR(1,0)]*b[ADR(0,5)]+a[ADR(1,1)]*b[ADR(1,5)]+a[ADR(1,2)]*b[ADR(2,5)]+a[ADR(1,3)]*b[ADR(3,5)]
+                 + a[ADR(1,4)]*b[ADR(4,5)]+a[ADR(1,5)]*b[ADR(5,5)]+a[ADR(1,6)]*b[ADR(6,5)]+a[ADR(1,7)]*b[ADR(7,5)];
+    r[ADR(1, 6)] = a[ADR(1,0)]*b[ADR(0,6)]+a[ADR(1,1)]*b[ADR(1,6)]+a[ADR(1,2)]*b[ADR(2,6)]+a[ADR(1,3)]*b[ADR(3,6)]
+                 + a[ADR(1,4)]*b[ADR(4,6)]+a[ADR(1,5)]*b[ADR(5,6)]+a[ADR(1,6)]*b[ADR(6,6)]+a[ADR(1,7)]*b[ADR(7,6)];
+    r[ADR(1, 7)] = a[ADR(1,0)]*b[ADR(0,7)]+a[ADR(1,1)]*b[ADR(1,7)]+a[ADR(1,2)]*b[ADR(2,7)]+a[ADR(1,3)]*b[ADR(3,7)]
+                 + a[ADR(1,4)]*b[ADR(4,7)]+a[ADR(1,5)]*b[ADR(5,7)]+a[ADR(1,6)]*b[ADR(6,7)]+a[ADR(1,7)]*b[ADR(7,7)];
 
-r[ADR(2, 0)] = a[ADR(2,0)]*b[ADR(0,0)]+a[ADR(2,1)]*b[ADR(1,0)]+a[ADR(2,2)]*b[ADR(2,0)]+a[ADR(2,3)]*b[ADR(3,0)]
-             + a[ADR(2,4)]*b[ADR(4,0)]+a[ADR(2,5)]*b[ADR(5,0)]+a[ADR(2,6)]*b[ADR(6,0)]+a[ADR(2,7)]*b[ADR(7,0)];
-r[ADR(2, 1)] = a[ADR(2,0)]*b[ADR(0,1)]+a[ADR(2,1)]*b[ADR(1,1)]+a[ADR(2,2)]*b[ADR(2,1)]+a[ADR(2,3)]*b[ADR(3,1)]
-             + a[ADR(2,4)]*b[ADR(4,1)]+a[ADR(2,5)]*b[ADR(5,1)]+a[ADR(2,6)]*b[ADR(6,1)]+a[ADR(2,7)]*b[ADR(7,1)];
-r[ADR(2, 2)] = a[ADR(2,0)]*b[ADR(0,2)]+a[ADR(2,1)]*b[ADR(1,2)]+a[ADR(2,2)]*b[ADR(2,2)]+a[ADR(2,3)]*b[ADR(3,2)]
-             + a[ADR(2,4)]*b[ADR(4,2)]+a[ADR(2,5)]*b[ADR(5,2)]+a[ADR(2,6)]*b[ADR(6,2)]+a[ADR(2,7)]*b[ADR(7,2)];
-r[ADR(2, 3)] = a[ADR(2,0)]*b[ADR(0,3)]+a[ADR(2,1)]*b[ADR(1,3)]+a[ADR(2,2)]*b[ADR(2,3)]+a[ADR(2,3)]*b[ADR(3,3)]
-             + a[ADR(2,4)]*b[ADR(4,3)]+a[ADR(2,5)]*b[ADR(5,3)]+a[ADR(2,6)]*b[ADR(6,3)]+a[ADR(2,7)]*b[ADR(7,3)];
-r[ADR(2, 4)] = a[ADR(2,0)]*b[ADR(0,4)]+a[ADR(2,1)]*b[ADR(1,4)]+a[ADR(2,2)]*b[ADR(2,4)]+a[ADR(2,3)]*b[ADR(3,4)]
-             + a[ADR(2,4)]*b[ADR(4,4)]+a[ADR(2,5)]*b[ADR(5,4)]+a[ADR(2,6)]*b[ADR(6,4)]+a[ADR(2,7)]*b[ADR(7,4)];
-r[ADR(2, 5)] = a[ADR(2,0)]*b[ADR(0,5)]+a[ADR(2,1)]*b[ADR(1,5)]+a[ADR(2,2)]*b[ADR(2,5)]+a[ADR(2,3)]*b[ADR(3,5)]
-             + a[ADR(2,4)]*b[ADR(4,5)]+a[ADR(2,5)]*b[ADR(5,5)]+a[ADR(2,6)]*b[ADR(6,5)]+a[ADR(2,7)]*b[ADR(7,5)];
-r[ADR(2, 6)] = a[ADR(2,0)]*b[ADR(0,6)]+a[ADR(2,1)]*b[ADR(1,6)]+a[ADR(2,2)]*b[ADR(2,6)]+a[ADR(2,3)]*b[ADR(3,6)]
-             + a[ADR(2,4)]*b[ADR(4,6)]+a[ADR(2,5)]*b[ADR(5,6)]+a[ADR(2,6)]*b[ADR(6,6)]+a[ADR(2,7)]*b[ADR(7,6)];
-r[ADR(2, 7)] = a[ADR(2,0)]*b[ADR(0,7)]+a[ADR(2,1)]*b[ADR(1,7)]+a[ADR(2,2)]*b[ADR(2,7)]+a[ADR(2,3)]*b[ADR(3,7)]
-             + a[ADR(2,4)]*b[ADR(4,7)]+a[ADR(2,5)]*b[ADR(5,7)]+a[ADR(2,6)]*b[ADR(6,7)]+a[ADR(2,7)]*b[ADR(7,7)];
+    r[ADR(2, 0)] = a[ADR(2,0)]*b[ADR(0,0)]+a[ADR(2,1)]*b[ADR(1,0)]+a[ADR(2,2)]*b[ADR(2,0)]+a[ADR(2,3)]*b[ADR(3,0)]
+                 + a[ADR(2,4)]*b[ADR(4,0)]+a[ADR(2,5)]*b[ADR(5,0)]+a[ADR(2,6)]*b[ADR(6,0)]+a[ADR(2,7)]*b[ADR(7,0)];
+    r[ADR(2, 1)] = a[ADR(2,0)]*b[ADR(0,1)]+a[ADR(2,1)]*b[ADR(1,1)]+a[ADR(2,2)]*b[ADR(2,1)]+a[ADR(2,3)]*b[ADR(3,1)]
+                 + a[ADR(2,4)]*b[ADR(4,1)]+a[ADR(2,5)]*b[ADR(5,1)]+a[ADR(2,6)]*b[ADR(6,1)]+a[ADR(2,7)]*b[ADR(7,1)];
+    r[ADR(2, 2)] = a[ADR(2,0)]*b[ADR(0,2)]+a[ADR(2,1)]*b[ADR(1,2)]+a[ADR(2,2)]*b[ADR(2,2)]+a[ADR(2,3)]*b[ADR(3,2)]
+                 + a[ADR(2,4)]*b[ADR(4,2)]+a[ADR(2,5)]*b[ADR(5,2)]+a[ADR(2,6)]*b[ADR(6,2)]+a[ADR(2,7)]*b[ADR(7,2)];
+    r[ADR(2, 3)] = a[ADR(2,0)]*b[ADR(0,3)]+a[ADR(2,1)]*b[ADR(1,3)]+a[ADR(2,2)]*b[ADR(2,3)]+a[ADR(2,3)]*b[ADR(3,3)]
+                 + a[ADR(2,4)]*b[ADR(4,3)]+a[ADR(2,5)]*b[ADR(5,3)]+a[ADR(2,6)]*b[ADR(6,3)]+a[ADR(2,7)]*b[ADR(7,3)];
+    r[ADR(2, 4)] = a[ADR(2,0)]*b[ADR(0,4)]+a[ADR(2,1)]*b[ADR(1,4)]+a[ADR(2,2)]*b[ADR(2,4)]+a[ADR(2,3)]*b[ADR(3,4)]
+                 + a[ADR(2,4)]*b[ADR(4,4)]+a[ADR(2,5)]*b[ADR(5,4)]+a[ADR(2,6)]*b[ADR(6,4)]+a[ADR(2,7)]*b[ADR(7,4)];
+    r[ADR(2, 5)] = a[ADR(2,0)]*b[ADR(0,5)]+a[ADR(2,1)]*b[ADR(1,5)]+a[ADR(2,2)]*b[ADR(2,5)]+a[ADR(2,3)]*b[ADR(3,5)]
+                 + a[ADR(2,4)]*b[ADR(4,5)]+a[ADR(2,5)]*b[ADR(5,5)]+a[ADR(2,6)]*b[ADR(6,5)]+a[ADR(2,7)]*b[ADR(7,5)];
+    r[ADR(2, 6)] = a[ADR(2,0)]*b[ADR(0,6)]+a[ADR(2,1)]*b[ADR(1,6)]+a[ADR(2,2)]*b[ADR(2,6)]+a[ADR(2,3)]*b[ADR(3,6)]
+                 + a[ADR(2,4)]*b[ADR(4,6)]+a[ADR(2,5)]*b[ADR(5,6)]+a[ADR(2,6)]*b[ADR(6,6)]+a[ADR(2,7)]*b[ADR(7,6)];
+    r[ADR(2, 7)] = a[ADR(2,0)]*b[ADR(0,7)]+a[ADR(2,1)]*b[ADR(1,7)]+a[ADR(2,2)]*b[ADR(2,7)]+a[ADR(2,3)]*b[ADR(3,7)]
+                 + a[ADR(2,4)]*b[ADR(4,7)]+a[ADR(2,5)]*b[ADR(5,7)]+a[ADR(2,6)]*b[ADR(6,7)]+a[ADR(2,7)]*b[ADR(7,7)];
 
-r[ADR(3, 0)] = a[ADR(3,0)]*b[ADR(0,0)]+a[ADR(3,1)]*b[ADR(1,0)]+a[ADR(3,2)]*b[ADR(2,0)]+a[ADR(3,3)]*b[ADR(3,0)]
-             + a[ADR(3,4)]*b[ADR(4,0)]+a[ADR(3,5)]*b[ADR(5,0)]+a[ADR(3,6)]*b[ADR(6,0)]+a[ADR(3,7)]*b[ADR(7,0)];
-r[ADR(3, 1)] = a[ADR(3,0)]*b[ADR(0,1)]+a[ADR(3,1)]*b[ADR(1,1)]+a[ADR(3,2)]*b[ADR(2,1)]+a[ADR(3,3)]*b[ADR(3,1)]
-             + a[ADR(3,4)]*b[ADR(4,1)]+a[ADR(3,5)]*b[ADR(5,1)]+a[ADR(3,6)]*b[ADR(6,1)]+a[ADR(3,7)]*b[ADR(7,1)];
-r[ADR(3, 2)] = a[ADR(3,0)]*b[ADR(0,2)]+a[ADR(3,1)]*b[ADR(1,2)]+a[ADR(3,2)]*b[ADR(2,2)]+a[ADR(3,3)]*b[ADR(3,2)]
-             + a[ADR(3,4)]*b[ADR(4,2)]+a[ADR(3,5)]*b[ADR(5,2)]+a[ADR(3,6)]*b[ADR(6,2)]+a[ADR(3,7)]*b[ADR(7,2)];
-r[ADR(3, 3)] = a[ADR(3,0)]*b[ADR(0,3)]+a[ADR(3,1)]*b[ADR(1,3)]+a[ADR(3,2)]*b[ADR(2,3)]+a[ADR(3,3)]*b[ADR(3,3)]
-             + a[ADR(3,4)]*b[ADR(4,3)]+a[ADR(3,5)]*b[ADR(5,3)]+a[ADR(3,6)]*b[ADR(6,3)]+a[ADR(3,7)]*b[ADR(7,3)];
-r[ADR(3, 4)] = a[ADR(3,0)]*b[ADR(0,4)]+a[ADR(3,1)]*b[ADR(1,4)]+a[ADR(3,2)]*b[ADR(2,4)]+a[ADR(3,3)]*b[ADR(3,4)]
-             + a[ADR(3,4)]*b[ADR(4,4)]+a[ADR(3,5)]*b[ADR(5,4)]+a[ADR(3,6)]*b[ADR(6,4)]+a[ADR(3,7)]*b[ADR(7,4)];
-r[ADR(3, 5)] = a[ADR(3,0)]*b[ADR(0,5)]+a[ADR(3,1)]*b[ADR(1,5)]+a[ADR(3,2)]*b[ADR(2,5)]+a[ADR(3,3)]*b[ADR(3,5)]
-             + a[ADR(3,4)]*b[ADR(4,5)]+a[ADR(3,5)]*b[ADR(5,5)]+a[ADR(3,6)]*b[ADR(6,5)]+a[ADR(3,7)]*b[ADR(7,5)];
-r[ADR(3, 6)] = a[ADR(3,0)]*b[ADR(0,6)]+a[ADR(3,1)]*b[ADR(1,6)]+a[ADR(3,2)]*b[ADR(2,6)]+a[ADR(3,3)]*b[ADR(3,6)]
-             + a[ADR(3,4)]*b[ADR(4,6)]+a[ADR(3,5)]*b[ADR(5,6)]+a[ADR(3,6)]*b[ADR(6,6)]+a[ADR(3,7)]*b[ADR(7,6)];
-r[ADR(3, 7)] = a[ADR(3,0)]*b[ADR(0,7)]+a[ADR(3,1)]*b[ADR(1,7)]+a[ADR(3,2)]*b[ADR(2,7)]+a[ADR(3,3)]*b[ADR(3,7)]
-             + a[ADR(3,4)]*b[ADR(4,7)]+a[ADR(3,5)]*b[ADR(5,7)]+a[ADR(3,6)]*b[ADR(6,7)]+a[ADR(3,7)]*b[ADR(7,7)];
+    r[ADR(3, 0)] = a[ADR(3,0)]*b[ADR(0,0)]+a[ADR(3,1)]*b[ADR(1,0)]+a[ADR(3,2)]*b[ADR(2,0)]+a[ADR(3,3)]*b[ADR(3,0)]
+                 + a[ADR(3,4)]*b[ADR(4,0)]+a[ADR(3,5)]*b[ADR(5,0)]+a[ADR(3,6)]*b[ADR(6,0)]+a[ADR(3,7)]*b[ADR(7,0)];
+    r[ADR(3, 1)] = a[ADR(3,0)]*b[ADR(0,1)]+a[ADR(3,1)]*b[ADR(1,1)]+a[ADR(3,2)]*b[ADR(2,1)]+a[ADR(3,3)]*b[ADR(3,1)]
+                 + a[ADR(3,4)]*b[ADR(4,1)]+a[ADR(3,5)]*b[ADR(5,1)]+a[ADR(3,6)]*b[ADR(6,1)]+a[ADR(3,7)]*b[ADR(7,1)];
+    r[ADR(3, 2)] = a[ADR(3,0)]*b[ADR(0,2)]+a[ADR(3,1)]*b[ADR(1,2)]+a[ADR(3,2)]*b[ADR(2,2)]+a[ADR(3,3)]*b[ADR(3,2)]
+                 + a[ADR(3,4)]*b[ADR(4,2)]+a[ADR(3,5)]*b[ADR(5,2)]+a[ADR(3,6)]*b[ADR(6,2)]+a[ADR(3,7)]*b[ADR(7,2)];
+    r[ADR(3, 3)] = a[ADR(3,0)]*b[ADR(0,3)]+a[ADR(3,1)]*b[ADR(1,3)]+a[ADR(3,2)]*b[ADR(2,3)]+a[ADR(3,3)]*b[ADR(3,3)]
+                 + a[ADR(3,4)]*b[ADR(4,3)]+a[ADR(3,5)]*b[ADR(5,3)]+a[ADR(3,6)]*b[ADR(6,3)]+a[ADR(3,7)]*b[ADR(7,3)];
+    r[ADR(3, 4)] = a[ADR(3,0)]*b[ADR(0,4)]+a[ADR(3,1)]*b[ADR(1,4)]+a[ADR(3,2)]*b[ADR(2,4)]+a[ADR(3,3)]*b[ADR(3,4)]
+                 + a[ADR(3,4)]*b[ADR(4,4)]+a[ADR(3,5)]*b[ADR(5,4)]+a[ADR(3,6)]*b[ADR(6,4)]+a[ADR(3,7)]*b[ADR(7,4)];
+    r[ADR(3, 5)] = a[ADR(3,0)]*b[ADR(0,5)]+a[ADR(3,1)]*b[ADR(1,5)]+a[ADR(3,2)]*b[ADR(2,5)]+a[ADR(3,3)]*b[ADR(3,5)]
+                 + a[ADR(3,4)]*b[ADR(4,5)]+a[ADR(3,5)]*b[ADR(5,5)]+a[ADR(3,6)]*b[ADR(6,5)]+a[ADR(3,7)]*b[ADR(7,5)];
+    r[ADR(3, 6)] = a[ADR(3,0)]*b[ADR(0,6)]+a[ADR(3,1)]*b[ADR(1,6)]+a[ADR(3,2)]*b[ADR(2,6)]+a[ADR(3,3)]*b[ADR(3,6)]
+                 + a[ADR(3,4)]*b[ADR(4,6)]+a[ADR(3,5)]*b[ADR(5,6)]+a[ADR(3,6)]*b[ADR(6,6)]+a[ADR(3,7)]*b[ADR(7,6)];
+    r[ADR(3, 7)] = a[ADR(3,0)]*b[ADR(0,7)]+a[ADR(3,1)]*b[ADR(1,7)]+a[ADR(3,2)]*b[ADR(2,7)]+a[ADR(3,3)]*b[ADR(3,7)]
+                 + a[ADR(3,4)]*b[ADR(4,7)]+a[ADR(3,5)]*b[ADR(5,7)]+a[ADR(3,6)]*b[ADR(6,7)]+a[ADR(3,7)]*b[ADR(7,7)];
 
-r[ADR(4, 0)] = a[ADR(4,0)]*b[ADR(0,0)]+a[ADR(4,1)]*b[ADR(1,0)]+a[ADR(4,2)]*b[ADR(2,0)]+a[ADR(4,3)]*b[ADR(3,0)]
-             + a[ADR(4,4)]*b[ADR(4,0)]+a[ADR(4,5)]*b[ADR(5,0)]+a[ADR(4,6)]*b[ADR(6,0)]+a[ADR(4,7)]*b[ADR(7,0)];
-r[ADR(4, 1)] = a[ADR(4,0)]*b[ADR(0,1)]+a[ADR(4,1)]*b[ADR(1,1)]+a[ADR(4,2)]*b[ADR(2,1)]+a[ADR(4,3)]*b[ADR(3,1)]
-             + a[ADR(4,4)]*b[ADR(4,1)]+a[ADR(4,5)]*b[ADR(5,1)]+a[ADR(4,6)]*b[ADR(6,1)]+a[ADR(4,7)]*b[ADR(7,1)];
-r[ADR(4, 2)] = a[ADR(4,0)]*b[ADR(0,2)]+a[ADR(4,1)]*b[ADR(1,2)]+a[ADR(4,2)]*b[ADR(2,2)]+a[ADR(4,3)]*b[ADR(3,2)]
-             + a[ADR(4,4)]*b[ADR(4,2)]+a[ADR(4,5)]*b[ADR(5,2)]+a[ADR(4,6)]*b[ADR(6,2)]+a[ADR(4,7)]*b[ADR(7,2)];
-r[ADR(4, 3)] = a[ADR(4,0)]*b[ADR(0,3)]+a[ADR(4,1)]*b[ADR(1,3)]+a[ADR(4,2)]*b[ADR(2,3)]+a[ADR(4,3)]*b[ADR(3,3)]
-             + a[ADR(4,4)]*b[ADR(4,3)]+a[ADR(4,5)]*b[ADR(5,3)]+a[ADR(4,6)]*b[ADR(6,3)]+a[ADR(4,7)]*b[ADR(7,3)];
-r[ADR(4, 4)] = a[ADR(4,0)]*b[ADR(0,4)]+a[ADR(4,1)]*b[ADR(1,4)]+a[ADR(4,2)]*b[ADR(2,4)]+a[ADR(4,3)]*b[ADR(3,4)]
-             + a[ADR(4,4)]*b[ADR(4,4)]+a[ADR(4,5)]*b[ADR(5,4)]+a[ADR(4,6)]*b[ADR(6,4)]+a[ADR(4,7)]*b[ADR(7,4)];
-r[ADR(4, 5)] = a[ADR(4,0)]*b[ADR(0,5)]+a[ADR(4,1)]*b[ADR(1,5)]+a[ADR(4,2)]*b[ADR(2,5)]+a[ADR(4,3)]*b[ADR(3,5)]
-             + a[ADR(4,4)]*b[ADR(4,5)]+a[ADR(4,5)]*b[ADR(5,5)]+a[ADR(4,6)]*b[ADR(6,5)]+a[ADR(4,7)]*b[ADR(7,5)];
-r[ADR(4, 6)] = a[ADR(4,0)]*b[ADR(0,6)]+a[ADR(4,1)]*b[ADR(1,6)]+a[ADR(4,2)]*b[ADR(2,6)]+a[ADR(4,3)]*b[ADR(3,6)]
-             + a[ADR(4,4)]*b[ADR(4,6)]+a[ADR(4,5)]*b[ADR(5,6)]+a[ADR(4,6)]*b[ADR(6,6)]+a[ADR(4,7)]*b[ADR(7,6)];
-r[ADR(4, 7)] = a[ADR(4,0)]*b[ADR(0,7)]+a[ADR(4,1)]*b[ADR(1,7)]+a[ADR(4,2)]*b[ADR(2,7)]+a[ADR(4,3)]*b[ADR(3,7)]
-             + a[ADR(4,4)]*b[ADR(4,7)]+a[ADR(4,5)]*b[ADR(5,7)]+a[ADR(4,6)]*b[ADR(6,7)]+a[ADR(4,7)]*b[ADR(7,7)];
+    r[ADR(4, 0)] = a[ADR(4,0)]*b[ADR(0,0)]+a[ADR(4,1)]*b[ADR(1,0)]+a[ADR(4,2)]*b[ADR(2,0)]+a[ADR(4,3)]*b[ADR(3,0)]
+                 + a[ADR(4,4)]*b[ADR(4,0)]+a[ADR(4,5)]*b[ADR(5,0)]+a[ADR(4,6)]*b[ADR(6,0)]+a[ADR(4,7)]*b[ADR(7,0)];
+    r[ADR(4, 1)] = a[ADR(4,0)]*b[ADR(0,1)]+a[ADR(4,1)]*b[ADR(1,1)]+a[ADR(4,2)]*b[ADR(2,1)]+a[ADR(4,3)]*b[ADR(3,1)]
+                 + a[ADR(4,4)]*b[ADR(4,1)]+a[ADR(4,5)]*b[ADR(5,1)]+a[ADR(4,6)]*b[ADR(6,1)]+a[ADR(4,7)]*b[ADR(7,1)];
+    r[ADR(4, 2)] = a[ADR(4,0)]*b[ADR(0,2)]+a[ADR(4,1)]*b[ADR(1,2)]+a[ADR(4,2)]*b[ADR(2,2)]+a[ADR(4,3)]*b[ADR(3,2)]
+                 + a[ADR(4,4)]*b[ADR(4,2)]+a[ADR(4,5)]*b[ADR(5,2)]+a[ADR(4,6)]*b[ADR(6,2)]+a[ADR(4,7)]*b[ADR(7,2)];
+    r[ADR(4, 3)] = a[ADR(4,0)]*b[ADR(0,3)]+a[ADR(4,1)]*b[ADR(1,3)]+a[ADR(4,2)]*b[ADR(2,3)]+a[ADR(4,3)]*b[ADR(3,3)]
+                 + a[ADR(4,4)]*b[ADR(4,3)]+a[ADR(4,5)]*b[ADR(5,3)]+a[ADR(4,6)]*b[ADR(6,3)]+a[ADR(4,7)]*b[ADR(7,3)];
+    r[ADR(4, 4)] = a[ADR(4,0)]*b[ADR(0,4)]+a[ADR(4,1)]*b[ADR(1,4)]+a[ADR(4,2)]*b[ADR(2,4)]+a[ADR(4,3)]*b[ADR(3,4)]
+                 + a[ADR(4,4)]*b[ADR(4,4)]+a[ADR(4,5)]*b[ADR(5,4)]+a[ADR(4,6)]*b[ADR(6,4)]+a[ADR(4,7)]*b[ADR(7,4)];
+    r[ADR(4, 5)] = a[ADR(4,0)]*b[ADR(0,5)]+a[ADR(4,1)]*b[ADR(1,5)]+a[ADR(4,2)]*b[ADR(2,5)]+a[ADR(4,3)]*b[ADR(3,5)]
+                 + a[ADR(4,4)]*b[ADR(4,5)]+a[ADR(4,5)]*b[ADR(5,5)]+a[ADR(4,6)]*b[ADR(6,5)]+a[ADR(4,7)]*b[ADR(7,5)];
+    r[ADR(4, 6)] = a[ADR(4,0)]*b[ADR(0,6)]+a[ADR(4,1)]*b[ADR(1,6)]+a[ADR(4,2)]*b[ADR(2,6)]+a[ADR(4,3)]*b[ADR(3,6)]
+                 + a[ADR(4,4)]*b[ADR(4,6)]+a[ADR(4,5)]*b[ADR(5,6)]+a[ADR(4,6)]*b[ADR(6,6)]+a[ADR(4,7)]*b[ADR(7,6)];
+    r[ADR(4, 7)] = a[ADR(4,0)]*b[ADR(0,7)]+a[ADR(4,1)]*b[ADR(1,7)]+a[ADR(4,2)]*b[ADR(2,7)]+a[ADR(4,3)]*b[ADR(3,7)]
+                 + a[ADR(4,4)]*b[ADR(4,7)]+a[ADR(4,5)]*b[ADR(5,7)]+a[ADR(4,6)]*b[ADR(6,7)]+a[ADR(4,7)]*b[ADR(7,7)];
 
-r[ADR(5, 0)] = a[ADR(5,0)]*b[ADR(0,0)]+a[ADR(5,1)]*b[ADR(1,0)]+a[ADR(5,2)]*b[ADR(2,0)]+a[ADR(5,3)]*b[ADR(3,0)]
-             + a[ADR(5,4)]*b[ADR(4,0)]+a[ADR(5,5)]*b[ADR(5,0)]+a[ADR(5,6)]*b[ADR(6,0)]+a[ADR(5,7)]*b[ADR(7,0)];
-r[ADR(5, 1)] = a[ADR(5,0)]*b[ADR(0,1)]+a[ADR(5,1)]*b[ADR(1,1)]+a[ADR(5,2)]*b[ADR(2,1)]+a[ADR(5,3)]*b[ADR(3,1)]
-             + a[ADR(5,4)]*b[ADR(4,1)]+a[ADR(5,5)]*b[ADR(5,1)]+a[ADR(5,6)]*b[ADR(6,1)]+a[ADR(5,7)]*b[ADR(7,1)];
-r[ADR(5, 2)] = a[ADR(5,0)]*b[ADR(0,2)]+a[ADR(5,1)]*b[ADR(1,2)]+a[ADR(5,2)]*b[ADR(2,2)]+a[ADR(5,3)]*b[ADR(3,2)]
-             + a[ADR(5,4)]*b[ADR(4,2)]+a[ADR(5,5)]*b[ADR(5,2)]+a[ADR(5,6)]*b[ADR(6,2)]+a[ADR(5,7)]*b[ADR(7,2)];
-r[ADR(5, 3)] = a[ADR(5,0)]*b[ADR(0,3)]+a[ADR(5,1)]*b[ADR(1,3)]+a[ADR(5,2)]*b[ADR(2,3)]+a[ADR(5,3)]*b[ADR(3,3)]
-             + a[ADR(5,4)]*b[ADR(4,3)]+a[ADR(5,5)]*b[ADR(5,3)]+a[ADR(5,6)]*b[ADR(6,3)]+a[ADR(5,7)]*b[ADR(7,3)];
-r[ADR(5, 4)] = a[ADR(5,0)]*b[ADR(0,4)]+a[ADR(5,1)]*b[ADR(1,4)]+a[ADR(5,2)]*b[ADR(2,4)]+a[ADR(5,3)]*b[ADR(3,4)]
-             + a[ADR(5,4)]*b[ADR(4,4)]+a[ADR(5,5)]*b[ADR(5,4)]+a[ADR(5,6)]*b[ADR(6,4)]+a[ADR(5,7)]*b[ADR(7,4)];
-r[ADR(5, 5)] = a[ADR(5,0)]*b[ADR(0,5)]+a[ADR(5,1)]*b[ADR(1,5)]+a[ADR(5,2)]*b[ADR(2,5)]+a[ADR(5,3)]*b[ADR(3,5)]
-             + a[ADR(5,4)]*b[ADR(4,5)]+a[ADR(5,5)]*b[ADR(5,5)]+a[ADR(5,6)]*b[ADR(6,5)]+a[ADR(5,7)]*b[ADR(7,5)];
-r[ADR(5, 6)] = a[ADR(5,0)]*b[ADR(0,6)]+a[ADR(5,1)]*b[ADR(1,6)]+a[ADR(5,2)]*b[ADR(2,6)]+a[ADR(5,3)]*b[ADR(3,6)]
-             + a[ADR(5,4)]*b[ADR(4,6)]+a[ADR(5,5)]*b[ADR(5,6)]+a[ADR(5,6)]*b[ADR(6,6)]+a[ADR(5,7)]*b[ADR(7,6)];
-r[ADR(5, 7)] = a[ADR(5,0)]*b[ADR(0,7)]+a[ADR(5,1)]*b[ADR(1,7)]+a[ADR(5,2)]*b[ADR(2,7)]+a[ADR(5,3)]*b[ADR(3,7)]
-             + a[ADR(5,4)]*b[ADR(4,7)]+a[ADR(5,5)]*b[ADR(5,7)]+a[ADR(5,6)]*b[ADR(6,7)]+a[ADR(5,7)]*b[ADR(7,7)];
+    r[ADR(5, 0)] = a[ADR(5,0)]*b[ADR(0,0)]+a[ADR(5,1)]*b[ADR(1,0)]+a[ADR(5,2)]*b[ADR(2,0)]+a[ADR(5,3)]*b[ADR(3,0)]
+                 + a[ADR(5,4)]*b[ADR(4,0)]+a[ADR(5,5)]*b[ADR(5,0)]+a[ADR(5,6)]*b[ADR(6,0)]+a[ADR(5,7)]*b[ADR(7,0)];
+    r[ADR(5, 1)] = a[ADR(5,0)]*b[ADR(0,1)]+a[ADR(5,1)]*b[ADR(1,1)]+a[ADR(5,2)]*b[ADR(2,1)]+a[ADR(5,3)]*b[ADR(3,1)]
+                 + a[ADR(5,4)]*b[ADR(4,1)]+a[ADR(5,5)]*b[ADR(5,1)]+a[ADR(5,6)]*b[ADR(6,1)]+a[ADR(5,7)]*b[ADR(7,1)];
+    r[ADR(5, 2)] = a[ADR(5,0)]*b[ADR(0,2)]+a[ADR(5,1)]*b[ADR(1,2)]+a[ADR(5,2)]*b[ADR(2,2)]+a[ADR(5,3)]*b[ADR(3,2)]
+                 + a[ADR(5,4)]*b[ADR(4,2)]+a[ADR(5,5)]*b[ADR(5,2)]+a[ADR(5,6)]*b[ADR(6,2)]+a[ADR(5,7)]*b[ADR(7,2)];
+    r[ADR(5, 3)] = a[ADR(5,0)]*b[ADR(0,3)]+a[ADR(5,1)]*b[ADR(1,3)]+a[ADR(5,2)]*b[ADR(2,3)]+a[ADR(5,3)]*b[ADR(3,3)]
+                 + a[ADR(5,4)]*b[ADR(4,3)]+a[ADR(5,5)]*b[ADR(5,3)]+a[ADR(5,6)]*b[ADR(6,3)]+a[ADR(5,7)]*b[ADR(7,3)];
+    r[ADR(5, 4)] = a[ADR(5,0)]*b[ADR(0,4)]+a[ADR(5,1)]*b[ADR(1,4)]+a[ADR(5,2)]*b[ADR(2,4)]+a[ADR(5,3)]*b[ADR(3,4)]
+                 + a[ADR(5,4)]*b[ADR(4,4)]+a[ADR(5,5)]*b[ADR(5,4)]+a[ADR(5,6)]*b[ADR(6,4)]+a[ADR(5,7)]*b[ADR(7,4)];
+    r[ADR(5, 5)] = a[ADR(5,0)]*b[ADR(0,5)]+a[ADR(5,1)]*b[ADR(1,5)]+a[ADR(5,2)]*b[ADR(2,5)]+a[ADR(5,3)]*b[ADR(3,5)]
+                 + a[ADR(5,4)]*b[ADR(4,5)]+a[ADR(5,5)]*b[ADR(5,5)]+a[ADR(5,6)]*b[ADR(6,5)]+a[ADR(5,7)]*b[ADR(7,5)];
+    r[ADR(5, 6)] = a[ADR(5,0)]*b[ADR(0,6)]+a[ADR(5,1)]*b[ADR(1,6)]+a[ADR(5,2)]*b[ADR(2,6)]+a[ADR(5,3)]*b[ADR(3,6)]
+                 + a[ADR(5,4)]*b[ADR(4,6)]+a[ADR(5,5)]*b[ADR(5,6)]+a[ADR(5,6)]*b[ADR(6,6)]+a[ADR(5,7)]*b[ADR(7,6)];
+    r[ADR(5, 7)] = a[ADR(5,0)]*b[ADR(0,7)]+a[ADR(5,1)]*b[ADR(1,7)]+a[ADR(5,2)]*b[ADR(2,7)]+a[ADR(5,3)]*b[ADR(3,7)]
+                 + a[ADR(5,4)]*b[ADR(4,7)]+a[ADR(5,5)]*b[ADR(5,7)]+a[ADR(5,6)]*b[ADR(6,7)]+a[ADR(5,7)]*b[ADR(7,7)];
 
-r[ADR(6, 0)] = a[ADR(6,0)]*b[ADR(0,0)]+a[ADR(6,1)]*b[ADR(1,0)]+a[ADR(6,2)]*b[ADR(2,0)]+a[ADR(6,3)]*b[ADR(3,0)]
-             + a[ADR(6,4)]*b[ADR(4,0)]+a[ADR(6,5)]*b[ADR(5,0)]+a[ADR(6,6)]*b[ADR(6,0)]+a[ADR(6,7)]*b[ADR(7,0)];
-r[ADR(6, 1)] = a[ADR(6,0)]*b[ADR(0,1)]+a[ADR(6,1)]*b[ADR(1,1)]+a[ADR(6,2)]*b[ADR(2,1)]+a[ADR(6,3)]*b[ADR(3,1)]
-             + a[ADR(6,4)]*b[ADR(4,1)]+a[ADR(6,5)]*b[ADR(5,1)]+a[ADR(6,6)]*b[ADR(6,1)]+a[ADR(6,7)]*b[ADR(7,1)];
-r[ADR(6, 2)] = a[ADR(6,0)]*b[ADR(0,2)]+a[ADR(6,1)]*b[ADR(1,2)]+a[ADR(6,2)]*b[ADR(2,2)]+a[ADR(6,3)]*b[ADR(3,2)]
-             + a[ADR(6,4)]*b[ADR(4,2)]+a[ADR(6,5)]*b[ADR(5,2)]+a[ADR(6,6)]*b[ADR(6,2)]+a[ADR(6,7)]*b[ADR(7,2)];
-r[ADR(6, 3)] = a[ADR(6,0)]*b[ADR(0,3)]+a[ADR(6,1)]*b[ADR(1,3)]+a[ADR(6,2)]*b[ADR(2,3)]+a[ADR(6,3)]*b[ADR(3,3)]
-             + a[ADR(6,4)]*b[ADR(4,3)]+a[ADR(6,5)]*b[ADR(5,3)]+a[ADR(6,6)]*b[ADR(6,3)]+a[ADR(6,7)]*b[ADR(7,3)];
-r[ADR(6, 4)] = a[ADR(6,0)]*b[ADR(0,4)]+a[ADR(6,1)]*b[ADR(1,4)]+a[ADR(6,2)]*b[ADR(2,4)]+a[ADR(6,3)]*b[ADR(3,4)]
-             + a[ADR(6,4)]*b[ADR(4,4)]+a[ADR(6,5)]*b[ADR(5,4)]+a[ADR(6,6)]*b[ADR(6,4)]+a[ADR(6,7)]*b[ADR(7,4)];
-r[ADR(6, 5)] = a[ADR(6,0)]*b[ADR(0,5)]+a[ADR(6,1)]*b[ADR(1,5)]+a[ADR(6,2)]*b[ADR(2,5)]+a[ADR(6,3)]*b[ADR(3,5)]
-             + a[ADR(6,4)]*b[ADR(4,5)]+a[ADR(6,5)]*b[ADR(5,5)]+a[ADR(6,6)]*b[ADR(6,5)]+a[ADR(6,7)]*b[ADR(7,5)];
-r[ADR(6, 6)] = a[ADR(6,0)]*b[ADR(0,6)]+a[ADR(6,1)]*b[ADR(1,6)]+a[ADR(6,2)]*b[ADR(2,6)]+a[ADR(6,3)]*b[ADR(3,6)]
-             + a[ADR(6,4)]*b[ADR(4,6)]+a[ADR(6,5)]*b[ADR(5,6)]+a[ADR(6,6)]*b[ADR(6,6)]+a[ADR(6,7)]*b[ADR(7,6)];
-r[ADR(6, 7)] = a[ADR(6,0)]*b[ADR(0,7)]+a[ADR(6,1)]*b[ADR(1,7)]+a[ADR(6,2)]*b[ADR(2,7)]+a[ADR(6,3)]*b[ADR(3,7)]
-             + a[ADR(6,4)]*b[ADR(4,7)]+a[ADR(6,5)]*b[ADR(5,7)]+a[ADR(6,6)]*b[ADR(6,7)]+a[ADR(6,7)]*b[ADR(7,7)];
+    r[ADR(6, 0)] = a[ADR(6,0)]*b[ADR(0,0)]+a[ADR(6,1)]*b[ADR(1,0)]+a[ADR(6,2)]*b[ADR(2,0)]+a[ADR(6,3)]*b[ADR(3,0)]
+                 + a[ADR(6,4)]*b[ADR(4,0)]+a[ADR(6,5)]*b[ADR(5,0)]+a[ADR(6,6)]*b[ADR(6,0)]+a[ADR(6,7)]*b[ADR(7,0)];
+    r[ADR(6, 1)] = a[ADR(6,0)]*b[ADR(0,1)]+a[ADR(6,1)]*b[ADR(1,1)]+a[ADR(6,2)]*b[ADR(2,1)]+a[ADR(6,3)]*b[ADR(3,1)]
+                 + a[ADR(6,4)]*b[ADR(4,1)]+a[ADR(6,5)]*b[ADR(5,1)]+a[ADR(6,6)]*b[ADR(6,1)]+a[ADR(6,7)]*b[ADR(7,1)];
+    r[ADR(6, 2)] = a[ADR(6,0)]*b[ADR(0,2)]+a[ADR(6,1)]*b[ADR(1,2)]+a[ADR(6,2)]*b[ADR(2,2)]+a[ADR(6,3)]*b[ADR(3,2)]
+                 + a[ADR(6,4)]*b[ADR(4,2)]+a[ADR(6,5)]*b[ADR(5,2)]+a[ADR(6,6)]*b[ADR(6,2)]+a[ADR(6,7)]*b[ADR(7,2)];
+    r[ADR(6, 3)] = a[ADR(6,0)]*b[ADR(0,3)]+a[ADR(6,1)]*b[ADR(1,3)]+a[ADR(6,2)]*b[ADR(2,3)]+a[ADR(6,3)]*b[ADR(3,3)]
+                 + a[ADR(6,4)]*b[ADR(4,3)]+a[ADR(6,5)]*b[ADR(5,3)]+a[ADR(6,6)]*b[ADR(6,3)]+a[ADR(6,7)]*b[ADR(7,3)];
+    r[ADR(6, 4)] = a[ADR(6,0)]*b[ADR(0,4)]+a[ADR(6,1)]*b[ADR(1,4)]+a[ADR(6,2)]*b[ADR(2,4)]+a[ADR(6,3)]*b[ADR(3,4)]
+                 + a[ADR(6,4)]*b[ADR(4,4)]+a[ADR(6,5)]*b[ADR(5,4)]+a[ADR(6,6)]*b[ADR(6,4)]+a[ADR(6,7)]*b[ADR(7,4)];
+    r[ADR(6, 5)] = a[ADR(6,0)]*b[ADR(0,5)]+a[ADR(6,1)]*b[ADR(1,5)]+a[ADR(6,2)]*b[ADR(2,5)]+a[ADR(6,3)]*b[ADR(3,5)]
+                 + a[ADR(6,4)]*b[ADR(4,5)]+a[ADR(6,5)]*b[ADR(5,5)]+a[ADR(6,6)]*b[ADR(6,5)]+a[ADR(6,7)]*b[ADR(7,5)];
+    r[ADR(6, 6)] = a[ADR(6,0)]*b[ADR(0,6)]+a[ADR(6,1)]*b[ADR(1,6)]+a[ADR(6,2)]*b[ADR(2,6)]+a[ADR(6,3)]*b[ADR(3,6)]
+                 + a[ADR(6,4)]*b[ADR(4,6)]+a[ADR(6,5)]*b[ADR(5,6)]+a[ADR(6,6)]*b[ADR(6,6)]+a[ADR(6,7)]*b[ADR(7,6)];
+    r[ADR(6, 7)] = a[ADR(6,0)]*b[ADR(0,7)]+a[ADR(6,1)]*b[ADR(1,7)]+a[ADR(6,2)]*b[ADR(2,7)]+a[ADR(6,3)]*b[ADR(3,7)]
+                 + a[ADR(6,4)]*b[ADR(4,7)]+a[ADR(6,5)]*b[ADR(5,7)]+a[ADR(6,6)]*b[ADR(6,7)]+a[ADR(6,7)]*b[ADR(7,7)];
 
-r[ADR(7, 0)] = a[ADR(7,0)]*b[ADR(0,0)]+a[ADR(7,1)]*b[ADR(1,0)]+a[ADR(7,2)]*b[ADR(2,0)]+a[ADR(7,3)]*b[ADR(3,0)]
-             + a[ADR(7,4)]*b[ADR(4,0)]+a[ADR(7,5)]*b[ADR(5,0)]+a[ADR(7,6)]*b[ADR(6,0)]+a[ADR(7,7)]*b[ADR(7,0)];
-r[ADR(7, 1)] = a[ADR(7,0)]*b[ADR(0,1)]+a[ADR(7,1)]*b[ADR(1,1)]+a[ADR(7,2)]*b[ADR(2,1)]+a[ADR(7,3)]*b[ADR(3,1)]
-             + a[ADR(7,4)]*b[ADR(4,1)]+a[ADR(7,5)]*b[ADR(5,1)]+a[ADR(7,6)]*b[ADR(6,1)]+a[ADR(7,7)]*b[ADR(7,1)];
-r[ADR(7, 2)] = a[ADR(7,0)]*b[ADR(0,2)]+a[ADR(7,1)]*b[ADR(1,2)]+a[ADR(7,2)]*b[ADR(2,2)]+a[ADR(7,3)]*b[ADR(3,2)]
-             + a[ADR(7,4)]*b[ADR(4,2)]+a[ADR(7,5)]*b[ADR(5,2)]+a[ADR(7,6)]*b[ADR(6,2)]+a[ADR(7,7)]*b[ADR(7,2)];
-r[ADR(7, 3)] = a[ADR(7,0)]*b[ADR(0,3)]+a[ADR(7,1)]*b[ADR(1,3)]+a[ADR(7,2)]*b[ADR(2,3)]+a[ADR(7,3)]*b[ADR(3,3)]
-             + a[ADR(7,4)]*b[ADR(4,3)]+a[ADR(7,5)]*b[ADR(5,3)]+a[ADR(7,6)]*b[ADR(6,3)]+a[ADR(7,7)]*b[ADR(7,3)];
-r[ADR(7, 4)] = a[ADR(7,0)]*b[ADR(0,4)]+a[ADR(7,1)]*b[ADR(1,4)]+a[ADR(7,2)]*b[ADR(2,4)]+a[ADR(7,3)]*b[ADR(3,4)]
-             + a[ADR(7,4)]*b[ADR(4,4)]+a[ADR(7,5)]*b[ADR(5,4)]+a[ADR(7,6)]*b[ADR(6,4)]+a[ADR(7,7)]*b[ADR(7,4)];
-r[ADR(7, 5)] = a[ADR(7,0)]*b[ADR(0,5)]+a[ADR(7,1)]*b[ADR(1,5)]+a[ADR(7,2)]*b[ADR(2,5)]+a[ADR(7,3)]*b[ADR(3,5)]
-             + a[ADR(7,4)]*b[ADR(4,5)]+a[ADR(7,5)]*b[ADR(5,5)]+a[ADR(7,6)]*b[ADR(6,5)]+a[ADR(7,7)]*b[ADR(7,5)];
-r[ADR(7, 6)] = a[ADR(7,0)]*b[ADR(0,6)]+a[ADR(7,1)]*b[ADR(1,6)]+a[ADR(7,2)]*b[ADR(2,6)]+a[ADR(7,3)]*b[ADR(3,6)]
-             + a[ADR(7,4)]*b[ADR(4,6)]+a[ADR(7,5)]*b[ADR(5,6)]+a[ADR(7,6)]*b[ADR(6,6)]+a[ADR(7,7)]*b[ADR(7,6)];
-r[ADR(7, 7)] = a[ADR(7,0)]*b[ADR(0,7)]+a[ADR(7,1)]*b[ADR(1,7)]+a[ADR(7,2)]*b[ADR(2,7)]+a[ADR(7,3)]*b[ADR(3,7)]
-             + a[ADR(7,4)]*b[ADR(4,7)]+a[ADR(7,5)]*b[ADR(5,7)]+a[ADR(7,6)]*b[ADR(6,7)]+a[ADR(7,7)]*b[ADR(7,7)];
+    r[ADR(7, 0)] = a[ADR(7,0)]*b[ADR(0,0)]+a[ADR(7,1)]*b[ADR(1,0)]+a[ADR(7,2)]*b[ADR(2,0)]+a[ADR(7,3)]*b[ADR(3,0)]
+                 + a[ADR(7,4)]*b[ADR(4,0)]+a[ADR(7,5)]*b[ADR(5,0)]+a[ADR(7,6)]*b[ADR(6,0)]+a[ADR(7,7)]*b[ADR(7,0)];
+    r[ADR(7, 1)] = a[ADR(7,0)]*b[ADR(0,1)]+a[ADR(7,1)]*b[ADR(1,1)]+a[ADR(7,2)]*b[ADR(2,1)]+a[ADR(7,3)]*b[ADR(3,1)]
+                 + a[ADR(7,4)]*b[ADR(4,1)]+a[ADR(7,5)]*b[ADR(5,1)]+a[ADR(7,6)]*b[ADR(6,1)]+a[ADR(7,7)]*b[ADR(7,1)];
+    r[ADR(7, 2)] = a[ADR(7,0)]*b[ADR(0,2)]+a[ADR(7,1)]*b[ADR(1,2)]+a[ADR(7,2)]*b[ADR(2,2)]+a[ADR(7,3)]*b[ADR(3,2)]
+                 + a[ADR(7,4)]*b[ADR(4,2)]+a[ADR(7,5)]*b[ADR(5,2)]+a[ADR(7,6)]*b[ADR(6,2)]+a[ADR(7,7)]*b[ADR(7,2)];
+    r[ADR(7, 3)] = a[ADR(7,0)]*b[ADR(0,3)]+a[ADR(7,1)]*b[ADR(1,3)]+a[ADR(7,2)]*b[ADR(2,3)]+a[ADR(7,3)]*b[ADR(3,3)]
+                 + a[ADR(7,4)]*b[ADR(4,3)]+a[ADR(7,5)]*b[ADR(5,3)]+a[ADR(7,6)]*b[ADR(6,3)]+a[ADR(7,7)]*b[ADR(7,3)];
+    r[ADR(7, 4)] = a[ADR(7,0)]*b[ADR(0,4)]+a[ADR(7,1)]*b[ADR(1,4)]+a[ADR(7,2)]*b[ADR(2,4)]+a[ADR(7,3)]*b[ADR(3,4)]
+                 + a[ADR(7,4)]*b[ADR(4,4)]+a[ADR(7,5)]*b[ADR(5,4)]+a[ADR(7,6)]*b[ADR(6,4)]+a[ADR(7,7)]*b[ADR(7,4)];
+    r[ADR(7, 5)] = a[ADR(7,0)]*b[ADR(0,5)]+a[ADR(7,1)]*b[ADR(1,5)]+a[ADR(7,2)]*b[ADR(2,5)]+a[ADR(7,3)]*b[ADR(3,5)]
+                 + a[ADR(7,4)]*b[ADR(4,5)]+a[ADR(7,5)]*b[ADR(5,5)]+a[ADR(7,6)]*b[ADR(6,5)]+a[ADR(7,7)]*b[ADR(7,5)];
+    r[ADR(7, 6)] = a[ADR(7,0)]*b[ADR(0,6)]+a[ADR(7,1)]*b[ADR(1,6)]+a[ADR(7,2)]*b[ADR(2,6)]+a[ADR(7,3)]*b[ADR(3,6)]
+                 + a[ADR(7,4)]*b[ADR(4,6)]+a[ADR(7,5)]*b[ADR(5,6)]+a[ADR(7,6)]*b[ADR(6,6)]+a[ADR(7,7)]*b[ADR(7,6)];
+    r[ADR(7, 7)] = a[ADR(7,0)]*b[ADR(0,7)]+a[ADR(7,1)]*b[ADR(1,7)]+a[ADR(7,2)]*b[ADR(2,7)]+a[ADR(7,3)]*b[ADR(3,7)]
+                 + a[ADR(7,4)]*b[ADR(4,7)]+a[ADR(7,5)]*b[ADR(5,7)]+a[ADR(7,6)]*b[ADR(6,7)]+a[ADR(7,7)]*b[ADR(7,7)];
 
 #endif
 
-//#endif
+#if 1
+
+    // New version of vectorization with load/store operations.
+
+    __assume_aligned(a, 64);
+    __assume_aligned(b, 64);
+    __assume_aligned(r, 64);
+
+
+    r[ADR(0, 0)] = a[ADR(0,0)]*b[ADR(0,0)]+a[ADR(0,1)]*b[ADR(1,0)]+a[ADR(0,2)]*b[ADR(2,0)]+a[ADR(0,3)]*b[ADR(3,0)]
+                 + a[ADR(0,4)]*b[ADR(4,0)]+a[ADR(0,5)]*b[ADR(5,0)]+a[ADR(0,6)]*b[ADR(6,0)]+a[ADR(0,7)]*b[ADR(7,0)];
+    r[ADR(0, 1)] = a[ADR(0,0)]*b[ADR(0,1)]+a[ADR(0,1)]*b[ADR(1,1)]+a[ADR(0,2)]*b[ADR(2,1)]+a[ADR(0,3)]*b[ADR(3,1)]
+                 + a[ADR(0,4)]*b[ADR(4,1)]+a[ADR(0,5)]*b[ADR(5,1)]+a[ADR(0,6)]*b[ADR(6,1)]+a[ADR(0,7)]*b[ADR(7,1)];
+    r[ADR(0, 2)] = a[ADR(0,0)]*b[ADR(0,2)]+a[ADR(0,1)]*b[ADR(1,2)]+a[ADR(0,2)]*b[ADR(2,2)]+a[ADR(0,3)]*b[ADR(3,2)]
+                 + a[ADR(0,4)]*b[ADR(4,2)]+a[ADR(0,5)]*b[ADR(5,2)]+a[ADR(0,6)]*b[ADR(6,2)]+a[ADR(0,7)]*b[ADR(7,2)];
+    r[ADR(0, 3)] = a[ADR(0,0)]*b[ADR(0,3)]+a[ADR(0,1)]*b[ADR(1,3)]+a[ADR(0,2)]*b[ADR(2,3)]+a[ADR(0,3)]*b[ADR(3,3)]
+                 + a[ADR(0,4)]*b[ADR(4,3)]+a[ADR(0,5)]*b[ADR(5,3)]+a[ADR(0,6)]*b[ADR(6,3)]+a[ADR(0,7)]*b[ADR(7,3)];
+    r[ADR(0, 4)] = a[ADR(0,0)]*b[ADR(0,4)]+a[ADR(0,1)]*b[ADR(1,4)]+a[ADR(0,2)]*b[ADR(2,4)]+a[ADR(0,3)]*b[ADR(3,4)]
+                 + a[ADR(0,4)]*b[ADR(4,4)]+a[ADR(0,5)]*b[ADR(5,4)]+a[ADR(0,6)]*b[ADR(6,4)]+a[ADR(0,7)]*b[ADR(7,4)];
+    r[ADR(0, 5)] = a[ADR(0,0)]*b[ADR(0,5)]+a[ADR(0,1)]*b[ADR(1,5)]+a[ADR(0,2)]*b[ADR(2,5)]+a[ADR(0,3)]*b[ADR(3,5)]
+                 + a[ADR(0,4)]*b[ADR(4,5)]+a[ADR(0,5)]*b[ADR(5,5)]+a[ADR(0,6)]*b[ADR(6,5)]+a[ADR(0,7)]*b[ADR(7,5)];
+    r[ADR(0, 6)] = a[ADR(0,0)]*b[ADR(0,6)]+a[ADR(0,1)]*b[ADR(1,6)]+a[ADR(0,2)]*b[ADR(2,6)]+a[ADR(0,3)]*b[ADR(3,6)]
+                 + a[ADR(0,4)]*b[ADR(4,6)]+a[ADR(0,5)]*b[ADR(5,6)]+a[ADR(0,6)]*b[ADR(6,6)]+a[ADR(0,7)]*b[ADR(7,6)];
+    r[ADR(0, 7)] = a[ADR(0,0)]*b[ADR(0,7)]+a[ADR(0,1)]*b[ADR(1,7)]+a[ADR(0,2)]*b[ADR(2,7)]+a[ADR(0,3)]*b[ADR(3,7)]
+                 + a[ADR(0,4)]*b[ADR(4,7)]+a[ADR(0,5)]*b[ADR(5,7)]+a[ADR(0,6)]*b[ADR(6,7)]+a[ADR(0,7)]*b[ADR(7,7)];
+
+    r[ADR(1, 0)] = a[ADR(1,0)]*b[ADR(0,0)]+a[ADR(1,1)]*b[ADR(1,0)]+a[ADR(1,2)]*b[ADR(2,0)]+a[ADR(1,3)]*b[ADR(3,0)]
+                 + a[ADR(1,4)]*b[ADR(4,0)]+a[ADR(1,5)]*b[ADR(5,0)]+a[ADR(1,6)]*b[ADR(6,0)]+a[ADR(1,7)]*b[ADR(7,0)];
+    r[ADR(1, 1)] = a[ADR(1,0)]*b[ADR(0,1)]+a[ADR(1,1)]*b[ADR(1,1)]+a[ADR(1,2)]*b[ADR(2,1)]+a[ADR(1,3)]*b[ADR(3,1)]
+                 + a[ADR(1,4)]*b[ADR(4,1)]+a[ADR(1,5)]*b[ADR(5,1)]+a[ADR(1,6)]*b[ADR(6,1)]+a[ADR(1,7)]*b[ADR(7,1)];
+    r[ADR(1, 2)] = a[ADR(1,0)]*b[ADR(0,2)]+a[ADR(1,1)]*b[ADR(1,2)]+a[ADR(1,2)]*b[ADR(2,2)]+a[ADR(1,3)]*b[ADR(3,2)]
+                 + a[ADR(1,4)]*b[ADR(4,2)]+a[ADR(1,5)]*b[ADR(5,2)]+a[ADR(1,6)]*b[ADR(6,2)]+a[ADR(1,7)]*b[ADR(7,2)];
+    r[ADR(1, 3)] = a[ADR(1,0)]*b[ADR(0,3)]+a[ADR(1,1)]*b[ADR(1,3)]+a[ADR(1,2)]*b[ADR(2,3)]+a[ADR(1,3)]*b[ADR(3,3)]
+                 + a[ADR(1,4)]*b[ADR(4,3)]+a[ADR(1,5)]*b[ADR(5,3)]+a[ADR(1,6)]*b[ADR(6,3)]+a[ADR(1,7)]*b[ADR(7,3)];
+    r[ADR(1, 4)] = a[ADR(1,0)]*b[ADR(0,4)]+a[ADR(1,1)]*b[ADR(1,4)]+a[ADR(1,2)]*b[ADR(2,4)]+a[ADR(1,3)]*b[ADR(3,4)]
+                 + a[ADR(1,4)]*b[ADR(4,4)]+a[ADR(1,5)]*b[ADR(5,4)]+a[ADR(1,6)]*b[ADR(6,4)]+a[ADR(1,7)]*b[ADR(7,4)];
+    r[ADR(1, 5)] = a[ADR(1,0)]*b[ADR(0,5)]+a[ADR(1,1)]*b[ADR(1,5)]+a[ADR(1,2)]*b[ADR(2,5)]+a[ADR(1,3)]*b[ADR(3,5)]
+                 + a[ADR(1,4)]*b[ADR(4,5)]+a[ADR(1,5)]*b[ADR(5,5)]+a[ADR(1,6)]*b[ADR(6,5)]+a[ADR(1,7)]*b[ADR(7,5)];
+    r[ADR(1, 6)] = a[ADR(1,0)]*b[ADR(0,6)]+a[ADR(1,1)]*b[ADR(1,6)]+a[ADR(1,2)]*b[ADR(2,6)]+a[ADR(1,3)]*b[ADR(3,6)]
+                 + a[ADR(1,4)]*b[ADR(4,6)]+a[ADR(1,5)]*b[ADR(5,6)]+a[ADR(1,6)]*b[ADR(6,6)]+a[ADR(1,7)]*b[ADR(7,6)];
+    r[ADR(1, 7)] = a[ADR(1,0)]*b[ADR(0,7)]+a[ADR(1,1)]*b[ADR(1,7)]+a[ADR(1,2)]*b[ADR(2,7)]+a[ADR(1,3)]*b[ADR(3,7)]
+                 + a[ADR(1,4)]*b[ADR(4,7)]+a[ADR(1,5)]*b[ADR(5,7)]+a[ADR(1,6)]*b[ADR(6,7)]+a[ADR(1,7)]*b[ADR(7,7)];
+
+    r[ADR(2, 0)] = a[ADR(2,0)]*b[ADR(0,0)]+a[ADR(2,1)]*b[ADR(1,0)]+a[ADR(2,2)]*b[ADR(2,0)]+a[ADR(2,3)]*b[ADR(3,0)]
+                 + a[ADR(2,4)]*b[ADR(4,0)]+a[ADR(2,5)]*b[ADR(5,0)]+a[ADR(2,6)]*b[ADR(6,0)]+a[ADR(2,7)]*b[ADR(7,0)];
+    r[ADR(2, 1)] = a[ADR(2,0)]*b[ADR(0,1)]+a[ADR(2,1)]*b[ADR(1,1)]+a[ADR(2,2)]*b[ADR(2,1)]+a[ADR(2,3)]*b[ADR(3,1)]
+                 + a[ADR(2,4)]*b[ADR(4,1)]+a[ADR(2,5)]*b[ADR(5,1)]+a[ADR(2,6)]*b[ADR(6,1)]+a[ADR(2,7)]*b[ADR(7,1)];
+    r[ADR(2, 2)] = a[ADR(2,0)]*b[ADR(0,2)]+a[ADR(2,1)]*b[ADR(1,2)]+a[ADR(2,2)]*b[ADR(2,2)]+a[ADR(2,3)]*b[ADR(3,2)]
+                 + a[ADR(2,4)]*b[ADR(4,2)]+a[ADR(2,5)]*b[ADR(5,2)]+a[ADR(2,6)]*b[ADR(6,2)]+a[ADR(2,7)]*b[ADR(7,2)];
+    r[ADR(2, 3)] = a[ADR(2,0)]*b[ADR(0,3)]+a[ADR(2,1)]*b[ADR(1,3)]+a[ADR(2,2)]*b[ADR(2,3)]+a[ADR(2,3)]*b[ADR(3,3)]
+                 + a[ADR(2,4)]*b[ADR(4,3)]+a[ADR(2,5)]*b[ADR(5,3)]+a[ADR(2,6)]*b[ADR(6,3)]+a[ADR(2,7)]*b[ADR(7,3)];
+    r[ADR(2, 4)] = a[ADR(2,0)]*b[ADR(0,4)]+a[ADR(2,1)]*b[ADR(1,4)]+a[ADR(2,2)]*b[ADR(2,4)]+a[ADR(2,3)]*b[ADR(3,4)]
+                 + a[ADR(2,4)]*b[ADR(4,4)]+a[ADR(2,5)]*b[ADR(5,4)]+a[ADR(2,6)]*b[ADR(6,4)]+a[ADR(2,7)]*b[ADR(7,4)];
+    r[ADR(2, 5)] = a[ADR(2,0)]*b[ADR(0,5)]+a[ADR(2,1)]*b[ADR(1,5)]+a[ADR(2,2)]*b[ADR(2,5)]+a[ADR(2,3)]*b[ADR(3,5)]
+                 + a[ADR(2,4)]*b[ADR(4,5)]+a[ADR(2,5)]*b[ADR(5,5)]+a[ADR(2,6)]*b[ADR(6,5)]+a[ADR(2,7)]*b[ADR(7,5)];
+    r[ADR(2, 6)] = a[ADR(2,0)]*b[ADR(0,6)]+a[ADR(2,1)]*b[ADR(1,6)]+a[ADR(2,2)]*b[ADR(2,6)]+a[ADR(2,3)]*b[ADR(3,6)]
+                 + a[ADR(2,4)]*b[ADR(4,6)]+a[ADR(2,5)]*b[ADR(5,6)]+a[ADR(2,6)]*b[ADR(6,6)]+a[ADR(2,7)]*b[ADR(7,6)];
+    r[ADR(2, 7)] = a[ADR(2,0)]*b[ADR(0,7)]+a[ADR(2,1)]*b[ADR(1,7)]+a[ADR(2,2)]*b[ADR(2,7)]+a[ADR(2,3)]*b[ADR(3,7)]
+                 + a[ADR(2,4)]*b[ADR(4,7)]+a[ADR(2,5)]*b[ADR(5,7)]+a[ADR(2,6)]*b[ADR(6,7)]+a[ADR(2,7)]*b[ADR(7,7)];
+
+    r[ADR(3, 0)] = a[ADR(3,0)]*b[ADR(0,0)]+a[ADR(3,1)]*b[ADR(1,0)]+a[ADR(3,2)]*b[ADR(2,0)]+a[ADR(3,3)]*b[ADR(3,0)]
+                 + a[ADR(3,4)]*b[ADR(4,0)]+a[ADR(3,5)]*b[ADR(5,0)]+a[ADR(3,6)]*b[ADR(6,0)]+a[ADR(3,7)]*b[ADR(7,0)];
+    r[ADR(3, 1)] = a[ADR(3,0)]*b[ADR(0,1)]+a[ADR(3,1)]*b[ADR(1,1)]+a[ADR(3,2)]*b[ADR(2,1)]+a[ADR(3,3)]*b[ADR(3,1)]
+                 + a[ADR(3,4)]*b[ADR(4,1)]+a[ADR(3,5)]*b[ADR(5,1)]+a[ADR(3,6)]*b[ADR(6,1)]+a[ADR(3,7)]*b[ADR(7,1)];
+    r[ADR(3, 2)] = a[ADR(3,0)]*b[ADR(0,2)]+a[ADR(3,1)]*b[ADR(1,2)]+a[ADR(3,2)]*b[ADR(2,2)]+a[ADR(3,3)]*b[ADR(3,2)]
+                 + a[ADR(3,4)]*b[ADR(4,2)]+a[ADR(3,5)]*b[ADR(5,2)]+a[ADR(3,6)]*b[ADR(6,2)]+a[ADR(3,7)]*b[ADR(7,2)];
+    r[ADR(3, 3)] = a[ADR(3,0)]*b[ADR(0,3)]+a[ADR(3,1)]*b[ADR(1,3)]+a[ADR(3,2)]*b[ADR(2,3)]+a[ADR(3,3)]*b[ADR(3,3)]
+                 + a[ADR(3,4)]*b[ADR(4,3)]+a[ADR(3,5)]*b[ADR(5,3)]+a[ADR(3,6)]*b[ADR(6,3)]+a[ADR(3,7)]*b[ADR(7,3)];
+    r[ADR(3, 4)] = a[ADR(3,0)]*b[ADR(0,4)]+a[ADR(3,1)]*b[ADR(1,4)]+a[ADR(3,2)]*b[ADR(2,4)]+a[ADR(3,3)]*b[ADR(3,4)]
+                 + a[ADR(3,4)]*b[ADR(4,4)]+a[ADR(3,5)]*b[ADR(5,4)]+a[ADR(3,6)]*b[ADR(6,4)]+a[ADR(3,7)]*b[ADR(7,4)];
+    r[ADR(3, 5)] = a[ADR(3,0)]*b[ADR(0,5)]+a[ADR(3,1)]*b[ADR(1,5)]+a[ADR(3,2)]*b[ADR(2,5)]+a[ADR(3,3)]*b[ADR(3,5)]
+                 + a[ADR(3,4)]*b[ADR(4,5)]+a[ADR(3,5)]*b[ADR(5,5)]+a[ADR(3,6)]*b[ADR(6,5)]+a[ADR(3,7)]*b[ADR(7,5)];
+    r[ADR(3, 6)] = a[ADR(3,0)]*b[ADR(0,6)]+a[ADR(3,1)]*b[ADR(1,6)]+a[ADR(3,2)]*b[ADR(2,6)]+a[ADR(3,3)]*b[ADR(3,6)]
+                 + a[ADR(3,4)]*b[ADR(4,6)]+a[ADR(3,5)]*b[ADR(5,6)]+a[ADR(3,6)]*b[ADR(6,6)]+a[ADR(3,7)]*b[ADR(7,6)];
+    r[ADR(3, 7)] = a[ADR(3,0)]*b[ADR(0,7)]+a[ADR(3,1)]*b[ADR(1,7)]+a[ADR(3,2)]*b[ADR(2,7)]+a[ADR(3,3)]*b[ADR(3,7)]
+                 + a[ADR(3,4)]*b[ADR(4,7)]+a[ADR(3,5)]*b[ADR(5,7)]+a[ADR(3,6)]*b[ADR(6,7)]+a[ADR(3,7)]*b[ADR(7,7)];
+
+    r[ADR(4, 0)] = a[ADR(4,0)]*b[ADR(0,0)]+a[ADR(4,1)]*b[ADR(1,0)]+a[ADR(4,2)]*b[ADR(2,0)]+a[ADR(4,3)]*b[ADR(3,0)]
+                 + a[ADR(4,4)]*b[ADR(4,0)]+a[ADR(4,5)]*b[ADR(5,0)]+a[ADR(4,6)]*b[ADR(6,0)]+a[ADR(4,7)]*b[ADR(7,0)];
+    r[ADR(4, 1)] = a[ADR(4,0)]*b[ADR(0,1)]+a[ADR(4,1)]*b[ADR(1,1)]+a[ADR(4,2)]*b[ADR(2,1)]+a[ADR(4,3)]*b[ADR(3,1)]
+                 + a[ADR(4,4)]*b[ADR(4,1)]+a[ADR(4,5)]*b[ADR(5,1)]+a[ADR(4,6)]*b[ADR(6,1)]+a[ADR(4,7)]*b[ADR(7,1)];
+    r[ADR(4, 2)] = a[ADR(4,0)]*b[ADR(0,2)]+a[ADR(4,1)]*b[ADR(1,2)]+a[ADR(4,2)]*b[ADR(2,2)]+a[ADR(4,3)]*b[ADR(3,2)]
+                 + a[ADR(4,4)]*b[ADR(4,2)]+a[ADR(4,5)]*b[ADR(5,2)]+a[ADR(4,6)]*b[ADR(6,2)]+a[ADR(4,7)]*b[ADR(7,2)];
+    r[ADR(4, 3)] = a[ADR(4,0)]*b[ADR(0,3)]+a[ADR(4,1)]*b[ADR(1,3)]+a[ADR(4,2)]*b[ADR(2,3)]+a[ADR(4,3)]*b[ADR(3,3)]
+                 + a[ADR(4,4)]*b[ADR(4,3)]+a[ADR(4,5)]*b[ADR(5,3)]+a[ADR(4,6)]*b[ADR(6,3)]+a[ADR(4,7)]*b[ADR(7,3)];
+    r[ADR(4, 4)] = a[ADR(4,0)]*b[ADR(0,4)]+a[ADR(4,1)]*b[ADR(1,4)]+a[ADR(4,2)]*b[ADR(2,4)]+a[ADR(4,3)]*b[ADR(3,4)]
+                 + a[ADR(4,4)]*b[ADR(4,4)]+a[ADR(4,5)]*b[ADR(5,4)]+a[ADR(4,6)]*b[ADR(6,4)]+a[ADR(4,7)]*b[ADR(7,4)];
+    r[ADR(4, 5)] = a[ADR(4,0)]*b[ADR(0,5)]+a[ADR(4,1)]*b[ADR(1,5)]+a[ADR(4,2)]*b[ADR(2,5)]+a[ADR(4,3)]*b[ADR(3,5)]
+                 + a[ADR(4,4)]*b[ADR(4,5)]+a[ADR(4,5)]*b[ADR(5,5)]+a[ADR(4,6)]*b[ADR(6,5)]+a[ADR(4,7)]*b[ADR(7,5)];
+    r[ADR(4, 6)] = a[ADR(4,0)]*b[ADR(0,6)]+a[ADR(4,1)]*b[ADR(1,6)]+a[ADR(4,2)]*b[ADR(2,6)]+a[ADR(4,3)]*b[ADR(3,6)]
+                 + a[ADR(4,4)]*b[ADR(4,6)]+a[ADR(4,5)]*b[ADR(5,6)]+a[ADR(4,6)]*b[ADR(6,6)]+a[ADR(4,7)]*b[ADR(7,6)];
+    r[ADR(4, 7)] = a[ADR(4,0)]*b[ADR(0,7)]+a[ADR(4,1)]*b[ADR(1,7)]+a[ADR(4,2)]*b[ADR(2,7)]+a[ADR(4,3)]*b[ADR(3,7)]
+                 + a[ADR(4,4)]*b[ADR(4,7)]+a[ADR(4,5)]*b[ADR(5,7)]+a[ADR(4,6)]*b[ADR(6,7)]+a[ADR(4,7)]*b[ADR(7,7)];
+
+    r[ADR(5, 0)] = a[ADR(5,0)]*b[ADR(0,0)]+a[ADR(5,1)]*b[ADR(1,0)]+a[ADR(5,2)]*b[ADR(2,0)]+a[ADR(5,3)]*b[ADR(3,0)]
+                 + a[ADR(5,4)]*b[ADR(4,0)]+a[ADR(5,5)]*b[ADR(5,0)]+a[ADR(5,6)]*b[ADR(6,0)]+a[ADR(5,7)]*b[ADR(7,0)];
+    r[ADR(5, 1)] = a[ADR(5,0)]*b[ADR(0,1)]+a[ADR(5,1)]*b[ADR(1,1)]+a[ADR(5,2)]*b[ADR(2,1)]+a[ADR(5,3)]*b[ADR(3,1)]
+                 + a[ADR(5,4)]*b[ADR(4,1)]+a[ADR(5,5)]*b[ADR(5,1)]+a[ADR(5,6)]*b[ADR(6,1)]+a[ADR(5,7)]*b[ADR(7,1)];
+    r[ADR(5, 2)] = a[ADR(5,0)]*b[ADR(0,2)]+a[ADR(5,1)]*b[ADR(1,2)]+a[ADR(5,2)]*b[ADR(2,2)]+a[ADR(5,3)]*b[ADR(3,2)]
+                 + a[ADR(5,4)]*b[ADR(4,2)]+a[ADR(5,5)]*b[ADR(5,2)]+a[ADR(5,6)]*b[ADR(6,2)]+a[ADR(5,7)]*b[ADR(7,2)];
+    r[ADR(5, 3)] = a[ADR(5,0)]*b[ADR(0,3)]+a[ADR(5,1)]*b[ADR(1,3)]+a[ADR(5,2)]*b[ADR(2,3)]+a[ADR(5,3)]*b[ADR(3,3)]
+                 + a[ADR(5,4)]*b[ADR(4,3)]+a[ADR(5,5)]*b[ADR(5,3)]+a[ADR(5,6)]*b[ADR(6,3)]+a[ADR(5,7)]*b[ADR(7,3)];
+    r[ADR(5, 4)] = a[ADR(5,0)]*b[ADR(0,4)]+a[ADR(5,1)]*b[ADR(1,4)]+a[ADR(5,2)]*b[ADR(2,4)]+a[ADR(5,3)]*b[ADR(3,4)]
+                 + a[ADR(5,4)]*b[ADR(4,4)]+a[ADR(5,5)]*b[ADR(5,4)]+a[ADR(5,6)]*b[ADR(6,4)]+a[ADR(5,7)]*b[ADR(7,4)];
+    r[ADR(5, 5)] = a[ADR(5,0)]*b[ADR(0,5)]+a[ADR(5,1)]*b[ADR(1,5)]+a[ADR(5,2)]*b[ADR(2,5)]+a[ADR(5,3)]*b[ADR(3,5)]
+                 + a[ADR(5,4)]*b[ADR(4,5)]+a[ADR(5,5)]*b[ADR(5,5)]+a[ADR(5,6)]*b[ADR(6,5)]+a[ADR(5,7)]*b[ADR(7,5)];
+    r[ADR(5, 6)] = a[ADR(5,0)]*b[ADR(0,6)]+a[ADR(5,1)]*b[ADR(1,6)]+a[ADR(5,2)]*b[ADR(2,6)]+a[ADR(5,3)]*b[ADR(3,6)]
+                 + a[ADR(5,4)]*b[ADR(4,6)]+a[ADR(5,5)]*b[ADR(5,6)]+a[ADR(5,6)]*b[ADR(6,6)]+a[ADR(5,7)]*b[ADR(7,6)];
+    r[ADR(5, 7)] = a[ADR(5,0)]*b[ADR(0,7)]+a[ADR(5,1)]*b[ADR(1,7)]+a[ADR(5,2)]*b[ADR(2,7)]+a[ADR(5,3)]*b[ADR(3,7)]
+                 + a[ADR(5,4)]*b[ADR(4,7)]+a[ADR(5,5)]*b[ADR(5,7)]+a[ADR(5,6)]*b[ADR(6,7)]+a[ADR(5,7)]*b[ADR(7,7)];
+
+    r[ADR(6, 0)] = a[ADR(6,0)]*b[ADR(0,0)]+a[ADR(6,1)]*b[ADR(1,0)]+a[ADR(6,2)]*b[ADR(2,0)]+a[ADR(6,3)]*b[ADR(3,0)]
+                 + a[ADR(6,4)]*b[ADR(4,0)]+a[ADR(6,5)]*b[ADR(5,0)]+a[ADR(6,6)]*b[ADR(6,0)]+a[ADR(6,7)]*b[ADR(7,0)];
+    r[ADR(6, 1)] = a[ADR(6,0)]*b[ADR(0,1)]+a[ADR(6,1)]*b[ADR(1,1)]+a[ADR(6,2)]*b[ADR(2,1)]+a[ADR(6,3)]*b[ADR(3,1)]
+                 + a[ADR(6,4)]*b[ADR(4,1)]+a[ADR(6,5)]*b[ADR(5,1)]+a[ADR(6,6)]*b[ADR(6,1)]+a[ADR(6,7)]*b[ADR(7,1)];
+    r[ADR(6, 2)] = a[ADR(6,0)]*b[ADR(0,2)]+a[ADR(6,1)]*b[ADR(1,2)]+a[ADR(6,2)]*b[ADR(2,2)]+a[ADR(6,3)]*b[ADR(3,2)]
+                 + a[ADR(6,4)]*b[ADR(4,2)]+a[ADR(6,5)]*b[ADR(5,2)]+a[ADR(6,6)]*b[ADR(6,2)]+a[ADR(6,7)]*b[ADR(7,2)];
+    r[ADR(6, 3)] = a[ADR(6,0)]*b[ADR(0,3)]+a[ADR(6,1)]*b[ADR(1,3)]+a[ADR(6,2)]*b[ADR(2,3)]+a[ADR(6,3)]*b[ADR(3,3)]
+                 + a[ADR(6,4)]*b[ADR(4,3)]+a[ADR(6,5)]*b[ADR(5,3)]+a[ADR(6,6)]*b[ADR(6,3)]+a[ADR(6,7)]*b[ADR(7,3)];
+    r[ADR(6, 4)] = a[ADR(6,0)]*b[ADR(0,4)]+a[ADR(6,1)]*b[ADR(1,4)]+a[ADR(6,2)]*b[ADR(2,4)]+a[ADR(6,3)]*b[ADR(3,4)]
+                 + a[ADR(6,4)]*b[ADR(4,4)]+a[ADR(6,5)]*b[ADR(5,4)]+a[ADR(6,6)]*b[ADR(6,4)]+a[ADR(6,7)]*b[ADR(7,4)];
+    r[ADR(6, 5)] = a[ADR(6,0)]*b[ADR(0,5)]+a[ADR(6,1)]*b[ADR(1,5)]+a[ADR(6,2)]*b[ADR(2,5)]+a[ADR(6,3)]*b[ADR(3,5)]
+                 + a[ADR(6,4)]*b[ADR(4,5)]+a[ADR(6,5)]*b[ADR(5,5)]+a[ADR(6,6)]*b[ADR(6,5)]+a[ADR(6,7)]*b[ADR(7,5)];
+    r[ADR(6, 6)] = a[ADR(6,0)]*b[ADR(0,6)]+a[ADR(6,1)]*b[ADR(1,6)]+a[ADR(6,2)]*b[ADR(2,6)]+a[ADR(6,3)]*b[ADR(3,6)]
+                 + a[ADR(6,4)]*b[ADR(4,6)]+a[ADR(6,5)]*b[ADR(5,6)]+a[ADR(6,6)]*b[ADR(6,6)]+a[ADR(6,7)]*b[ADR(7,6)];
+    r[ADR(6, 7)] = a[ADR(6,0)]*b[ADR(0,7)]+a[ADR(6,1)]*b[ADR(1,7)]+a[ADR(6,2)]*b[ADR(2,7)]+a[ADR(6,3)]*b[ADR(3,7)]
+                 + a[ADR(6,4)]*b[ADR(4,7)]+a[ADR(6,5)]*b[ADR(5,7)]+a[ADR(6,6)]*b[ADR(6,7)]+a[ADR(6,7)]*b[ADR(7,7)];
+
+    r[ADR(7, 0)] = a[ADR(7,0)]*b[ADR(0,0)]+a[ADR(7,1)]*b[ADR(1,0)]+a[ADR(7,2)]*b[ADR(2,0)]+a[ADR(7,3)]*b[ADR(3,0)]
+                 + a[ADR(7,4)]*b[ADR(4,0)]+a[ADR(7,5)]*b[ADR(5,0)]+a[ADR(7,6)]*b[ADR(6,0)]+a[ADR(7,7)]*b[ADR(7,0)];
+    r[ADR(7, 1)] = a[ADR(7,0)]*b[ADR(0,1)]+a[ADR(7,1)]*b[ADR(1,1)]+a[ADR(7,2)]*b[ADR(2,1)]+a[ADR(7,3)]*b[ADR(3,1)]
+                 + a[ADR(7,4)]*b[ADR(4,1)]+a[ADR(7,5)]*b[ADR(5,1)]+a[ADR(7,6)]*b[ADR(6,1)]+a[ADR(7,7)]*b[ADR(7,1)];
+    r[ADR(7, 2)] = a[ADR(7,0)]*b[ADR(0,2)]+a[ADR(7,1)]*b[ADR(1,2)]+a[ADR(7,2)]*b[ADR(2,2)]+a[ADR(7,3)]*b[ADR(3,2)]
+                 + a[ADR(7,4)]*b[ADR(4,2)]+a[ADR(7,5)]*b[ADR(5,2)]+a[ADR(7,6)]*b[ADR(6,2)]+a[ADR(7,7)]*b[ADR(7,2)];
+    r[ADR(7, 3)] = a[ADR(7,0)]*b[ADR(0,3)]+a[ADR(7,1)]*b[ADR(1,3)]+a[ADR(7,2)]*b[ADR(2,3)]+a[ADR(7,3)]*b[ADR(3,3)]
+                 + a[ADR(7,4)]*b[ADR(4,3)]+a[ADR(7,5)]*b[ADR(5,3)]+a[ADR(7,6)]*b[ADR(6,3)]+a[ADR(7,7)]*b[ADR(7,3)];
+    r[ADR(7, 4)] = a[ADR(7,0)]*b[ADR(0,4)]+a[ADR(7,1)]*b[ADR(1,4)]+a[ADR(7,2)]*b[ADR(2,4)]+a[ADR(7,3)]*b[ADR(3,4)]
+                 + a[ADR(7,4)]*b[ADR(4,4)]+a[ADR(7,5)]*b[ADR(5,4)]+a[ADR(7,6)]*b[ADR(6,4)]+a[ADR(7,7)]*b[ADR(7,4)];
+    r[ADR(7, 5)] = a[ADR(7,0)]*b[ADR(0,5)]+a[ADR(7,1)]*b[ADR(1,5)]+a[ADR(7,2)]*b[ADR(2,5)]+a[ADR(7,3)]*b[ADR(3,5)]
+                 + a[ADR(7,4)]*b[ADR(4,5)]+a[ADR(7,5)]*b[ADR(5,5)]+a[ADR(7,6)]*b[ADR(6,5)]+a[ADR(7,7)]*b[ADR(7,5)];
+    r[ADR(7, 6)] = a[ADR(7,0)]*b[ADR(0,6)]+a[ADR(7,1)]*b[ADR(1,6)]+a[ADR(7,2)]*b[ADR(2,6)]+a[ADR(7,3)]*b[ADR(3,6)]
+                 + a[ADR(7,4)]*b[ADR(4,6)]+a[ADR(7,5)]*b[ADR(5,6)]+a[ADR(7,6)]*b[ADR(6,6)]+a[ADR(7,7)]*b[ADR(7,6)];
+    r[ADR(7, 7)] = a[ADR(7,0)]*b[ADR(0,7)]+a[ADR(7,1)]*b[ADR(1,7)]+a[ADR(7,2)]*b[ADR(2,7)]+a[ADR(7,3)]*b[ADR(3,7)]
+                 + a[ADR(7,4)]*b[ADR(4,7)]+a[ADR(7,5)]*b[ADR(5,7)]+a[ADR(7,6)]*b[ADR(6,7)]+a[ADR(7,7)]*b[ADR(7,7)];
+
+#endif
+
+#endif
 
 }
 
