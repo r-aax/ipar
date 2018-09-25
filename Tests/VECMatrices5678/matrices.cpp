@@ -13,6 +13,13 @@
 
 //--------------------------------------------------------------------------------------------------
 
+// Modes.
+#define OLD_VEC     0
+#define FULL_UNROLL 0
+#define NEW_VEC     1
+
+//--------------------------------------------------------------------------------------------------
+
 // Short names.
 #define LD(ADDR) _mm512_load_ps(ADDR)
 #define ST(ADDR, VAL) _mm512_store_ps(ADDR, VAL)
@@ -28,6 +35,8 @@
 #define CMP(va, vb, cmp) _mm512_cmp_ps_mask(va, vb, cmp)
 #define SETZERO() _mm512_setzero_ps()
 #define SET1(v) _mm512_set1_ps(v)
+#define FMADD(v1, v2, v3) _mm512_fmadd_ps(v1, v2, v3)
+#define PERMXV(ind, v) _mm512_permutexvar_ps(ind, v)
 
 //--------------------------------------------------------------------------------------------------
 
@@ -112,9 +121,10 @@ void om_mult_mm_8x8_opt(float * __restrict a,
 
 #else
 
-#if 0
+#if OLD_VEC == 1
 
     // Old version of vectorization with gather/scatter.
+    // sp 2.59
 
     __assume_aligned(a, 64);
     __assume_aligned(b, 64);
@@ -169,9 +179,10 @@ void om_mult_mm_8x8_opt(float * __restrict a,
 
 #endif
 
-#if 0
+#if FULL_UNROLL
 
     // Full unroll.
+    // sp 3.71
 
     __assume_aligned(a, 64);
     __assume_aligned(b, 64);
@@ -316,150 +327,79 @@ void om_mult_mm_8x8_opt(float * __restrict a,
 
 #endif
 
-#if 1
+#if NEW_VEC == 1
 
     // New version of vectorization with load/store operations.
+    // sp 5.73
 
     __assume_aligned(a, 64);
     __assume_aligned(b, 64);
     __assume_aligned(r, 64);
 
+    // Indices.
+    __m512i ind_df = _mm512_set_epi32( 7,  6,  5,  4,  3,  2, 1, 0,
+                                       7,  6,  5,  4,  3,  2, 1, 0);
+    __m512i ind_ds = _mm512_set_epi32(15, 14, 13, 12, 11, 10, 9, 8,
+                                      15, 14, 13, 12, 11, 10, 9, 8);
 
-    r[ADR(0, 0)] = a[ADR(0,0)]*b[ADR(0,0)]+a[ADR(0,1)]*b[ADR(1,0)]+a[ADR(0,2)]*b[ADR(2,0)]+a[ADR(0,3)]*b[ADR(3,0)]
-                 + a[ADR(0,4)]*b[ADR(4,0)]+a[ADR(0,5)]*b[ADR(5,0)]+a[ADR(0,6)]*b[ADR(6,0)]+a[ADR(0,7)]*b[ADR(7,0)];
-    r[ADR(0, 1)] = a[ADR(0,0)]*b[ADR(0,1)]+a[ADR(0,1)]*b[ADR(1,1)]+a[ADR(0,2)]*b[ADR(2,1)]+a[ADR(0,3)]*b[ADR(3,1)]
-                 + a[ADR(0,4)]*b[ADR(4,1)]+a[ADR(0,5)]*b[ADR(5,1)]+a[ADR(0,6)]*b[ADR(6,1)]+a[ADR(0,7)]*b[ADR(7,1)];
-    r[ADR(0, 2)] = a[ADR(0,0)]*b[ADR(0,2)]+a[ADR(0,1)]*b[ADR(1,2)]+a[ADR(0,2)]*b[ADR(2,2)]+a[ADR(0,3)]*b[ADR(3,2)]
-                 + a[ADR(0,4)]*b[ADR(4,2)]+a[ADR(0,5)]*b[ADR(5,2)]+a[ADR(0,6)]*b[ADR(6,2)]+a[ADR(0,7)]*b[ADR(7,2)];
-    r[ADR(0, 3)] = a[ADR(0,0)]*b[ADR(0,3)]+a[ADR(0,1)]*b[ADR(1,3)]+a[ADR(0,2)]*b[ADR(2,3)]+a[ADR(0,3)]*b[ADR(3,3)]
-                 + a[ADR(0,4)]*b[ADR(4,3)]+a[ADR(0,5)]*b[ADR(5,3)]+a[ADR(0,6)]*b[ADR(6,3)]+a[ADR(0,7)]*b[ADR(7,3)];
-    r[ADR(0, 4)] = a[ADR(0,0)]*b[ADR(0,4)]+a[ADR(0,1)]*b[ADR(1,4)]+a[ADR(0,2)]*b[ADR(2,4)]+a[ADR(0,3)]*b[ADR(3,4)]
-                 + a[ADR(0,4)]*b[ADR(4,4)]+a[ADR(0,5)]*b[ADR(5,4)]+a[ADR(0,6)]*b[ADR(6,4)]+a[ADR(0,7)]*b[ADR(7,4)];
-    r[ADR(0, 5)] = a[ADR(0,0)]*b[ADR(0,5)]+a[ADR(0,1)]*b[ADR(1,5)]+a[ADR(0,2)]*b[ADR(2,5)]+a[ADR(0,3)]*b[ADR(3,5)]
-                 + a[ADR(0,4)]*b[ADR(4,5)]+a[ADR(0,5)]*b[ADR(5,5)]+a[ADR(0,6)]*b[ADR(6,5)]+a[ADR(0,7)]*b[ADR(7,5)];
-    r[ADR(0, 6)] = a[ADR(0,0)]*b[ADR(0,6)]+a[ADR(0,1)]*b[ADR(1,6)]+a[ADR(0,2)]*b[ADR(2,6)]+a[ADR(0,3)]*b[ADR(3,6)]
-                 + a[ADR(0,4)]*b[ADR(4,6)]+a[ADR(0,5)]*b[ADR(5,6)]+a[ADR(0,6)]*b[ADR(6,6)]+a[ADR(0,7)]*b[ADR(7,6)];
-    r[ADR(0, 7)] = a[ADR(0,0)]*b[ADR(0,7)]+a[ADR(0,1)]*b[ADR(1,7)]+a[ADR(0,2)]*b[ADR(2,7)]+a[ADR(0,3)]*b[ADR(3,7)]
-                 + a[ADR(0,4)]*b[ADR(4,7)]+a[ADR(0,5)]*b[ADR(5,7)]+a[ADR(0,6)]*b[ADR(6,7)]+a[ADR(0,7)]*b[ADR(7,7)];
+    // Load full b matrix lines.
+    __m512 b0 = LD(&b[0]);
+    __m512 b1 = _mm512_permutexvar_ps(ind_ds, b0);
+    __m512 b2 = LD(&b[2 * V8]);
+    __m512 b3 = _mm512_permutexvar_ps(ind_ds, b2);
+    __m512 b4 = LD(&b[4 * V8]);
+    __m512 b5 = _mm512_permutexvar_ps(ind_ds, b4);
+    __m512 b6 = LD(&b[6 * V8]);
+    __m512 b7 = _mm512_permutexvar_ps(ind_ds, b6);
 
-    r[ADR(1, 0)] = a[ADR(1,0)]*b[ADR(0,0)]+a[ADR(1,1)]*b[ADR(1,0)]+a[ADR(1,2)]*b[ADR(2,0)]+a[ADR(1,3)]*b[ADR(3,0)]
-                 + a[ADR(1,4)]*b[ADR(4,0)]+a[ADR(1,5)]*b[ADR(5,0)]+a[ADR(1,6)]*b[ADR(6,0)]+a[ADR(1,7)]*b[ADR(7,0)];
-    r[ADR(1, 1)] = a[ADR(1,0)]*b[ADR(0,1)]+a[ADR(1,1)]*b[ADR(1,1)]+a[ADR(1,2)]*b[ADR(2,1)]+a[ADR(1,3)]*b[ADR(3,1)]
-                 + a[ADR(1,4)]*b[ADR(4,1)]+a[ADR(1,5)]*b[ADR(5,1)]+a[ADR(1,6)]*b[ADR(6,1)]+a[ADR(1,7)]*b[ADR(7,1)];
-    r[ADR(1, 2)] = a[ADR(1,0)]*b[ADR(0,2)]+a[ADR(1,1)]*b[ADR(1,2)]+a[ADR(1,2)]*b[ADR(2,2)]+a[ADR(1,3)]*b[ADR(3,2)]
-                 + a[ADR(1,4)]*b[ADR(4,2)]+a[ADR(1,5)]*b[ADR(5,2)]+a[ADR(1,6)]*b[ADR(6,2)]+a[ADR(1,7)]*b[ADR(7,2)];
-    r[ADR(1, 3)] = a[ADR(1,0)]*b[ADR(0,3)]+a[ADR(1,1)]*b[ADR(1,3)]+a[ADR(1,2)]*b[ADR(2,3)]+a[ADR(1,3)]*b[ADR(3,3)]
-                 + a[ADR(1,4)]*b[ADR(4,3)]+a[ADR(1,5)]*b[ADR(5,3)]+a[ADR(1,6)]*b[ADR(6,3)]+a[ADR(1,7)]*b[ADR(7,3)];
-    r[ADR(1, 4)] = a[ADR(1,0)]*b[ADR(0,4)]+a[ADR(1,1)]*b[ADR(1,4)]+a[ADR(1,2)]*b[ADR(2,4)]+a[ADR(1,3)]*b[ADR(3,4)]
-                 + a[ADR(1,4)]*b[ADR(4,4)]+a[ADR(1,5)]*b[ADR(5,4)]+a[ADR(1,6)]*b[ADR(6,4)]+a[ADR(1,7)]*b[ADR(7,4)];
-    r[ADR(1, 5)] = a[ADR(1,0)]*b[ADR(0,5)]+a[ADR(1,1)]*b[ADR(1,5)]+a[ADR(1,2)]*b[ADR(2,5)]+a[ADR(1,3)]*b[ADR(3,5)]
-                 + a[ADR(1,4)]*b[ADR(4,5)]+a[ADR(1,5)]*b[ADR(5,5)]+a[ADR(1,6)]*b[ADR(6,5)]+a[ADR(1,7)]*b[ADR(7,5)];
-    r[ADR(1, 6)] = a[ADR(1,0)]*b[ADR(0,6)]+a[ADR(1,1)]*b[ADR(1,6)]+a[ADR(1,2)]*b[ADR(2,6)]+a[ADR(1,3)]*b[ADR(3,6)]
-                 + a[ADR(1,4)]*b[ADR(4,6)]+a[ADR(1,5)]*b[ADR(5,6)]+a[ADR(1,6)]*b[ADR(6,6)]+a[ADR(1,7)]*b[ADR(7,6)];
-    r[ADR(1, 7)] = a[ADR(1,0)]*b[ADR(0,7)]+a[ADR(1,1)]*b[ADR(1,7)]+a[ADR(1,2)]*b[ADR(2,7)]+a[ADR(1,3)]*b[ADR(3,7)]
-                 + a[ADR(1,4)]*b[ADR(4,7)]+a[ADR(1,5)]*b[ADR(5,7)]+a[ADR(1,6)]*b[ADR(6,7)]+a[ADR(1,7)]*b[ADR(7,7)];
+    // Correct even matrices lines.
+    b0 = _mm512_permutexvar_ps(ind_df, b0);
+    b2 = _mm512_permutexvar_ps(ind_df, b2);
+    b4 = _mm512_permutexvar_ps(ind_df, b4);
+    b6 = _mm512_permutexvar_ps(ind_df, b6);
 
-    r[ADR(2, 0)] = a[ADR(2,0)]*b[ADR(0,0)]+a[ADR(2,1)]*b[ADR(1,0)]+a[ADR(2,2)]*b[ADR(2,0)]+a[ADR(2,3)]*b[ADR(3,0)]
-                 + a[ADR(2,4)]*b[ADR(4,0)]+a[ADR(2,5)]*b[ADR(5,0)]+a[ADR(2,6)]*b[ADR(6,0)]+a[ADR(2,7)]*b[ADR(7,0)];
-    r[ADR(2, 1)] = a[ADR(2,0)]*b[ADR(0,1)]+a[ADR(2,1)]*b[ADR(1,1)]+a[ADR(2,2)]*b[ADR(2,1)]+a[ADR(2,3)]*b[ADR(3,1)]
-                 + a[ADR(2,4)]*b[ADR(4,1)]+a[ADR(2,5)]*b[ADR(5,1)]+a[ADR(2,6)]*b[ADR(6,1)]+a[ADR(2,7)]*b[ADR(7,1)];
-    r[ADR(2, 2)] = a[ADR(2,0)]*b[ADR(0,2)]+a[ADR(2,1)]*b[ADR(1,2)]+a[ADR(2,2)]*b[ADR(2,2)]+a[ADR(2,3)]*b[ADR(3,2)]
-                 + a[ADR(2,4)]*b[ADR(4,2)]+a[ADR(2,5)]*b[ADR(5,2)]+a[ADR(2,6)]*b[ADR(6,2)]+a[ADR(2,7)]*b[ADR(7,2)];
-    r[ADR(2, 3)] = a[ADR(2,0)]*b[ADR(0,3)]+a[ADR(2,1)]*b[ADR(1,3)]+a[ADR(2,2)]*b[ADR(2,3)]+a[ADR(2,3)]*b[ADR(3,3)]
-                 + a[ADR(2,4)]*b[ADR(4,3)]+a[ADR(2,5)]*b[ADR(5,3)]+a[ADR(2,6)]*b[ADR(6,3)]+a[ADR(2,7)]*b[ADR(7,3)];
-    r[ADR(2, 4)] = a[ADR(2,0)]*b[ADR(0,4)]+a[ADR(2,1)]*b[ADR(1,4)]+a[ADR(2,2)]*b[ADR(2,4)]+a[ADR(2,3)]*b[ADR(3,4)]
-                 + a[ADR(2,4)]*b[ADR(4,4)]+a[ADR(2,5)]*b[ADR(5,4)]+a[ADR(2,6)]*b[ADR(6,4)]+a[ADR(2,7)]*b[ADR(7,4)];
-    r[ADR(2, 5)] = a[ADR(2,0)]*b[ADR(0,5)]+a[ADR(2,1)]*b[ADR(1,5)]+a[ADR(2,2)]*b[ADR(2,5)]+a[ADR(2,3)]*b[ADR(3,5)]
-                 + a[ADR(2,4)]*b[ADR(4,5)]+a[ADR(2,5)]*b[ADR(5,5)]+a[ADR(2,6)]*b[ADR(6,5)]+a[ADR(2,7)]*b[ADR(7,5)];
-    r[ADR(2, 6)] = a[ADR(2,0)]*b[ADR(0,6)]+a[ADR(2,1)]*b[ADR(1,6)]+a[ADR(2,2)]*b[ADR(2,6)]+a[ADR(2,3)]*b[ADR(3,6)]
-                 + a[ADR(2,4)]*b[ADR(4,6)]+a[ADR(2,5)]*b[ADR(5,6)]+a[ADR(2,6)]*b[ADR(6,6)]+a[ADR(2,7)]*b[ADR(7,6)];
-    r[ADR(2, 7)] = a[ADR(2,0)]*b[ADR(0,7)]+a[ADR(2,1)]*b[ADR(1,7)]+a[ADR(2,2)]*b[ADR(2,7)]+a[ADR(2,3)]*b[ADR(3,7)]
-                 + a[ADR(2,4)]*b[ADR(4,7)]+a[ADR(2,5)]*b[ADR(5,7)]+a[ADR(2,6)]*b[ADR(6,7)]+a[ADR(2,7)]*b[ADR(7,7)];
+    // Load full a matrix lines.
+    __m512 a0 = LD(&a[0]);
+    __m512 a2 = LD(&a[2 * V8]);
+    __m512 a4 = LD(&a[4 * V8]);
+    __m512 a6 = LD(&a[6 * V8]);
 
-    r[ADR(3, 0)] = a[ADR(3,0)]*b[ADR(0,0)]+a[ADR(3,1)]*b[ADR(1,0)]+a[ADR(3,2)]*b[ADR(2,0)]+a[ADR(3,3)]*b[ADR(3,0)]
-                 + a[ADR(3,4)]*b[ADR(4,0)]+a[ADR(3,5)]*b[ADR(5,0)]+a[ADR(3,6)]*b[ADR(6,0)]+a[ADR(3,7)]*b[ADR(7,0)];
-    r[ADR(3, 1)] = a[ADR(3,0)]*b[ADR(0,1)]+a[ADR(3,1)]*b[ADR(1,1)]+a[ADR(3,2)]*b[ADR(2,1)]+a[ADR(3,3)]*b[ADR(3,1)]
-                 + a[ADR(3,4)]*b[ADR(4,1)]+a[ADR(3,5)]*b[ADR(5,1)]+a[ADR(3,6)]*b[ADR(6,1)]+a[ADR(3,7)]*b[ADR(7,1)];
-    r[ADR(3, 2)] = a[ADR(3,0)]*b[ADR(0,2)]+a[ADR(3,1)]*b[ADR(1,2)]+a[ADR(3,2)]*b[ADR(2,2)]+a[ADR(3,3)]*b[ADR(3,2)]
-                 + a[ADR(3,4)]*b[ADR(4,2)]+a[ADR(3,5)]*b[ADR(5,2)]+a[ADR(3,6)]*b[ADR(6,2)]+a[ADR(3,7)]*b[ADR(7,2)];
-    r[ADR(3, 3)] = a[ADR(3,0)]*b[ADR(0,3)]+a[ADR(3,1)]*b[ADR(1,3)]+a[ADR(3,2)]*b[ADR(2,3)]+a[ADR(3,3)]*b[ADR(3,3)]
-                 + a[ADR(3,4)]*b[ADR(4,3)]+a[ADR(3,5)]*b[ADR(5,3)]+a[ADR(3,6)]*b[ADR(6,3)]+a[ADR(3,7)]*b[ADR(7,3)];
-    r[ADR(3, 4)] = a[ADR(3,0)]*b[ADR(0,4)]+a[ADR(3,1)]*b[ADR(1,4)]+a[ADR(3,2)]*b[ADR(2,4)]+a[ADR(3,3)]*b[ADR(3,4)]
-                 + a[ADR(3,4)]*b[ADR(4,4)]+a[ADR(3,5)]*b[ADR(5,4)]+a[ADR(3,6)]*b[ADR(6,4)]+a[ADR(3,7)]*b[ADR(7,4)];
-    r[ADR(3, 5)] = a[ADR(3,0)]*b[ADR(0,5)]+a[ADR(3,1)]*b[ADR(1,5)]+a[ADR(3,2)]*b[ADR(2,5)]+a[ADR(3,3)]*b[ADR(3,5)]
-                 + a[ADR(3,4)]*b[ADR(4,5)]+a[ADR(3,5)]*b[ADR(5,5)]+a[ADR(3,6)]*b[ADR(6,5)]+a[ADR(3,7)]*b[ADR(7,5)];
-    r[ADR(3, 6)] = a[ADR(3,0)]*b[ADR(0,6)]+a[ADR(3,1)]*b[ADR(1,6)]+a[ADR(3,2)]*b[ADR(2,6)]+a[ADR(3,3)]*b[ADR(3,6)]
-                 + a[ADR(3,4)]*b[ADR(4,6)]+a[ADR(3,5)]*b[ADR(5,6)]+a[ADR(3,6)]*b[ADR(6,6)]+a[ADR(3,7)]*b[ADR(7,6)];
-    r[ADR(3, 7)] = a[ADR(3,0)]*b[ADR(0,7)]+a[ADR(3,1)]*b[ADR(1,7)]+a[ADR(3,2)]*b[ADR(2,7)]+a[ADR(3,3)]*b[ADR(3,7)]
-                 + a[ADR(3,4)]*b[ADR(4,7)]+a[ADR(3,5)]*b[ADR(5,7)]+a[ADR(3,6)]*b[ADR(6,7)]+a[ADR(3,7)]*b[ADR(7,7)];
+    // Indices.
+    __m512i ind_0 = _mm512_set_epi32( 8,  8,  8,  8,  8,  8,  8,  8,
+                                      0,  0,  0,  0,  0,  0,  0,  0);
+    __m512i ind_1 = _mm512_set_epi32( 9,  9,  9,  9,  9,  9,  9,  9,
+                                      1,  1,  1,  1,  1,  1,  1,  1);
+    __m512i ind_2 = _mm512_set_epi32(10, 10, 10, 10, 10, 10, 10, 10,
+                                      2,  2,  2,  2,  2,  2,  2,  2);
+    __m512i ind_3 = _mm512_set_epi32(11, 11, 11, 11, 11, 11, 11, 11,
+                                      3,  3,  3,  3,  3,  3,  3,  3);
+    __m512i ind_4 = _mm512_set_epi32(12, 12, 12, 12, 12, 12, 12, 12,
+                                      4,  4,  4,  4,  4,  4,  4,  4);
+    __m512i ind_5 = _mm512_set_epi32(13, 13, 13, 13, 13, 13, 13, 13,
+                                      5,  5,  5,  5,  5,  5,  5,  5);
+    __m512i ind_6 = _mm512_set_epi32(14, 14, 14, 14, 14, 14, 14, 14,
+                                      6,  6,  6,  6,  6,  6,  6,  6);
+    __m512i ind_7 = _mm512_set_epi32(15, 15, 15, 15, 15, 15, 15, 15,
+                                      7,  7,  7,  7,  7,  7,  7,  7);
 
-    r[ADR(4, 0)] = a[ADR(4,0)]*b[ADR(0,0)]+a[ADR(4,1)]*b[ADR(1,0)]+a[ADR(4,2)]*b[ADR(2,0)]+a[ADR(4,3)]*b[ADR(3,0)]
-                 + a[ADR(4,4)]*b[ADR(4,0)]+a[ADR(4,5)]*b[ADR(5,0)]+a[ADR(4,6)]*b[ADR(6,0)]+a[ADR(4,7)]*b[ADR(7,0)];
-    r[ADR(4, 1)] = a[ADR(4,0)]*b[ADR(0,1)]+a[ADR(4,1)]*b[ADR(1,1)]+a[ADR(4,2)]*b[ADR(2,1)]+a[ADR(4,3)]*b[ADR(3,1)]
-                 + a[ADR(4,4)]*b[ADR(4,1)]+a[ADR(4,5)]*b[ADR(5,1)]+a[ADR(4,6)]*b[ADR(6,1)]+a[ADR(4,7)]*b[ADR(7,1)];
-    r[ADR(4, 2)] = a[ADR(4,0)]*b[ADR(0,2)]+a[ADR(4,1)]*b[ADR(1,2)]+a[ADR(4,2)]*b[ADR(2,2)]+a[ADR(4,3)]*b[ADR(3,2)]
-                 + a[ADR(4,4)]*b[ADR(4,2)]+a[ADR(4,5)]*b[ADR(5,2)]+a[ADR(4,6)]*b[ADR(6,2)]+a[ADR(4,7)]*b[ADR(7,2)];
-    r[ADR(4, 3)] = a[ADR(4,0)]*b[ADR(0,3)]+a[ADR(4,1)]*b[ADR(1,3)]+a[ADR(4,2)]*b[ADR(2,3)]+a[ADR(4,3)]*b[ADR(3,3)]
-                 + a[ADR(4,4)]*b[ADR(4,3)]+a[ADR(4,5)]*b[ADR(5,3)]+a[ADR(4,6)]*b[ADR(6,3)]+a[ADR(4,7)]*b[ADR(7,3)];
-    r[ADR(4, 4)] = a[ADR(4,0)]*b[ADR(0,4)]+a[ADR(4,1)]*b[ADR(1,4)]+a[ADR(4,2)]*b[ADR(2,4)]+a[ADR(4,3)]*b[ADR(3,4)]
-                 + a[ADR(4,4)]*b[ADR(4,4)]+a[ADR(4,5)]*b[ADR(5,4)]+a[ADR(4,6)]*b[ADR(6,4)]+a[ADR(4,7)]*b[ADR(7,4)];
-    r[ADR(4, 5)] = a[ADR(4,0)]*b[ADR(0,5)]+a[ADR(4,1)]*b[ADR(1,5)]+a[ADR(4,2)]*b[ADR(2,5)]+a[ADR(4,3)]*b[ADR(3,5)]
-                 + a[ADR(4,4)]*b[ADR(4,5)]+a[ADR(4,5)]*b[ADR(5,5)]+a[ADR(4,6)]*b[ADR(6,5)]+a[ADR(4,7)]*b[ADR(7,5)];
-    r[ADR(4, 6)] = a[ADR(4,0)]*b[ADR(0,6)]+a[ADR(4,1)]*b[ADR(1,6)]+a[ADR(4,2)]*b[ADR(2,6)]+a[ADR(4,3)]*b[ADR(3,6)]
-                 + a[ADR(4,4)]*b[ADR(4,6)]+a[ADR(4,5)]*b[ADR(5,6)]+a[ADR(4,6)]*b[ADR(6,6)]+a[ADR(4,7)]*b[ADR(7,6)];
-    r[ADR(4, 7)] = a[ADR(4,0)]*b[ADR(0,7)]+a[ADR(4,1)]*b[ADR(1,7)]+a[ADR(4,2)]*b[ADR(2,7)]+a[ADR(4,3)]*b[ADR(3,7)]
-                 + a[ADR(4,4)]*b[ADR(4,7)]+a[ADR(4,5)]*b[ADR(5,7)]+a[ADR(4,6)]*b[ADR(6,7)]+a[ADR(4,7)]*b[ADR(7,7)];
+#define BLOCK(N, A)                                                    \
+    ST(&r[N * V8],                                                     \
+       FMADD(PERMXV(ind_0, A), b0,                                     \
+             FMADD(PERMXV(ind_1, A), b1,                               \
+                   FMADD(PERMXV(ind_2, A), b2,                         \
+                         FMADD(PERMXV(ind_3, A), b3,                   \
+                               FMADD(PERMXV(ind_4, A), b4,             \
+                                     FMADD(PERMXV(ind_5, A), b5,       \
+                                           FMADD(PERMXV(ind_6, A), b6, \
+                                                 MUL(PERMXV(ind_7, A), b7)))))))));
 
-    r[ADR(5, 0)] = a[ADR(5,0)]*b[ADR(0,0)]+a[ADR(5,1)]*b[ADR(1,0)]+a[ADR(5,2)]*b[ADR(2,0)]+a[ADR(5,3)]*b[ADR(3,0)]
-                 + a[ADR(5,4)]*b[ADR(4,0)]+a[ADR(5,5)]*b[ADR(5,0)]+a[ADR(5,6)]*b[ADR(6,0)]+a[ADR(5,7)]*b[ADR(7,0)];
-    r[ADR(5, 1)] = a[ADR(5,0)]*b[ADR(0,1)]+a[ADR(5,1)]*b[ADR(1,1)]+a[ADR(5,2)]*b[ADR(2,1)]+a[ADR(5,3)]*b[ADR(3,1)]
-                 + a[ADR(5,4)]*b[ADR(4,1)]+a[ADR(5,5)]*b[ADR(5,1)]+a[ADR(5,6)]*b[ADR(6,1)]+a[ADR(5,7)]*b[ADR(7,1)];
-    r[ADR(5, 2)] = a[ADR(5,0)]*b[ADR(0,2)]+a[ADR(5,1)]*b[ADR(1,2)]+a[ADR(5,2)]*b[ADR(2,2)]+a[ADR(5,3)]*b[ADR(3,2)]
-                 + a[ADR(5,4)]*b[ADR(4,2)]+a[ADR(5,5)]*b[ADR(5,2)]+a[ADR(5,6)]*b[ADR(6,2)]+a[ADR(5,7)]*b[ADR(7,2)];
-    r[ADR(5, 3)] = a[ADR(5,0)]*b[ADR(0,3)]+a[ADR(5,1)]*b[ADR(1,3)]+a[ADR(5,2)]*b[ADR(2,3)]+a[ADR(5,3)]*b[ADR(3,3)]
-                 + a[ADR(5,4)]*b[ADR(4,3)]+a[ADR(5,5)]*b[ADR(5,3)]+a[ADR(5,6)]*b[ADR(6,3)]+a[ADR(5,7)]*b[ADR(7,3)];
-    r[ADR(5, 4)] = a[ADR(5,0)]*b[ADR(0,4)]+a[ADR(5,1)]*b[ADR(1,4)]+a[ADR(5,2)]*b[ADR(2,4)]+a[ADR(5,3)]*b[ADR(3,4)]
-                 + a[ADR(5,4)]*b[ADR(4,4)]+a[ADR(5,5)]*b[ADR(5,4)]+a[ADR(5,6)]*b[ADR(6,4)]+a[ADR(5,7)]*b[ADR(7,4)];
-    r[ADR(5, 5)] = a[ADR(5,0)]*b[ADR(0,5)]+a[ADR(5,1)]*b[ADR(1,5)]+a[ADR(5,2)]*b[ADR(2,5)]+a[ADR(5,3)]*b[ADR(3,5)]
-                 + a[ADR(5,4)]*b[ADR(4,5)]+a[ADR(5,5)]*b[ADR(5,5)]+a[ADR(5,6)]*b[ADR(6,5)]+a[ADR(5,7)]*b[ADR(7,5)];
-    r[ADR(5, 6)] = a[ADR(5,0)]*b[ADR(0,6)]+a[ADR(5,1)]*b[ADR(1,6)]+a[ADR(5,2)]*b[ADR(2,6)]+a[ADR(5,3)]*b[ADR(3,6)]
-                 + a[ADR(5,4)]*b[ADR(4,6)]+a[ADR(5,5)]*b[ADR(5,6)]+a[ADR(5,6)]*b[ADR(6,6)]+a[ADR(5,7)]*b[ADR(7,6)];
-    r[ADR(5, 7)] = a[ADR(5,0)]*b[ADR(0,7)]+a[ADR(5,1)]*b[ADR(1,7)]+a[ADR(5,2)]*b[ADR(2,7)]+a[ADR(5,3)]*b[ADR(3,7)]
-                 + a[ADR(5,4)]*b[ADR(4,7)]+a[ADR(5,5)]*b[ADR(5,7)]+a[ADR(5,6)]*b[ADR(6,7)]+a[ADR(5,7)]*b[ADR(7,7)];
+    // Four blocks for storing result.
+    BLOCK(0, a0);
+    BLOCK(2, a2);
+    BLOCK(4, a4);
+    BLOCK(6, a6);
 
-    r[ADR(6, 0)] = a[ADR(6,0)]*b[ADR(0,0)]+a[ADR(6,1)]*b[ADR(1,0)]+a[ADR(6,2)]*b[ADR(2,0)]+a[ADR(6,3)]*b[ADR(3,0)]
-                 + a[ADR(6,4)]*b[ADR(4,0)]+a[ADR(6,5)]*b[ADR(5,0)]+a[ADR(6,6)]*b[ADR(6,0)]+a[ADR(6,7)]*b[ADR(7,0)];
-    r[ADR(6, 1)] = a[ADR(6,0)]*b[ADR(0,1)]+a[ADR(6,1)]*b[ADR(1,1)]+a[ADR(6,2)]*b[ADR(2,1)]+a[ADR(6,3)]*b[ADR(3,1)]
-                 + a[ADR(6,4)]*b[ADR(4,1)]+a[ADR(6,5)]*b[ADR(5,1)]+a[ADR(6,6)]*b[ADR(6,1)]+a[ADR(6,7)]*b[ADR(7,1)];
-    r[ADR(6, 2)] = a[ADR(6,0)]*b[ADR(0,2)]+a[ADR(6,1)]*b[ADR(1,2)]+a[ADR(6,2)]*b[ADR(2,2)]+a[ADR(6,3)]*b[ADR(3,2)]
-                 + a[ADR(6,4)]*b[ADR(4,2)]+a[ADR(6,5)]*b[ADR(5,2)]+a[ADR(6,6)]*b[ADR(6,2)]+a[ADR(6,7)]*b[ADR(7,2)];
-    r[ADR(6, 3)] = a[ADR(6,0)]*b[ADR(0,3)]+a[ADR(6,1)]*b[ADR(1,3)]+a[ADR(6,2)]*b[ADR(2,3)]+a[ADR(6,3)]*b[ADR(3,3)]
-                 + a[ADR(6,4)]*b[ADR(4,3)]+a[ADR(6,5)]*b[ADR(5,3)]+a[ADR(6,6)]*b[ADR(6,3)]+a[ADR(6,7)]*b[ADR(7,3)];
-    r[ADR(6, 4)] = a[ADR(6,0)]*b[ADR(0,4)]+a[ADR(6,1)]*b[ADR(1,4)]+a[ADR(6,2)]*b[ADR(2,4)]+a[ADR(6,3)]*b[ADR(3,4)]
-                 + a[ADR(6,4)]*b[ADR(4,4)]+a[ADR(6,5)]*b[ADR(5,4)]+a[ADR(6,6)]*b[ADR(6,4)]+a[ADR(6,7)]*b[ADR(7,4)];
-    r[ADR(6, 5)] = a[ADR(6,0)]*b[ADR(0,5)]+a[ADR(6,1)]*b[ADR(1,5)]+a[ADR(6,2)]*b[ADR(2,5)]+a[ADR(6,3)]*b[ADR(3,5)]
-                 + a[ADR(6,4)]*b[ADR(4,5)]+a[ADR(6,5)]*b[ADR(5,5)]+a[ADR(6,6)]*b[ADR(6,5)]+a[ADR(6,7)]*b[ADR(7,5)];
-    r[ADR(6, 6)] = a[ADR(6,0)]*b[ADR(0,6)]+a[ADR(6,1)]*b[ADR(1,6)]+a[ADR(6,2)]*b[ADR(2,6)]+a[ADR(6,3)]*b[ADR(3,6)]
-                 + a[ADR(6,4)]*b[ADR(4,6)]+a[ADR(6,5)]*b[ADR(5,6)]+a[ADR(6,6)]*b[ADR(6,6)]+a[ADR(6,7)]*b[ADR(7,6)];
-    r[ADR(6, 7)] = a[ADR(6,0)]*b[ADR(0,7)]+a[ADR(6,1)]*b[ADR(1,7)]+a[ADR(6,2)]*b[ADR(2,7)]+a[ADR(6,3)]*b[ADR(3,7)]
-                 + a[ADR(6,4)]*b[ADR(4,7)]+a[ADR(6,5)]*b[ADR(5,7)]+a[ADR(6,6)]*b[ADR(6,7)]+a[ADR(6,7)]*b[ADR(7,7)];
-
-    r[ADR(7, 0)] = a[ADR(7,0)]*b[ADR(0,0)]+a[ADR(7,1)]*b[ADR(1,0)]+a[ADR(7,2)]*b[ADR(2,0)]+a[ADR(7,3)]*b[ADR(3,0)]
-                 + a[ADR(7,4)]*b[ADR(4,0)]+a[ADR(7,5)]*b[ADR(5,0)]+a[ADR(7,6)]*b[ADR(6,0)]+a[ADR(7,7)]*b[ADR(7,0)];
-    r[ADR(7, 1)] = a[ADR(7,0)]*b[ADR(0,1)]+a[ADR(7,1)]*b[ADR(1,1)]+a[ADR(7,2)]*b[ADR(2,1)]+a[ADR(7,3)]*b[ADR(3,1)]
-                 + a[ADR(7,4)]*b[ADR(4,1)]+a[ADR(7,5)]*b[ADR(5,1)]+a[ADR(7,6)]*b[ADR(6,1)]+a[ADR(7,7)]*b[ADR(7,1)];
-    r[ADR(7, 2)] = a[ADR(7,0)]*b[ADR(0,2)]+a[ADR(7,1)]*b[ADR(1,2)]+a[ADR(7,2)]*b[ADR(2,2)]+a[ADR(7,3)]*b[ADR(3,2)]
-                 + a[ADR(7,4)]*b[ADR(4,2)]+a[ADR(7,5)]*b[ADR(5,2)]+a[ADR(7,6)]*b[ADR(6,2)]+a[ADR(7,7)]*b[ADR(7,2)];
-    r[ADR(7, 3)] = a[ADR(7,0)]*b[ADR(0,3)]+a[ADR(7,1)]*b[ADR(1,3)]+a[ADR(7,2)]*b[ADR(2,3)]+a[ADR(7,3)]*b[ADR(3,3)]
-                 + a[ADR(7,4)]*b[ADR(4,3)]+a[ADR(7,5)]*b[ADR(5,3)]+a[ADR(7,6)]*b[ADR(6,3)]+a[ADR(7,7)]*b[ADR(7,3)];
-    r[ADR(7, 4)] = a[ADR(7,0)]*b[ADR(0,4)]+a[ADR(7,1)]*b[ADR(1,4)]+a[ADR(7,2)]*b[ADR(2,4)]+a[ADR(7,3)]*b[ADR(3,4)]
-                 + a[ADR(7,4)]*b[ADR(4,4)]+a[ADR(7,5)]*b[ADR(5,4)]+a[ADR(7,6)]*b[ADR(6,4)]+a[ADR(7,7)]*b[ADR(7,4)];
-    r[ADR(7, 5)] = a[ADR(7,0)]*b[ADR(0,5)]+a[ADR(7,1)]*b[ADR(1,5)]+a[ADR(7,2)]*b[ADR(2,5)]+a[ADR(7,3)]*b[ADR(3,5)]
-                 + a[ADR(7,4)]*b[ADR(4,5)]+a[ADR(7,5)]*b[ADR(5,5)]+a[ADR(7,6)]*b[ADR(6,5)]+a[ADR(7,7)]*b[ADR(7,5)];
-    r[ADR(7, 6)] = a[ADR(7,0)]*b[ADR(0,6)]+a[ADR(7,1)]*b[ADR(1,6)]+a[ADR(7,2)]*b[ADR(2,6)]+a[ADR(7,3)]*b[ADR(3,6)]
-                 + a[ADR(7,4)]*b[ADR(4,6)]+a[ADR(7,5)]*b[ADR(5,6)]+a[ADR(7,6)]*b[ADR(6,6)]+a[ADR(7,7)]*b[ADR(7,6)];
-    r[ADR(7, 7)] = a[ADR(7,0)]*b[ADR(0,7)]+a[ADR(7,1)]*b[ADR(1,7)]+a[ADR(7,2)]*b[ADR(2,7)]+a[ADR(7,3)]*b[ADR(3,7)]
-                 + a[ADR(7,4)]*b[ADR(4,7)]+a[ADR(7,5)]*b[ADR(5,7)]+a[ADR(7,6)]*b[ADR(6,7)]+a[ADR(7,7)]*b[ADR(7,7)];
+#undef BLOCK
 
 #endif
 

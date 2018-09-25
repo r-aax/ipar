@@ -21,7 +21,7 @@ float get(__m512 v, int i)
 {
     float arr[16];
 
-    ST(&arr[0], v);
+    _mm512_store_ps(&arr[0], v);
 
     return arr[i];
 }
@@ -35,9 +35,9 @@ void set(__m512 *v, int i, float f)
 {
     float arr[16];
 
-    ST(&arr[0], *v);
+    _mm512_store_ps(&arr[0], *v);
     arr[i] = f;
-    *v = LD(&arr[0]);
+    *v = _mm512_load_ps(&arr[0]);
 }
 
 /// \brief Print __m512 vector.
