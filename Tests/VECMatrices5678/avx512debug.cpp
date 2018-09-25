@@ -10,6 +10,36 @@
 
 using namespace std;
 
+/// \brief Get <c>i</c>-th element from vector.
+///
+/// \param[in] v - vector
+/// \param[in] i - index
+///
+/// \return
+/// Element.
+float get(__m512 v, int i)
+{
+    float arr[16];
+
+    ST(&arr[0], v);
+
+    return arr[i];
+}
+
+/// \brief Set <c>i</c>-th element in vector.
+///
+/// \param[in,out] v - vector
+/// \param[in] i - index
+/// \param[in] f - value
+void set(__m512 *v, int i, float f)
+{
+    float arr[16];
+
+    ST(&arr[0], *v);
+    arr[i] = f;
+    *v = LD(&arr[0]);
+}
+
 /// \brief Print __m512 vector.
 ///
 /// \param v - vector

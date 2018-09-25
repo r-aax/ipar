@@ -8,6 +8,8 @@
 
 #include <immintrin.h>
 
+float get(__m512 v, int i);
+void set(__m512 *v, int i, float f);
 void print_m512(__m512 v);
 
 #endif
