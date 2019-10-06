@@ -10,76 +10,143 @@
 #include <math.h>
 #include "tri_box_intersect.h"
 
+/// @brief Mini flag.
+#define MINI 0
+
 using namespace Utils;
 
 /// @brief Datas.
 
 float Ax[]
 {
+#if MINI == 0
 #include "ax.txt"
+#else
+#include "ax_mini.txt"
+#endif
 };
 const int TESTS_COUNT = sizeof(Ax) / sizeof(float);
 float Ay[TESTS_COUNT]
 {
+#if MINI == 0
 #include "ay.txt"
+#else
+#include "ay_mini.txt"
+#endif
 };
 float Az[TESTS_COUNT]
 {
+#if MINI == 0
 #include "az.txt"
+#else
+#include "az_mini.txt"
+#endif
 };
 float Bx[TESTS_COUNT]
 {
+#if MINI == 0
 #include "bx.txt"
+#else
+#include "bx_mini.txt"
+#endif
 };
 float By[TESTS_COUNT]
 {
+#if MINI == 0
 #include "by.txt"
+#else
+#include "by_mini.txt"
+#endif
 };
 float Bz[TESTS_COUNT]
 {
+#if MINI == 0
 #include "bz.txt"
+#else
+#include "bz_mini.txt"
+#endif
 };
 float Cx[TESTS_COUNT]
 {
+#if MINI == 0
 #include "cx.txt"
+#else
+#include "cx_mini.txt"
+#endif
 };
 float Cy[TESTS_COUNT]
 {
+#if MINI == 0
 #include "cy.txt"
+#else
+#include "cy_mini.txt"
+#endif
 };
 float Cz[TESTS_COUNT]
 {
+#if MINI == 0
 #include "cz.txt"
+#else
+#include "cz_mini.txt"
+#endif
 };
 float Xl[TESTS_COUNT]
 {
+#if MINI == 0
 #include "xl.txt"
+#else
+#include "xl_mini.txt"
+#endif
 };
 float Xh[TESTS_COUNT]
 {
+#if MINI == 0
 #include "xh.txt"
+#else
+#include "xh_mini.txt"
+#endif
 };
 float Yl[TESTS_COUNT]
 {
+#if MINI == 0
 #include "yl.txt"
+#else
+#include "yl_mini.txt"
+#endif
 };
 float Yh[TESTS_COUNT]
 {
+#if MINI == 0
 #include "yh.txt"
+#else
+#include "yh_mini.txt"
+#endif
 };
 float Zl[TESTS_COUNT]
 {
+#if MINI == 0
 #include "zl.txt"
+#else
+#include "zl_mini.txt"
+#endif
 };
 float Zh[TESTS_COUNT]
 {
+#if MINI == 0
 #include "zh.txt"
+#else
+#include "zh_mini.txt"
+#endif
 };
 
 /// @brief Original results.
 bool R_orig[TESTS_COUNT]
 {
+#if MINI == 0
 #include "r.txt"
+#else
+#include "r_mini.txt"
+#endif
 };
 
 /// @brief Optimized results.
