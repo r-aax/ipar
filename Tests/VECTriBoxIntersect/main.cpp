@@ -10,31 +10,77 @@
 #include <math.h>
 #include "tri_box_intersect.h"
 
-/// @brief Tests count.
-#define TESTS_COUNT 10
-
 using namespace Utils;
 
 /// @brief Datas.
 
-float Ax[TESTS_COUNT];
-float Ay[TESTS_COUNT];
-float Az[TESTS_COUNT];
-float Bx[TESTS_COUNT];
-float By[TESTS_COUNT];
-float Bz[TESTS_COUNT];
-float Cx[TESTS_COUNT];
-float Cy[TESTS_COUNT];
-float Cz[TESTS_COUNT];
-float Xl[TESTS_COUNT];
-float Xh[TESTS_COUNT];
-float Yl[TESTS_COUNT];
-float Yh[TESTS_COUNT];
-float Zl[TESTS_COUNT];
-float Zh[TESTS_COUNT];
+float Ax[]
+{
+#include "ax.txt"
+};
+const int TESTS_COUNT = sizeof(Ax) / sizeof(int);
+float Ay[TESTS_COUNT]
+{
+#include "ay.txt"
+};
+float Az[TESTS_COUNT]
+{
+#include "az.txt"
+};
+float Bx[TESTS_COUNT]
+{
+#include "bx.txt"
+};
+float By[TESTS_COUNT]
+{
+#include "by.txt"
+};
+float Bz[TESTS_COUNT]
+{
+#include "bz.txt"
+};
+float Cx[TESTS_COUNT]
+{
+#include "cx.txt"
+};
+float Cy[TESTS_COUNT]
+{
+#include "cy.txt"
+};
+float Cz[TESTS_COUNT]
+{
+#include "cz.txt"
+};
+float Xl[TESTS_COUNT]
+{
+#include "xl.txt"
+};
+float Xh[TESTS_COUNT]
+{
+#include "xh.txt"
+};
+float Yl[TESTS_COUNT]
+{
+#include "yl.txt"
+};
+float Yh[TESTS_COUNT]
+{
+#include "yh.txt"
+};
+float Zl[TESTS_COUNT]
+{
+#include "zl.txt"
+};
+float Zh[TESTS_COUNT]
+{
+#include "zh.txt"
+};
 
 /// @brief Original results.
-bool R_orig[TESTS_COUNT];
+bool R_orig[TESTS_COUNT]
+{
+#include "r.txt"
+};
 
 /// @brief Optimized results.
 bool R_opt[TESTS_COUNT];
