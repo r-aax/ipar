@@ -18,7 +18,7 @@ float Ax[]
 {
 #include "ax.txt"
 };
-const int TESTS_COUNT = sizeof(Ax) / sizeof(int);
+const int TESTS_COUNT = sizeof(Ax) / sizeof(float);
 float Ay[TESTS_COUNT]
 {
 #include "ay.txt"
@@ -102,19 +102,21 @@ clean_array(float *a,
 /// Check function.
 ///
 /// @return
-/// All cases are right.
-static bool
+/// Fault range.
+static float
 check()
 {
+    int c = 0;
+
     for (int i = 0; i < TESTS_COUNT; i++)
     {
         if (R_orig[i] != R_opt[i])
         {
-            return false;
+            c++;
         }
     }
 
-    return true;
+    return 100.0 * ((float)c / (float)TESTS_COUNT);
 }
 
 /// @brief Main function.
@@ -142,19 +144,23 @@ main(int argc,
 
     Timer *timer = new Timer(Timer::OMP);
     double time_orig, time_opt;
-    bool is_ok;
+    float fault_range;
 
     // Original.
     timer->Init();
+#if 1
     for (int i = 0; i < repeats_count; i++)
     {
         tri_box_intersects_orig(Ax, Ay, Az, Bx, By, Bz, Cx, Cy, Cz, Xl, Xh, Yl, Yh, Zl, Zh, TESTS_COUNT, R_orig);
     }
+#endif
     timer->Start();
+#if 1
     for (int i = 0; i < repeats_count; i++)
     {
         tri_box_intersects_orig(Ax, Ay, Az, Bx, By, Bz, Cx, Cy, Cz, Xl, Xh, Yl, Yh, Zl, Zh, TESTS_COUNT, R_orig);
     }
+#endif
     timer->Stop();
     time_orig = timer->Time();
 
@@ -173,11 +179,11 @@ main(int argc,
     time_opt = timer->Time();
 
     // Check.
-    is_ok = check();
+    fault_range = check();
 
     cout << "VECTriBoxIntersect : orig = " << time_orig << ", opt = " << time_opt << endl;
     cout << "VECTriBoxIntersect : speedup = " << ((time_orig - time_opt) / time_orig) * 100.0 << "%" << endl;
-    cout << "VECTriBoxIntersect : check = " << is_ok << endl;
+    cout << "VECTriBoxIntersect : fault_range = " << fault_range << "%" << endl;
     cout << "------------------------------------------------" << endl;
 
     delete timer;
