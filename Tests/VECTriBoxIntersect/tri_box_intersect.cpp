@@ -354,24 +354,24 @@ tri_box_intersects_opt_16(float * __restrict__ xa,
 
     for (int w = 0; w < VEC_WIDTH; w++)
     {
-        int i;
-        bool i_do;
-
         r[w] = true;
+    }
 
+    int i, j;
+
+    for (int w = 0; w < VEC_WIDTH; w++)
+    {
         i = 0;
-        i_do = true;
 
-        while ((i < basic_eqns_count) && i_do)
+        while ((i < basic_eqns_count) && r[w])
         {
             float bi0 = b[i][0][w];
 
             if (bi0 != 0.0)
             {
-                int j = i + 1;
-                bool j_do = true;
+                j = i + 1;
 
-                while ((j < basic_eqns_count) && j_do)
+                while ((j < basic_eqns_count) && r[w])
                 {
                     if (bi0 * b[j][0][w] < 0.0)
                     {
@@ -384,12 +384,7 @@ tri_box_intersects_opt_16(float * __restrict__ xa,
                             f1 = -f1;
                         }
 
-                        if (!upgrade_solution_opt(&lo[w], &hi[w], f0, f1))
-                        {
-                            r[w] = false;
-                            i_do = false;
-                            j_do = false;
-                        }
+                        r[w] = upgrade_solution_opt(&lo[w], &hi[w], f0, f1);
                     }
 
                     j++;
@@ -401,17 +396,11 @@ tri_box_intersects_opt_16(float * __restrict__ xa,
 
         i = 0;
 
-        while ((i < basic_eqns_count) && i_do)
+        while ((i < basic_eqns_count) && r[w])
         {
-            float bi0 = b[i][0][w];
-
-            if (bi0 == 0.0)
+            if (b[i][0][w] == 0.0)
             {
-                if (!upgrade_solution_opt(&lo[w], &hi[w], b[i][1][w], b[i][2][w]))
-                {
-                    r[w] = false;
-                    i_do = false;
-                }
+                r[w] = upgrade_solution_opt(&lo[w], &hi[w], b[i][1][w], b[i][2][w]);
             }
 
             i++;
