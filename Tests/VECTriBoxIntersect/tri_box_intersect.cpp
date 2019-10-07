@@ -354,24 +354,19 @@ tri_box_intersects_opt_16(float * __restrict__ xa,
 
     for (int w = 0; w < VEC_WIDTH; w++)
     {
+        int i;
+        bool i_do;
+
         r[w] = true;
 
-        int i = 0;
-        bool i_do = true;
+        i = 0;
+        i_do = true;
 
         while ((i < basic_eqns_count) && i_do)
         {
             float bi0 = b[i][0][w];
 
-            if (bi0 == 0.0)
-            {
-                if (!upgrade_solution_opt(&lo[w], &hi[w], b[i][1][w], b[i][2][w]))
-                {
-                    r[w] = false;
-                    i_do = false;
-                }
-            }
-            else
+            if (bi0 != 0.0)
             {
                 int j = i + 1;
                 bool j_do = true;
@@ -398,6 +393,24 @@ tri_box_intersects_opt_16(float * __restrict__ xa,
                     }
 
                     j++;
+                }
+            }
+
+            i++;
+        }
+
+        i = 0;
+
+        while ((i < basic_eqns_count) && i_do)
+        {
+            float bi0 = b[i][0][w];
+
+            if (bi0 == 0.0)
+            {
+                if (!upgrade_solution_opt(&lo[w], &hi[w], b[i][1][w], b[i][2][w]))
+                {
+                    r[w] = false;
+                    i_do = false;
                 }
             }
 

@@ -11,7 +11,7 @@ fi
 FLAGS="-O3"
 #INFO_FLAGS="-qopt-report=5"
 INFO_FLAGS=""
-EXE="VECTrBoxIntersect.out"
+EXE="VECTriBoxIntersect.out"
 
 rm -f $EXE
 
