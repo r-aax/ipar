@@ -11,12 +11,13 @@
 #include <string>
 
 #include "../../Utils/Maths.h"
+#include "avx512.h"
 
 using namespace std;
 
-#ifdef INTEL
+//#ifdef INTEL
 #include <immintrin.h>
-#endif
+//#endif
 
 /// @brief Upgrade interval.
 ///
@@ -283,7 +284,7 @@ tri_box_intersects_orig(float * __restrict__ ax,
     }
 }
 
-void
+__m512i
 tri_box_intersects_opt_16(float * __restrict__ xa,
                           float * __restrict__ ya,
                           float * __restrict__ za,
@@ -298,24 +299,17 @@ tri_box_intersects_opt_16(float * __restrict__ xa,
                           float * __restrict__ yl,
                           float * __restrict__ yh,
                           float * __restrict__ zl,
-                          float * __restrict__ zh,
-                          bool * __restrict__ r)
+                          float * __restrict__ zh)
 {
 
 #if 0
 
-    for (int i = 0; i < VEC_WIDTH; i++)
-    {
-        r[i] = tri_box_intersect_opt(ax[i], ay[i], az[i],
-                                     bx[i], by[i], bz[i],
-                                     cx[i], cy[i], cz[i],
-                                     xl[i], xh[i],
-                                     yl[i], yh[i],
-                                     zl[i], zh[i]);
-    }
+    // Origin.
+    ;
 
 #else
 
+    bool r[VEC_WIDTH];
     const int basic_eqns_count = 8;
     float lo[VEC_WIDTH];
     float hi[VEC_WIDTH];
@@ -407,6 +401,8 @@ tri_box_intersects_opt_16(float * __restrict__ xa,
         }
     }
 
+    return _mm512_load_epi32(&r[0]);
+
 #endif
 
 }
@@ -437,12 +433,12 @@ tri_box_intersects_opt(float * __restrict__ ax,
 {
     for (int i = 0; i < c; i += VEC_WIDTH)
     {
-        tri_box_intersects_opt_16(&ax[i], &ay[i], &az[i],
-                                 &bx[i], &by[i], &bz[i],
-                                 &cx[i], &cy[i], &cz[i],
-                                 &xl[i], &xh[i],
-                                 &yl[i], &yh[i],
-                                 &zl[i], &zh[i],
-                                 &r[i]);
+        __m512i res = tri_box_intersects_opt_16(&ax[i], &ay[i], &az[i],
+                                                &bx[i], &by[i], &bz[i],
+                                                &cx[i], &cy[i], &cz[i],
+                                                &xl[i], &xh[i],
+                                                &yl[i], &yh[i],
+                                                &zl[i], &zh[i]);
+        _mm512_store_epi32(&r[i], res);
     }
 }
