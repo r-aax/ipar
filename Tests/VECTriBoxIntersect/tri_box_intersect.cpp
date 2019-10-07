@@ -321,6 +321,7 @@ tri_box_intersects_opt_16(float * __restrict__ xa,
     float hi[VEC_WIDTH];
     float b[basic_eqns_count][3][VEC_WIDTH];
 
+    // Init.
     for (int w = 0; w < VEC_WIDTH; w++)
     {
         lo[w] = 0.0;
@@ -349,9 +350,16 @@ tri_box_intersects_opt_16(float * __restrict__ xa,
         b[7][0][w] = -1.0;
         b[7][1][w] = 0.0;
         b[7][2][w] = 0.0;
+    }
 
-        // Выполнение свертки.
-        for (int i = 0; i < basic_eqns_count; i++)
+    for (int w = 0; w < VEC_WIDTH; w++)
+    {
+        r[w] = true;
+
+        int i = 0;
+        bool i_do = true;
+
+        while ((i < basic_eqns_count) && i_do)
         {
             float bi0 = b[i][0][w];
 
@@ -360,13 +368,15 @@ tri_box_intersects_opt_16(float * __restrict__ xa,
                 if (!upgrade_solution_opt(&lo[w], &hi[w], b[i][1][w], b[i][2][w]))
                 {
                     r[w] = false;
-
-                    goto LL;
+                    i_do = false;
                 }
             }
             else
             {
-                for (int j = i + 1; j < basic_eqns_count; j++)
+                int j = i + 1;
+                bool j_do = true;
+
+                while ((j < basic_eqns_count) && j_do)
                 {
                     if (bi0 * b[j][0][w] < 0.0)
                     {
@@ -382,18 +392,17 @@ tri_box_intersects_opt_16(float * __restrict__ xa,
                         if (!upgrade_solution_opt(&lo[w], &hi[w], f0, f1))
                         {
                             r[w] = false;
-
-                            goto LL;
+                            i_do = false;
+                            j_do = false;
                         }
                     }
+
+                    j++;
                 }
             }
+
+            i++;
         }
-
-        r[w] = true;
-LL:
-    ;
-
     }
 
 #endif
