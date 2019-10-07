@@ -217,10 +217,10 @@ tri_box_intersect_opt(float xa,
                       float zl,
                       float zh)
 {
-    float lo = -1000000.0;
-    float hi = 1000000.0;
+    float lo = 0.0;
+    float hi = 1.0;
 
-    const int basic_eqns_count = 10;
+    const int basic_eqns_count = 8;
     float b[basic_eqns_count][3];
     b[0][0] = xb - xa;
     b[0][1] = xc - xa;
@@ -246,12 +246,6 @@ tri_box_intersect_opt(float xa,
     b[7][0] = -1.0;
     b[7][1] = 0.0;
     b[7][2] = 0.0;
-    b[8][0] = 0.0;
-    b[8][1] = 1.0;
-    b[8][2] = -1.0;
-    b[9][0] = 0.0;
-    b[9][1] = -1.0;
-    b[9][2] = 0.0;
 
     // Выполнение свертки.
     for (int i = 0; i < basic_eqns_count; i++)
@@ -265,15 +259,10 @@ tri_box_intersect_opt(float xa,
         }
         else
         {
-            // Коэффициент ненулевой.
-            // Работаем с двумя неравенствами.
             for (int j = i + 1; j < basic_eqns_count; j++)
             {
                 if (b[i][0] * b[j][0] < 0.0)
                 {
-                    // Нашли разнознаковые неравенства.
-                    // Определяем, кто какого знака.
-
                     int p, q;
 
                     if (b[i][0] > 0.0)
@@ -298,7 +287,6 @@ tri_box_intersect_opt(float xa,
         }
     }
 
-    // Если не отвалились до сих пор, то решение есть.
     return true;
 }
 
