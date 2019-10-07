@@ -230,11 +230,11 @@ clean_array(float *a,
 /// @return
 /// Fault range.
 static float
-check()
+check(int tests_count)
 {
     int c = 0;
 
-    for (int i = 0; i < TESTS_COUNT; i++)
+    for (int i = 0; i < tests_count; i++)
     {
         if (R_orig[i] != R_opt[i])
         {
@@ -242,7 +242,7 @@ check()
         }
     }
 
-    return 100.0 * ((float)c / (float)TESTS_COUNT);
+    return 100.0 * ((float)c / (float)tests_count);
 }
 
 /// @brief Main function.
@@ -255,7 +255,7 @@ main(int argc,
 {
     cout << "================================================" << endl;
 
-    int tests_count = TESTS_COUNT;
+    int tests_count = TESTS_COUNT - TESTS_COUNT % VEC_WIDTH;
     int repeats_count = 1;
 
     // Parse repeats count if given.
@@ -277,14 +277,14 @@ main(int argc,
 #if 1
     for (int i = 0; i < repeats_count; i++)
     {
-        tri_box_intersects_orig(Ax, Ay, Az, Bx, By, Bz, Cx, Cy, Cz, Xl, Xh, Yl, Yh, Zl, Zh, TESTS_COUNT, R_orig);
+        tri_box_intersects_orig(Ax, Ay, Az, Bx, By, Bz, Cx, Cy, Cz, Xl, Xh, Yl, Yh, Zl, Zh, tests_count, R_orig);
     }
 #endif
     timer->Start();
 #if 1
     for (int i = 0; i < repeats_count; i++)
     {
-        tri_box_intersects_orig(Ax, Ay, Az, Bx, By, Bz, Cx, Cy, Cz, Xl, Xh, Yl, Yh, Zl, Zh, TESTS_COUNT, R_orig);
+        tri_box_intersects_orig(Ax, Ay, Az, Bx, By, Bz, Cx, Cy, Cz, Xl, Xh, Yl, Yh, Zl, Zh, tests_count, R_orig);
     }
 #endif
     timer->Stop();
@@ -294,18 +294,18 @@ main(int argc,
     timer->Init();
     for (int i = 0; i < repeats_count; i++)
     {
-        tri_box_intersects_opt(Ax, Ay, Az, Bx, By, Bz, Cx, Cy, Cz, Xl, Xh, Yl, Yh, Zl, Zh, TESTS_COUNT, R_opt);
+        tri_box_intersects_opt(Ax, Ay, Az, Bx, By, Bz, Cx, Cy, Cz, Xl, Xh, Yl, Yh, Zl, Zh, tests_count, R_opt);
     }
     timer->Start();
     for (int i = 0; i < repeats_count; i++)
     {
-        tri_box_intersects_opt(Ax, Ay, Az, Bx, By, Bz, Cx, Cy, Cz, Xl, Xh, Yl, Yh, Zl, Zh, TESTS_COUNT, R_opt);
+        tri_box_intersects_opt(Ax, Ay, Az, Bx, By, Bz, Cx, Cy, Cz, Xl, Xh, Yl, Yh, Zl, Zh, tests_count, R_opt);
     }
     timer->Stop();
     time_opt = timer->Time();
 
     // Check.
-    fault_range = check();
+    fault_range = check(tests_count);
 
     cout << "VECTriBoxIntersect : orig = " << time_orig << ", opt = " << time_opt << endl;
     cout << "VECTriBoxIntersect : speedup = " << ((time_orig - time_opt) / time_orig) * 100.0 << "%" << endl;

@@ -18,6 +18,34 @@ using namespace std;
 #include <immintrin.h>
 #endif
 
+/// @brief Upgrade interval.
+///
+/// @return
+/// <c>true</c>, if current solve interval is not zero,
+/// <c>false</c>, otherwise.
+bool
+upgrade_solution_orig(float * __restrict__ lo,
+                      float * __restrict__ hi,
+                      float f0,
+                      float f1)
+{
+    if (f0 > 0.0)
+    {
+        *hi = Utils::Min(*hi, -f1 / f0);
+    }
+    else if (f0 < 0.0)
+    {
+        *lo = Utils::Max(*lo, -f1 / f0);
+    }
+    else
+    {
+        // Interval didn't change.
+        return f1 <= 0.0;
+    }
+
+    return *lo <= *hi;
+}
+
 /// @brief Origin single case.
 bool
 tri_box_intersect_orig(float xa,
@@ -36,7 +64,10 @@ tri_box_intersect_orig(float xa,
                        float zl,
                        float zh)
 {
-    const int basic_eqns_count = 10;
+    float lo = 0.0;
+    float hi = 1.0;
+
+    const int basic_eqns_count = 8;
     float b[basic_eqns_count][3];
     b[0][0] = xb - xa;
     b[0][1] = xc - xa;
@@ -62,112 +93,43 @@ tri_box_intersect_orig(float xa,
     b[7][0] = -1.0;
     b[7][1] = 0.0;
     b[7][2] = 0.0;
-    b[8][0] = 0.0;
-    b[8][1] = 1.0;
-    b[8][2] = -1.0;
-    b[9][0] = 0.0;
-    b[9][1] = -1.0;
-    b[9][2] = 0.0;
-
-    int n = 0;
-    float f[18][2];
 
     // Выполнение свертки.
     for (int i = 0; i < basic_eqns_count; i++)
     {
-        if (b[i][0] == 0.0)
+        float bi0 = b[i][0];
+
+        if (bi0 == 0.0)
         {
-            // Нулевой коэффициент, неравенство переходит as is.
-            f[n][0] = b[i][1];
-            f[n][1] = b[i][2];
-            n++;
+            if (!upgrade_solution_orig(&lo, &hi, b[i][1], b[i][2]))
+            {
+                return false;
+            }
         }
         else
         {
-            // Коэффициент ненулевой.
-            // Работаем с двумя неравенствами.
             for (int j = i + 1; j < basic_eqns_count; j++)
             {
-                if (b[i][0] * b[j][0] < 0.0)
+                if (bi0 * b[j][0] < 0.0)
                 {
-                    // Нашли разнознаковые неравенства.
-                    // Определяем, кто какого знака.
+                    float f0 = bi0 * b[j][1] - b[j][0] * b[i][1];
+                    float f1 = bi0 * b[j][2] - b[j][0] * b[i][2];
 
-                    int p, q;
-
-                    if (b[i][0] > 0.0)
+                    if (bi0 < 0.0)
                     {
-                        p = i;
-                        q = j;
-                    }
-                    else
-                    {
-                        p = j;
-                        q = i;
+                        f0 = -f0;
+                        f1 = -f1;
                     }
 
-                    // Сворачиваем два неравенства в одно.
-                    f[n][0] = b[p][0] * b[q][1] - b[q][0] * b[p][1];
-                    f[n][1] = b[p][0] * b[q][2] - b[q][0] * b[p][2];
-                    n++;
+                    if (!upgrade_solution_orig(&lo, &hi, f0, f1))
+                    {
+                        return false;
+                    }
                 }
             }
         }
     }
 
-    float lo = 0.0;
-    float hi = 0.0;
-    bool is_lo_init = false;
-    bool is_hi_init = false;
-
-    for (int i = 0; i < n; i++)
-    {
-        if (f[i][0] > 0.0)
-        {
-            float k = -f[i][1] / f[i][0];
-
-            // Неравенство kx + v <= 0 (k > 0).
-            // Верхняя граница.
-            if (!is_hi_init || (k < hi))
-            {
-                hi = k;
-                is_hi_init = true;
-            }
-        }
-        else if (f[i][0] < 0.0)
-        {
-            float k = -f[i][1] / f[i][0];
-
-            // Неравенство kx + v <= 0 (k < 0).
-            // Нижняя граница.
-            // kx <= -v => x >= -v / k
-            if (!is_lo_init || k > lo)
-            {
-                lo = k;
-                is_lo_init = true;
-            }
-        }
-        else
-        {
-            // Нулевой коэффициент, проверяем тождество.
-            if (f[i][1] > 0.0)
-            {
-                // Встретили неравенство positive_value <= 0.0.
-                // Система неразрешима.
-                return false;
-            }
-        }
-
-        if (is_lo_init
-            && is_hi_init
-            && (hi < lo))
-        {
-            // Пересечение уже нулевое.
-            return false;
-        }
-    }
-
-    // Если не отвалились до сих пор, то решение есть.
     return true;
 }
 
@@ -177,10 +139,10 @@ tri_box_intersect_orig(float xa,
 /// <c>true</c>, if current solve interval is not zero,
 /// <c>false</c>, otherwise.
 bool
-upgrade_solution(float *lo,
-                 float *hi,
-                 float f0,
-                 float f1)
+upgrade_solution_opt(float * __restrict__ lo,
+                     float * __restrict__ hi,
+                     float f0,
+                     float f1)
 {
     if (f0 > 0.0)
     {
@@ -250,9 +212,11 @@ tri_box_intersect_opt(float xa,
     // Выполнение свертки.
     for (int i = 0; i < basic_eqns_count; i++)
     {
-        if (b[i][0] == 0.0)
+        float bi0 = b[i][0];
+
+        if (bi0 == 0.0)
         {
-            if (!upgrade_solution(&lo, &hi, b[i][1], b[i][2]))
+            if (!upgrade_solution_opt(&lo, &hi, b[i][1], b[i][2]))
             {
                 return false;
             }
@@ -261,24 +225,18 @@ tri_box_intersect_opt(float xa,
         {
             for (int j = i + 1; j < basic_eqns_count; j++)
             {
-                if (b[i][0] * b[j][0] < 0.0)
+                if (bi0 * b[j][0] < 0.0)
                 {
-                    int p, q;
+                    float f0 = bi0 * b[j][1] - b[j][0] * b[i][1];
+                    float f1 = bi0 * b[j][2] - b[j][0] * b[i][2];
 
-                    if (b[i][0] > 0.0)
+                    if (bi0 < 0.0)
                     {
-                        p = i;
-                        q = j;
-                    }
-                    else
-                    {
-                        p = j;
-                        q = i;
+                        f0 = -f0;
+                        f1 = -f1;
                     }
 
-                    if (!upgrade_solution(&lo, &hi,
-                                          b[p][0] * b[q][1] - b[q][0] * b[p][1],
-                                          b[p][0] * b[q][2] - b[q][0] * b[p][2]))
+                    if (!upgrade_solution_opt(&lo, &hi, f0, f1))
                     {
                         return false;
                     }
@@ -296,12 +254,23 @@ tri_box_intersect_opt(float xa,
 /// @param [in] c - Count.
 /// @param [out] r - Results.
 void
-tri_box_intersects_orig(float *ax, float *ay, float *az,
-                        float *bx, float *by, float *bz,
-                        float *cx, float *cy, float *cz,
-                        float *xl, float *xh, float *yl, float *yh, float *zl, float *zh,
+tri_box_intersects_orig(float * __restrict__ ax,
+                        float * __restrict__ ay,
+                        float * __restrict__ az,
+                        float * __restrict__ bx,
+                        float * __restrict__ by,
+                        float * __restrict__ bz,
+                        float * __restrict__ cx,
+                        float * __restrict__ cy,
+                        float * __restrict__ cz,
+                        float * __restrict__ xl,
+                        float * __restrict__ xh,
+                        float * __restrict__ yl,
+                        float * __restrict__ yh,
+                        float * __restrict__ zl,
+                        float * __restrict__ zh,
                         int c,
-                        bool *r)
+                        bool * __restrict__ r)
 {
     for (int i = 0; i < c; i++)
     {
@@ -314,26 +283,155 @@ tri_box_intersects_orig(float *ax, float *ay, float *az,
     }
 }
 
+void
+tri_box_intersects_opt_16(float * __restrict__ xa,
+                          float * __restrict__ ya,
+                          float * __restrict__ za,
+                          float * __restrict__ xb,
+                          float * __restrict__ yb,
+                          float * __restrict__ zb,
+                          float * __restrict__ xc,
+                          float * __restrict__ yc,
+                          float * __restrict__ zc,
+                          float * __restrict__ xl,
+                          float * __restrict__ xh,
+                          float * __restrict__ yl,
+                          float * __restrict__ yh,
+                          float * __restrict__ zl,
+                          float * __restrict__ zh,
+                          bool * __restrict__ r)
+{
+
+#if 0
+
+    for (int i = 0; i < VEC_WIDTH; i++)
+    {
+        r[i] = tri_box_intersect_opt(ax[i], ay[i], az[i],
+                                     bx[i], by[i], bz[i],
+                                     cx[i], cy[i], cz[i],
+                                     xl[i], xh[i],
+                                     yl[i], yh[i],
+                                     zl[i], zh[i]);
+    }
+
+#else
+
+    const int basic_eqns_count = 8;
+    float lo[VEC_WIDTH];
+    float hi[VEC_WIDTH];
+    float b[basic_eqns_count][3][VEC_WIDTH];
+
+    for (int w = 0; w < VEC_WIDTH; w++)
+    {
+        lo[w] = 0.0;
+        hi[w] = 1.0;
+        b[0][0][w] = xb[w] - xa[w];
+        b[0][1][w] = xc[w] - xa[w];
+        b[0][2][w] = -(xh[w] - xa[w]);
+        b[1][0][w] = -(xb[w] - xa[w]);
+        b[1][1][w] = -(xc[w] - xa[w]);
+        b[1][2][w] = xl[w] - xa[w];
+        b[2][0][w] = yb[w] - ya[w];
+        b[2][1][w] = yc[w] - ya[w];
+        b[2][2][w] = -(yh[w] - ya[w]);
+        b[3][0][w] = -(yb[w] - ya[w]);
+        b[3][1][w] = -(yc[w] - ya[w]);
+        b[3][2][w] = yl[w] - ya[w];
+        b[4][0][w] = zb[w] - za[w];
+        b[4][1][w] = zc[w] - za[w];
+        b[4][2][w] = -(zh[w] - za[w]);
+        b[5][0][w] = -(zb[w] - za[w]);
+        b[5][1][w] = -(zc[w] - za[w]);
+        b[5][2][w] = zl[w] - za[w];
+        b[6][0][w] = 1.0;
+        b[6][1][w] = 0.0;
+        b[6][2][w] = -1.0;
+        b[7][0][w] = -1.0;
+        b[7][1][w] = 0.0;
+        b[7][2][w] = 0.0;
+
+        // Выполнение свертки.
+        for (int i = 0; i < basic_eqns_count; i++)
+        {
+            float bi0 = b[i][0][w];
+
+            if (bi0 == 0.0)
+            {
+                if (!upgrade_solution_opt(&lo[w], &hi[w], b[i][1][w], b[i][2][w]))
+                {
+                    r[w] = false;
+
+                    goto LL;
+                }
+            }
+            else
+            {
+                for (int j = i + 1; j < basic_eqns_count; j++)
+                {
+                    if (bi0 * b[j][0][w] < 0.0)
+                    {
+                        float f0 = bi0 * b[j][1][w] - b[j][0][w] * b[i][1][w];
+                        float f1 = bi0 * b[j][2][w] - b[j][0][w] * b[i][2][w];
+
+                        if (bi0 < 0.0)
+                        {
+                            f0 = -f0;
+                            f1 = -f1;
+                        }
+
+                        if (!upgrade_solution_opt(&lo[w], &hi[w], f0, f1))
+                        {
+                            r[w] = false;
+
+                            goto LL;
+                        }
+                    }
+                }
+            }
+        }
+
+        r[w] = true;
+LL:
+    ;
+
+    }
+
+#endif
+
+}
+
 /// @brief Optimized fucntion.
 ///
 /// @param [in] ax-zh - Datas.
 /// @param [in] c - Count.
 /// @param [out] r - Results.
 void
-tri_box_intersects_opt(float *ax, float *ay, float *az,
-                       float *bx, float *by, float *bz,
-                       float *cx, float *cy, float *cz,
-                       float *xl, float *xh, float *yl, float *yh, float *zl, float *zh,
+tri_box_intersects_opt(float * __restrict__ ax,
+                       float * __restrict__ ay,
+                       float * __restrict__ az,
+                       float * __restrict__ bx,
+                       float * __restrict__ by,
+                       float * __restrict__ bz,
+                       float * __restrict__ cx,
+                       float * __restrict__ cy,
+                       float * __restrict__ cz,
+                       float * __restrict__ xl,
+                       float * __restrict__ xh,
+                       float * __restrict__ yl,
+                       float * __restrict__ yh,
+                       float * __restrict__ zl,
+                       float * __restrict__ zh,
                        int c,
-                       bool *r)
+                       bool * __restrict__ r)
 {
-    for (int i = 0; i < c; i++)
+    for (int i = 0; i < c; i += VEC_WIDTH)
     {
-        r[i] = tri_box_intersect_opt(ax[i], ay[i], az[i],
-                                      bx[i], by[i], bz[i],
-                                      cx[i], cy[i], cz[i],
-                                      xl[i], xh[i],
-                                      yl[i], yh[i],
-                                      zl[i], zh[i]);
+        tri_box_intersects_opt_16(&ax[i], &ay[i], &az[i],
+                                 &bx[i], &by[i], &bz[i],
+                                 &cx[i], &cy[i], &cz[i],
+                                 &xl[i], &xh[i],
+                                 &yl[i], &yh[i],
+                                 &zl[i], &zh[i],
+                                 &r[i]);
     }
 }
