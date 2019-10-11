@@ -495,7 +495,10 @@ tri_box_intersects_opt_16(float * __restrict__ xa,
             c_loop_i = (i < basic_eqns_count) && r[w];
         }
         while (c_loop_i);
+    }
 
+    for (int w = 0; w < VEC_WIDTH; w++)
+    {
         i = 0;
 
         do
