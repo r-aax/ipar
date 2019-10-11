@@ -471,32 +471,39 @@ tri_box_intersects_opt_16(float * __restrict__ xa,
     //--------------------------------------------------------------------------
     // first loop
 
-    for (int w = 0; w < VEC_WIDTH; w++)
     {
         int i = 0;
-        bool m = true;
+        __mmask16 m = 0xFFFF;
+        __m512 zlo = LD(&lo[0]);
+        __m512 zhi = LD(&hi[0]);
 
         do
         {
-            float f0 = b[i][1][w];
-            float f1 = b[i][2][w];
-            float k;
-            bool c_body = m && (b[i][0][w] == 0.0);
-            bool c_f0z = c_body && (f0 == 0.0);
-            bool c_f0p = c_body && (f0 > 0.0);
-            bool c_f0n = c_body && (f0 < 0.0);
-            bool c_f1p = c_body && (f1 > 0.0);
+            __m512 f0 = LD(&b[i][1][0]);
+            __m512 f1 = LD(&b[i][2][0]);
+            __m512 k;
 
-            COND_EXE(lo[w] = hi[w] + 1.0, c_f0z && c_f1p);
-            COND_EXE(k = -f1 / f0, !c_f0z);
-            COND_EXE(hi[w] = Utils::Min(hi[w], k), c_f0p);
-            COND_EXE(lo[w] = Utils::Max(lo[w], k), c_f0n);
-            COND_EXE(r[w] = ((lo[w] <= hi[w]) ? 1 : 0), c_body);
+            __mmask16 c_body = m & _mm512_cmpeq_ps_mask(LD(&b[i][0][0]), z0);
+            __mmask16 c_f0z = c_body & _mm512_cmpeq_ps_mask(f0, z0);
+            __mmask16 c_f0p = c_body & ~_mm512_cmple_ps_mask(f0, z0);
+            __mmask16 c_f0n = c_body & _mm512_cmplt_ps_mask(f0, z0);
+            __mmask16 c_f1p = c_body & ~_mm512_cmple_ps_mask(f1, z0);
+
+            zlo = _mm512_mask_add_ps(zlo, c_f0z & c_f1p, zhi, z1);
+            k = _mm512_mask_div_ps(k, ~c_f0z, f1, f0);
+            k = SUB(z0, k);
+            zhi = _mm512_mask_min_ps(zhi, c_f0p, zhi, k);
+            zlo = _mm512_mask_max_ps(zlo, c_f0n, zlo, k);
+            _mm512_mask_store_ps(&r[0], c_body,
+                                 _mm512_mask_blend_ps(_mm512_cmple_ps_mask(zlo, zhi), z0, z1));
 
             i++;
-            m = m && (r[w] == 1);
+            m = m & _mm512_cmple_ps_mask(zlo, zhi);
         }
         while ((i < basic_eqns_count) && m);
+
+        ST(&lo[0], zlo);
+        ST(&hi[0], zhi);
     }
 
     //--------------------------------------------------------------------------
