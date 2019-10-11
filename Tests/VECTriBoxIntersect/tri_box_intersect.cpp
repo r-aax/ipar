@@ -470,10 +470,7 @@ tri_box_intersects_opt_16(float * __restrict__ xa,
     ST(&b[7][2][0], z0);
 
     // Result init.
-    for (int w = 0; w < VEC_WIDTH; w++)
-    {
-        r[w] = 1;
-    }
+    _mm512_store_epi32(r, _mm512_set1_epi32(1));
 
     // Main loop.
     for (int w = 0; w < VEC_WIDTH; w++)
