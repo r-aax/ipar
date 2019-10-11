@@ -468,18 +468,20 @@ tri_box_intersects_opt_16(float * __restrict__ xa,
     // Init result.
     _mm512_store_epi32(r, _mm512_set1_epi32(1));
 
-    int i, j;
+    //--------------------------------------------------------------------------
+    // first loop
 
     for (int w = 0; w < VEC_WIDTH; w++)
     {
-        i = 0;
+        int i = 0;
+        bool m = true;
 
         do
         {
             float f0 = b[i][1][w];
             float f1 = b[i][2][w];
             float k;
-            bool c_body = (b[i][0][w] == 0.0);
+            bool c_body = m && (b[i][0][w] == 0.0);
             bool c_f0z = c_body && (f0 == 0.0);
             bool c_f0p = c_body && (f0 > 0.0);
             bool c_f0n = c_body && (f0 < 0.0);
@@ -492,13 +494,17 @@ tri_box_intersects_opt_16(float * __restrict__ xa,
             COND_EXE(r[w] = ((lo[w] <= hi[w]) ? 1 : 0), c_body);
 
             i++;
-            c_loop_i = (i < basic_eqns_count) && r[w];
+            m = m && (r[w] == 1);
         }
-        while (c_loop_i);
+        while ((i < basic_eqns_count) && m);
     }
+
+    //--------------------------------------------------------------------------
 
     for (int w = 0; w < VEC_WIDTH; w++)
     {
+        int i, j;
+
         i = 0;
 
         do
