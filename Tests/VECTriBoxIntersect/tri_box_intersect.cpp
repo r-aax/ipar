@@ -407,18 +407,22 @@ __m512 z1 = SETONE();
 #endif
 
 void
-update_lo_hi_opt(bool m,
-                 float f0,
-                 float f1,
-                 float *lo,
-                 float *hi)
+update_lo_hi_opt(__mmask16 m,
+                 __m512 f0,
+                 __m512 f1,
+                 __m512 *lo,
+                 __m512 *hi)
 {
-    float k;
+    __mmask16 c_f0z = _mm512_cmpeq_ps_mask(f0, z0);
+    __mmask16 c_f0n = _mm512_cmplt_ps_mask(f0, z0);
+    __mmask16 c_f0p = ~(c_f0z | c_f0n);
+    __mmask16 c_f1p = _mm512_cmplt_ps_mask(z0, f1);
+    __m512 k = _mm512_mask_div_ps(k, ~(m & c_f0z), f1, f0);
 
-    COND_EXE(*lo = *hi + 1.0, m && (f0 == 0.0) && (f1 > 0.0));
-    COND_EXE(k = -f1 / f0, !(m && (f0 == 0.0)));
-    COND_EXE(*hi = Utils::Min(*hi, k), m && (f0 > 0.0));
-    COND_EXE(*lo = Utils::Max(*lo, k), m && (f0 < 0.0));
+    k = SUB(z0, k);
+    *lo = _mm512_mask_add_ps(*lo, m & c_f0z & c_f1p, *hi, z1);
+    *hi = _mm512_mask_min_ps(*hi, m & c_f0p, *hi, k);
+    *lo = _mm512_mask_max_ps(*lo, m & c_f0n, *lo, k);
 }
 
 void
@@ -440,7 +444,6 @@ tri_box_intersects_opt_16(float * __restrict__ xa,
                           int * __restrict__ r)
 {
     const int basic_eqns_count = 8;
-    float lo, hi;
     float b[basic_eqns_count][3][VEC_WIDTH];
 
     // Init.
@@ -472,54 +475,56 @@ tri_box_intersects_opt_16(float * __restrict__ xa,
     // Result init.
     _mm512_store_epi32(r, _mm512_set1_epi32(1));
 
+    //
     // Main loop.
-    for (int w = 0; w < VEC_WIDTH; w++)
-    {
-        lo = 0.0;
-        hi = 1.0;
+    //
 
-        for (int i = 0; i < basic_eqns_count; i++)
+    __m512 lo = z0;
+    __m512 hi = z1;
+
+    for (int i = 0; i < basic_eqns_count; i++)
+    {
+        update_lo_hi_opt(_mm512_cmpeq_ps_mask(LD(&b[i][0][0]), z0),
+                         LD(&b[i][1][0]),
+                         LD(&b[i][2][0]),
+                         &lo, &hi);
+
+        if (!_mm512_cmplt_ps_mask(lo, hi))
         {
-            update_lo_hi_opt(b[i][0][w] == 0.0,
-                             b[i][1][w],
-                             b[i][2][w],
+            break;
+        }
+    }
+
+    for (int i = 0; i < basic_eqns_count; i++)
+    {
+        __m512 bi0 = LD(&b[i][0][0]);
+        __m512 abi0 = ABS(bi0);
+
+        for (int j = i + 1; j < basic_eqns_count; j++)
+        {
+            __m512 bj0 = LD(&b[j][0][0]);
+            __m512 abj0 = ABS(bj0);
+
+            update_lo_hi_opt(_mm512_cmplt_ps_mask(MUL(bi0, bj0), z0),
+                             ADD(MUL(abi0, LD(&b[j][1][0])), MUL(abj0, LD(&b[i][1][0]))),
+                             ADD(MUL(abi0, LD(&b[j][2][0])), MUL(abj0, LD(&b[i][2][0]))),
                              &lo, &hi);
 
-            if (lo > hi)
+            if (!_mm512_cmplt_ps_mask(lo, hi))
             {
                 break;
             }
         }
 
-        for (int i = 0; i < basic_eqns_count; i++)
+        if (!_mm512_cmplt_ps_mask(lo, hi))
         {
-            float bi0 = b[i][0][w];
-            float abi0 = fabs(bi0);
-
-            for (int j = i + 1; j < basic_eqns_count; j++)
-            {
-                float bj0 = b[j][0][w];
-                float abj0 = fabs(bj0);
-
-                update_lo_hi_opt(bi0 * bj0 < 0.0,
-                                 abi0 * b[j][1][w] + abj0 * b[i][1][w],
-                                 abi0 * b[j][2][w] + abj0 * b[i][2][w],
-                                 &lo, &hi);
-
-                if (lo > hi)
-                {
-                    break;
-                }
-            }
-
-            if (lo > hi)
-            {
-                break;
-            }
+            break;
         }
-
-        COND_EXE(r[w] = 0, lo > hi);
     }
+
+    _mm512_mask_store_epi32(r,
+                            _mm512_cmplt_ps_mask(hi, lo),
+                            _mm512_set1_epi32(0));
 }
 
 /// @brief Original function.
