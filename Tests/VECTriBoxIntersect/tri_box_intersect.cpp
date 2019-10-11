@@ -275,7 +275,7 @@ tri_box_intersects_orig_16(float * __restrict__ xa,
                            float * __restrict__ yh,
                            float * __restrict__ zl,
                            float * __restrict__ zh,
-                           bool * __restrict__ r)
+                           int * __restrict__ r)
 {
     const int basic_eqns_count = 8;
     float lo[VEC_WIDTH];
@@ -317,7 +317,7 @@ tri_box_intersects_orig_16(float * __restrict__ xa,
 
     for (int w = 0; w < VEC_WIDTH; w++)
     {
-        r[w] = true;
+        r[w] = 1;
     }
 
     int i, j;
@@ -341,7 +341,7 @@ tri_box_intersects_orig_16(float * __restrict__ xa,
             COND_EXE(k = -f1 / f0, !c_f0z);
             COND_EXE(hi[w] = Utils::Min(hi[w], k), c_f0p);
             COND_EXE(lo[w] = Utils::Max(lo[w], k), c_f0n);
-            COND_EXE(r[w] = (lo[w] <= hi[w]), c_body);
+            COND_EXE(r[w] = ((lo[w] <= hi[w]) ? 1 : 0), c_body);
 
             i++;
             c_loop_i = (i < basic_eqns_count) && r[w];
@@ -376,7 +376,7 @@ tri_box_intersects_orig_16(float * __restrict__ xa,
                 COND_EXE(k = -f1 / f0, !c_f0z);
                 COND_EXE(hi[w] = Utils::Min(hi[w], k), c_f0p);
                 COND_EXE(lo[w] = Utils::Max(lo[w], k), c_f0n);
-                COND_EXE(r[w] = (lo[w] <= hi[w]), c_body);
+                COND_EXE(r[w] = ((lo[w] <= hi[w]) ? 1 : 0), c_body);
 
                 j++;
                 c_loop_j = (j < basic_eqns_count) && r[w];
@@ -428,7 +428,7 @@ tri_box_intersects_opt_16(float * __restrict__ xa,
                           float * __restrict__ yh,
                           float * __restrict__ zl,
                           float * __restrict__ zh,
-                          bool * __restrict__ r)
+                          int * __restrict__ r)
 {
     const int basic_eqns_count = 8;
     float lo[VEC_WIDTH];
@@ -468,7 +468,7 @@ tri_box_intersects_opt_16(float * __restrict__ xa,
     // Init result.
     for (int w = 0; w < VEC_WIDTH; w++)
     {
-        r[w] = true;
+        r[w] = 1;
     }
 
     int i, j;
@@ -492,7 +492,7 @@ tri_box_intersects_opt_16(float * __restrict__ xa,
             COND_EXE(k = -f1 / f0, !c_f0z);
             COND_EXE(hi[w] = Utils::Min(hi[w], k), c_f0p);
             COND_EXE(lo[w] = Utils::Max(lo[w], k), c_f0n);
-            COND_EXE(r[w] = (lo[w] <= hi[w]), c_body);
+            COND_EXE(r[w] = ((lo[w] <= hi[w]) ? 1 : 0), c_body);
 
             i++;
             c_loop_i = (i < basic_eqns_count) && r[w];
@@ -527,7 +527,7 @@ tri_box_intersects_opt_16(float * __restrict__ xa,
                 COND_EXE(k = -f1 / f0, !c_f0z);
                 COND_EXE(hi[w] = Utils::Min(hi[w], k), c_f0p);
                 COND_EXE(lo[w] = Utils::Max(lo[w], k), c_f0n);
-                COND_EXE(r[w] = (lo[w] <= hi[w]), c_body);
+                COND_EXE(r[w] = ((lo[w] <= hi[w]) ? 1 : 0), c_body);
 
                 j++;
                 c_loop_j = (j < basic_eqns_count) && r[w];
@@ -562,7 +562,7 @@ tri_box_intersects_orig(float * __restrict__ ax,
                         float * __restrict__ zl,
                         float * __restrict__ zh,
                         int c,
-                        bool * __restrict__ r)
+                        int * __restrict__ r)
 {
     for (int i = 0; i < c; i += VEC_WIDTH)
     {
@@ -598,7 +598,7 @@ tri_box_intersects_opt(float * __restrict__ ax,
                        float * __restrict__ zl,
                        float * __restrict__ zh,
                        int c,
-                       bool * __restrict__ r)
+                       int * __restrict__ r)
 {
     for (int i = 0; i < c; i += VEC_WIDTH)
     {

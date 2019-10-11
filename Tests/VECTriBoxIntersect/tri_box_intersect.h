@@ -28,7 +28,7 @@ tri_box_intersects_orig(float * __restrict__ ax,
                         float * __restrict__ zl,
                         float * __restrict__ zh,
                         int c,
-                        bool * __restrict__ r);
+                        int * __restrict__ r);
 
 // Optimized fucntion.
 void
@@ -48,6 +48,6 @@ tri_box_intersects_opt(float * __restrict__ ax,
                        float * __restrict__ zl,
                        float * __restrict__ zh,
                        int c,
-                       bool * __restrict__ r);
+                       int * __restrict__ r);
 
 #endif // !TRI_BOX_INTERSECTS

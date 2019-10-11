@@ -198,8 +198,8 @@ float Zh[TESTS_COUNT]
 
 };
 
-/// @brief Original results.
-bool R_orig[TESTS_COUNT]
+/// @brief Original results in bool.
+bool R_orig_bool[TESTS_COUNT]
 {
 #if MINI == 0
 #include "r.txt"
@@ -208,8 +208,11 @@ bool R_orig[TESTS_COUNT]
 #endif
 };
 
+/// @brief Original results.
+int R_orig[TESTS_COUNT];
+
 /// @brief Optimized results.
-bool R_opt[TESTS_COUNT];
+int R_opt[TESTS_COUNT];
 
 /// @brief Clean array.
 ///
@@ -253,6 +256,11 @@ int
 main(int argc,
      char **argv)
 {
+    for (int i = 0; i < TESTS_COUNT; i++)
+    {
+        R_orig[i] = (R_orig_bool[i] ? 1 : 0);
+    }
+
     cout << "================================================" << endl;
 
     int tests_count = TESTS_COUNT - TESTS_COUNT % VEC_WIDTH;
