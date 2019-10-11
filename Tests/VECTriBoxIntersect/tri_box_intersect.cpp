@@ -380,6 +380,12 @@ tri_box_intersects_orig_16(float * __restrict__ xa,
 //
 //
 
+#define COND_EXE(command, pred) \
+if (pred) \
+{ \
+    command; \
+}
+
 void
 tri_box_intersects_opt_16(float * __restrict__ xa,
                           float * __restrict__ ya,
@@ -458,30 +464,11 @@ tri_box_intersects_opt_16(float * __restrict__ xa,
             bool c_f0n = c_body && (f0 < 0.0);
             bool c_f1p = c_body && (f1 > 0.0);
 
-            if (c_f0z && c_f1p)
-            {
-                lo[w] = hi[w] + 1.0;
-            }
-
-            if (!c_f0z)
-            {
-                k = -f1 / f0;
-            }
-
-            if (c_f0p)
-            {
-                hi[w] = Utils::Min(hi[w], k);
-            }
-
-            if (c_f0n)
-            {
-                lo[w] = Utils::Max(lo[w], k);
-            }
-
-            if (c_body)
-            {
-                r[w] = (lo[w] <= hi[w]);
-            }
+            COND_EXE(lo[w] = hi[w] + 1.0, c_f0z && c_f1p);
+            COND_EXE(k = -f1 / f0, !c_f0z);
+            COND_EXE(hi[w] = Utils::Min(hi[w], k), c_f0p);
+            COND_EXE(lo[w] = Utils::Max(lo[w], k), c_f0n);
+            COND_EXE(r[w] = (lo[w] <= hi[w]), c_body);
 
             i++;
             c_loop_i = (i < basic_eqns_count) && r[w];
@@ -512,30 +499,11 @@ tri_box_intersects_opt_16(float * __restrict__ xa,
                 bool c_f0n = c_body && (f0 < 0.0);
                 bool c_f1p = c_body && (f1 > 0.0);
 
-                if (c_f0z && c_f1p)
-                {
-                    lo[w] = hi[w] + 1.0;
-                }
-
-                if (!c_f0z)
-                {
-                    k = -f1 / f0;
-                }
-
-                if (c_f0p)
-                {
-                    hi[w] = Utils::Min(hi[w], k);
-                }
-
-                if (c_f0n)
-                {
-                    lo[w] = Utils::Max(lo[w], k);
-                }
-
-                if (c_body)
-                {
-                    r[w] = (lo[w] <= hi[w]);
-                }
+                COND_EXE(lo[w] = hi[w] + 1.0, c_f0z && c_f1p);
+                COND_EXE(k = -f1 / f0, !c_f0z);
+                COND_EXE(hi[w] = Utils::Min(hi[w], k), c_f0p);
+                COND_EXE(lo[w] = Utils::Max(lo[w], k), c_f0n);
+                COND_EXE(r[w] = (lo[w] <= hi[w]), c_body);
 
                 j++;
                 c_loop_j = (j < basic_eqns_count) && r[w];
