@@ -444,33 +444,30 @@ tri_box_intersects_opt_16(float * __restrict__ xa,
     float b[basic_eqns_count][3][VEC_WIDTH];
 
     // Init.
-    for (int w = 0; w < VEC_WIDTH; w++)
-    {
-        b[0][0][w] = xb[w] - xa[w];
-        b[0][1][w] = xc[w] - xa[w];
-        b[0][2][w] = -(xh[w] - xa[w]);
-        b[1][0][w] = -(xb[w] - xa[w]);
-        b[1][1][w] = -(xc[w] - xa[w]);
-        b[1][2][w] = xl[w] - xa[w];
-        b[2][0][w] = yb[w] - ya[w];
-        b[2][1][w] = yc[w] - ya[w];
-        b[2][2][w] = -(yh[w] - ya[w]);
-        b[3][0][w] = -(yb[w] - ya[w]);
-        b[3][1][w] = -(yc[w] - ya[w]);
-        b[3][2][w] = yl[w] - ya[w];
-        b[4][0][w] = zb[w] - za[w];
-        b[4][1][w] = zc[w] - za[w];
-        b[4][2][w] = -(zh[w] - za[w]);
-        b[5][0][w] = -(zb[w] - za[w]);
-        b[5][1][w] = -(zc[w] - za[w]);
-        b[5][2][w] = zl[w] - za[w];
-        b[6][0][w] = 1.0;
-        b[6][1][w] = 0.0;
-        b[6][2][w] = -1.0;
-        b[7][0][w] = -1.0;
-        b[7][1][w] = 0.0;
-        b[7][2][w] = 0.0;
-    }
+    ST(&b[0][0][0], SUB(LD(xb), LD(xa)));
+    ST(&b[0][1][0], SUB(LD(xc), LD(xa)));
+    ST(&b[0][2][0], SUB(LD(xa), LD(xh)));
+    ST(&b[1][0][0], SUB(LD(xa), LD(xb)));
+    ST(&b[1][1][0], SUB(LD(xa), LD(xc)));
+    ST(&b[1][2][0], SUB(LD(xl), LD(xa)));
+    ST(&b[2][0][0], SUB(LD(yb), LD(ya)));
+    ST(&b[2][1][0], SUB(LD(yc), LD(ya)));
+    ST(&b[2][2][0], SUB(LD(ya), LD(yh)));
+    ST(&b[3][0][0], SUB(LD(ya), LD(yb)));
+    ST(&b[3][1][0], SUB(LD(ya), LD(yc)));
+    ST(&b[3][2][0], SUB(LD(yl), LD(ya)));
+    ST(&b[4][0][0], SUB(LD(zb), LD(za)));
+    ST(&b[4][1][0], SUB(LD(zc), LD(za)));
+    ST(&b[4][2][0], SUB(LD(za), LD(zh)));
+    ST(&b[5][0][0], SUB(LD(za), LD(zb)));
+    ST(&b[5][1][0], SUB(LD(za), LD(zc)));
+    ST(&b[5][2][0], SUB(LD(zl), LD(za)));
+    ST(&b[6][0][0], z1);
+    ST(&b[6][1][0], z0);
+    ST(&b[6][2][0], SET1(-1.0));
+    ST(&b[7][0][0], SET1(-1.0));
+    ST(&b[7][1][0], z0);
+    ST(&b[7][2][0], z0);
 
     // Result init.
     for (int w = 0; w < VEC_WIDTH; w++)
