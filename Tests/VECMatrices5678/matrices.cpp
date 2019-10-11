@@ -14,9 +14,9 @@
 //--------------------------------------------------------------------------------------------------
 
 // Modes.
-#define OLD_VEC     1
+#define OLD_VEC     0
 #define FULL_UNROLL 0
-#define NEW_VEC     0
+#define NEW_VEC     1
 
 //--------------------------------------------------------------------------------------------------
 
@@ -422,7 +422,7 @@ void om_mult_mm_7x7_orig(float * __restrict a,
     {
         for (int j = 0; j < V8; j++)
         {
-            r[ADDR(i, j)] = 0.0;
+            r[ADR(i, j)] = 0.0;
         }
     }
 
@@ -743,7 +743,7 @@ void om_mult_mm_6x6_orig(float * __restrict a,
     {
         for (int j = 0; j < V8; j++)
         {
-            r[ADDR(i, j)] = 0.0;
+            r[ADR(i, j)] = 0.0;
         }
     }
 
@@ -926,7 +926,7 @@ void om_mult_mm_6x6_opt(float * __restrict a,
                  + a[ADR(4,4)]*b[ADR(4,5)]+a[ADR(4,5)]*b[ADR(5,5)];
     r[ADR(4, 6)] = 0.0;
     r[ADR(4, 7)] = 0.0;
-    
+
     r[ADR(5, 0)] = a[ADR(5,0)]*b[ADR(0,0)]+a[ADR(5,1)]*b[ADR(1,0)]+a[ADR(5,2)]*b[ADR(2,0)]+a[ADR(5,3)]*b[ADR(3,0)]
                  + a[ADR(5,4)]*b[ADR(4,0)]+a[ADR(5,5)]*b[ADR(5,0)];
     r[ADR(5, 1)] = a[ADR(5,0)]*b[ADR(0,1)]+a[ADR(5,1)]*b[ADR(1,1)]+a[ADR(5,2)]*b[ADR(2,1)]+a[ADR(5,3)]*b[ADR(3,1)]
@@ -1021,7 +1021,7 @@ void om_mult_mm_6x6_opt(float * __restrict a,
     BLOCK(0, a0);
     BLOCK(2, a2);
     BLOCK(4, a4);
-    
+
     ST(&r[6 * V8], SETZERO());
 
 #undef BLOCK
@@ -1047,7 +1047,7 @@ void om_mult_mm_5x5_orig(float * __restrict a,
     {
         for (int j = 0; j < V8; j++)
         {
-            r[ADDR(i, j)] = 0.0;
+            r[ADR(i, j)] = 0.0;
         }
     }
 
@@ -1309,7 +1309,7 @@ void om_mult_mm_5x5_opt(float * __restrict a,
     BLOCK(2, a2);
     BLOCK(4, a4);
 
-    ST(&r[6 * V8], SETZERO())
+    ST(&r[6 * V8], SETZERO());
 
 #undef BLOCK
 

@@ -145,21 +145,25 @@ upgrade_solution_opt(float * __restrict__ lo,
                      float f0,
                      float f1)
 {
-    if (f0 > 0.0)
+    if (f0 == 0.0)
     {
-        *hi = Utils::Min(*hi, -f1 / f0);
-    }
-    else if (f0 < 0.0)
-    {
-        *lo = Utils::Max(*lo, -f1 / f0);
+        return f1 <= 0.0;
     }
     else
     {
-        // Interval didn't change.
-        return f1 <= 0.0;
-    }
+        float k = -f1 / f0;
 
-    return *lo <= *hi;
+        if (f0 > 0.0)
+        {
+            *hi = Utils::Min(*hi, -f1 / f0);
+        }
+        else
+        {
+            *lo = Utils::Max(*lo, -f1 / f0);
+        }
+
+        return *lo <= *hi;
+    }
 }
 
 /// @brief Origin single case.
@@ -249,67 +253,24 @@ tri_box_intersect_opt(float xa,
     return true;
 }
 
-/// @brief Original function.
-///
-/// @param [in] ax-zh - Datas.
-/// @param [in] c - Count.
-/// @param [out] r - Results.
 void
-tri_box_intersects_orig(float * __restrict__ ax,
-                        float * __restrict__ ay,
-                        float * __restrict__ az,
-                        float * __restrict__ bx,
-                        float * __restrict__ by,
-                        float * __restrict__ bz,
-                        float * __restrict__ cx,
-                        float * __restrict__ cy,
-                        float * __restrict__ cz,
-                        float * __restrict__ xl,
-                        float * __restrict__ xh,
-                        float * __restrict__ yl,
-                        float * __restrict__ yh,
-                        float * __restrict__ zl,
-                        float * __restrict__ zh,
-                        int c,
-                        bool * __restrict__ r)
+tri_box_intersects_orig_16(float * __restrict__ xa,
+                           float * __restrict__ ya,
+                           float * __restrict__ za,
+                           float * __restrict__ xb,
+                           float * __restrict__ yb,
+                           float * __restrict__ zb,
+                           float * __restrict__ xc,
+                           float * __restrict__ yc,
+                           float * __restrict__ zc,
+                           float * __restrict__ xl,
+                           float * __restrict__ xh,
+                           float * __restrict__ yl,
+                           float * __restrict__ yh,
+                           float * __restrict__ zl,
+                           float * __restrict__ zh,
+                           bool * __restrict__ r)
 {
-    for (int i = 0; i < c; i++)
-    {
-        r[i] = tri_box_intersect_orig(ax[i], ay[i], az[i],
-                                      bx[i], by[i], bz[i],
-                                      cx[i], cy[i], cz[i],
-                                      xl[i], xh[i],
-                                      yl[i], yh[i],
-                                      zl[i], zh[i]);
-    }
-}
-
-__m512i
-tri_box_intersects_opt_16(float * __restrict__ xa,
-                          float * __restrict__ ya,
-                          float * __restrict__ za,
-                          float * __restrict__ xb,
-                          float * __restrict__ yb,
-                          float * __restrict__ zb,
-                          float * __restrict__ xc,
-                          float * __restrict__ yc,
-                          float * __restrict__ zc,
-                          float * __restrict__ xl,
-                          float * __restrict__ xh,
-                          float * __restrict__ yl,
-                          float * __restrict__ yh,
-                          float * __restrict__ zl,
-                          float * __restrict__ zh)
-{
-
-#if 0
-
-    // Origin.
-    ;
-
-#else
-
-    bool r[VEC_WIDTH];
     const int basic_eqns_count = 8;
     float lo[VEC_WIDTH];
     float hi[VEC_WIDTH];
@@ -378,7 +339,7 @@ tri_box_intersects_opt_16(float * __restrict__ xa,
                             f1 = -f1;
                         }
 
-                        r[w] = upgrade_solution_opt(&lo[w], &hi[w], f0, f1);
+                        r[w] = upgrade_solution_orig(&lo[w], &hi[w], f0, f1);
                     }
 
                     j++;
@@ -394,17 +355,233 @@ tri_box_intersects_opt_16(float * __restrict__ xa,
         {
             if (b[i][0][w] == 0.0)
             {
-                r[w] = upgrade_solution_opt(&lo[w], &hi[w], b[i][1][w], b[i][2][w]);
+                r[w] = upgrade_solution_orig(&lo[w], &hi[w], b[i][1][w], b[i][2][w]);
             }
 
             i++;
         }
     }
+}
 
-    return _mm512_load_epi32(&r[0]);
+//
+//
+//
+// I).
+// bi0 * bj0 < 0
+// if (bi0 > 0) // bj0 < 0
+//     bi0 * bj1 - bj0 * bi1
+// if (bi0 < 0) // bj0 > 0
+//     -bi0 * bj1 + bj0 * bi1
+// RESUME : r = abs(bi0) * bj1 - abs(bj0) * bi1
+//
+// II).
+// do-while (first iteration is always to be done)
+//
+//
+//
 
-#endif
+void
+tri_box_intersects_opt_16(float * __restrict__ xa,
+                          float * __restrict__ ya,
+                          float * __restrict__ za,
+                          float * __restrict__ xb,
+                          float * __restrict__ yb,
+                          float * __restrict__ zb,
+                          float * __restrict__ xc,
+                          float * __restrict__ yc,
+                          float * __restrict__ zc,
+                          float * __restrict__ xl,
+                          float * __restrict__ xh,
+                          float * __restrict__ yl,
+                          float * __restrict__ yh,
+                          float * __restrict__ zl,
+                          float * __restrict__ zh,
+                          bool * __restrict__ r)
+{
+    const int basic_eqns_count = 8;
+    float lo[VEC_WIDTH];
+    float hi[VEC_WIDTH];
+    float b[basic_eqns_count][3][VEC_WIDTH];
 
+    bool c_loop_i, c_loop_j;
+
+    // Init.
+    for (int w = 0; w < VEC_WIDTH; w++)
+    {
+        lo[w] = 0.0;
+        hi[w] = 1.0;
+        b[0][0][w] = xb[w] - xa[w];
+        b[0][1][w] = xc[w] - xa[w];
+        b[0][2][w] = -(xh[w] - xa[w]);
+        b[1][0][w] = -(xb[w] - xa[w]);
+        b[1][1][w] = -(xc[w] - xa[w]);
+        b[1][2][w] = xl[w] - xa[w];
+        b[2][0][w] = yb[w] - ya[w];
+        b[2][1][w] = yc[w] - ya[w];
+        b[2][2][w] = -(yh[w] - ya[w]);
+        b[3][0][w] = -(yb[w] - ya[w]);
+        b[3][1][w] = -(yc[w] - ya[w]);
+        b[3][2][w] = yl[w] - ya[w];
+        b[4][0][w] = zb[w] - za[w];
+        b[4][1][w] = zc[w] - za[w];
+        b[4][2][w] = -(zh[w] - za[w]);
+        b[5][0][w] = -(zb[w] - za[w]);
+        b[5][1][w] = -(zc[w] - za[w]);
+        b[5][2][w] = zl[w] - za[w];
+        b[6][0][w] = 1.0;
+        b[6][1][w] = 0.0;
+        b[6][2][w] = -1.0;
+        b[7][0][w] = -1.0;
+        b[7][1][w] = 0.0;
+        b[7][2][w] = 0.0;
+    }
+
+    for (int w = 0; w < VEC_WIDTH; w++)
+    {
+        r[w] = true;
+    }
+
+    int i, j;
+
+    for (int w = 0; w < VEC_WIDTH; w++)
+    {
+        i = 0;
+
+        do
+        {
+            float f0 = b[i][1][w];
+            float f1 = b[i][2][w];
+            float k;
+            bool c_body = (b[i][0][w] == 0.0);
+            bool c_f0z = c_body && (f0 == 0.0);
+            bool c_f0p = c_body && (f0 > 0.0);
+            bool c_f0n = c_body && (f0 < 0.0);
+            bool c_f1p = c_body && (f1 > 0.0);
+
+            if (c_f0z && c_f1p)
+            {
+                lo[w] = hi[w] + 1.0;
+            }
+
+            if (!c_f0z)
+            {
+                k = -f1 / f0;
+            }
+
+            if (c_f0p)
+            {
+                hi[w] = Utils::Min(hi[w], k);
+            }
+
+            if (c_f0n)
+            {
+                lo[w] = Utils::Max(lo[w], k);
+            }
+
+            if (c_body)
+            {
+                r[w] = (lo[w] <= hi[w]);
+            }
+
+            i++;
+            c_loop_i = (i < basic_eqns_count) && r[w];
+        }
+        while (c_loop_i);
+
+        i = 0;
+
+        do
+        {
+            float bi0 = b[i][0][w];
+            float abi0 = fabs(bi0);
+            bool c_bi0z = (bi0 == 0.0);
+
+            j = i + 1;
+            c_loop_j = !c_bi0z;
+
+            while (c_loop_j)
+            {
+                float bj0 = b[j][0][w];
+                float abj0 = fabs(bj0);
+                float f0 = abi0 * b[j][1][w] + abj0 * b[i][1][w];
+                float f1 = abi0 * b[j][2][w] + abj0 * b[i][2][w];
+                float k;
+                bool c_body = (bi0 * bj0 < 0.0);
+                bool c_f0z = c_body && (f0 == 0.0);
+                bool c_f0p = c_body && (f0 > 0.0);
+                bool c_f0n = c_body && (f0 < 0.0);
+                bool c_f1p = c_body && (f1 > 0.0);
+
+                if (c_f0z && c_f1p)
+                {
+                    lo[w] = hi[w] + 1.0;
+                }
+
+                if (!c_f0z)
+                {
+                    k = -f1 / f0;
+                }
+
+                if (c_f0p)
+                {
+                    hi[w] = Utils::Min(hi[w], k);
+                }
+
+                if (c_f0n)
+                {
+                    lo[w] = Utils::Max(lo[w], k);
+                }
+
+                if (c_body)
+                {
+                    r[w] = (lo[w] <= hi[w]);
+                }
+
+                j++;
+                c_loop_j = (j < basic_eqns_count) && r[w];
+            }
+
+            i++;
+            c_loop_i = (i < basic_eqns_count - 1) && r[w];
+        }
+        while (c_loop_i);
+    }
+}
+
+/// @brief Original function.
+///
+/// @param [in] ax-zh - Datas.
+/// @param [in] c - Count.
+/// @param [out] r - Results.
+void
+tri_box_intersects_orig(float * __restrict__ ax,
+                        float * __restrict__ ay,
+                        float * __restrict__ az,
+                        float * __restrict__ bx,
+                        float * __restrict__ by,
+                        float * __restrict__ bz,
+                        float * __restrict__ cx,
+                        float * __restrict__ cy,
+                        float * __restrict__ cz,
+                        float * __restrict__ xl,
+                        float * __restrict__ xh,
+                        float * __restrict__ yl,
+                        float * __restrict__ yh,
+                        float * __restrict__ zl,
+                        float * __restrict__ zh,
+                        int c,
+                        bool * __restrict__ r)
+{
+    for (int i = 0; i < c; i += VEC_WIDTH)
+    {
+        tri_box_intersects_orig_16(&ax[i], &ay[i], &az[i],
+                                   &bx[i], &by[i], &bz[i],
+                                   &cx[i], &cy[i], &cz[i],
+                                   &xl[i], &xh[i],
+                                   &yl[i], &yh[i],
+                                   &zl[i], &zh[i],
+                                   &r[i]);
+    }
 }
 
 /// @brief Optimized fucntion.
@@ -433,12 +610,12 @@ tri_box_intersects_opt(float * __restrict__ ax,
 {
     for (int i = 0; i < c; i += VEC_WIDTH)
     {
-        __m512i res = tri_box_intersects_opt_16(&ax[i], &ay[i], &az[i],
-                                                &bx[i], &by[i], &bz[i],
-                                                &cx[i], &cy[i], &cz[i],
-                                                &xl[i], &xh[i],
-                                                &yl[i], &yh[i],
-                                                &zl[i], &zh[i]);
-        _mm512_store_epi32(&r[i], res);
+        tri_box_intersects_opt_16(&ax[i], &ay[i], &az[i],
+                                   &bx[i], &by[i], &bz[i],
+                                   &cx[i], &cy[i], &cz[i],
+                                   &xl[i], &xh[i],
+                                   &yl[i], &yh[i],
+                                   &zl[i], &zh[i],
+                                   &r[i]);
     }
 }
