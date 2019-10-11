@@ -9,8 +9,8 @@ then
     COMP="mpiicc"
 fi
 
-#FLAGS="-DINTEL -O3 -xmic-avx512 -qopt-prefetch"
-FLAGS="-O3 -std=c++11"
+FLAGS="-DINTEL -O3 -xmic-avx512 -qopt-prefetch"
+#FLAGS="-O3 -std=c++11"
 #INFO_FLAGS="-qopt-report=5"
 INFO_FLAGS=""
 EXE="VECTriBoxIntersect_knl.out"

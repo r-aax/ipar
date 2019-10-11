@@ -253,6 +253,12 @@ tri_box_intersect_opt(float xa,
     return true;
 }
 
+#define COND_EXE(command, pred) \
+if (pred) \
+{ \
+    command; \
+}
+
 void
 tri_box_intersects_orig_16(float * __restrict__ xa,
                            float * __restrict__ ya,
@@ -275,6 +281,8 @@ tri_box_intersects_orig_16(float * __restrict__ xa,
     float lo[VEC_WIDTH];
     float hi[VEC_WIDTH];
     float b[basic_eqns_count][3][VEC_WIDTH];
+
+    bool c_loop_i, c_loop_j;
 
     // Init.
     for (int w = 0; w < VEC_WIDTH; w++)
@@ -318,48 +326,66 @@ tri_box_intersects_orig_16(float * __restrict__ xa,
     {
         i = 0;
 
-        while ((i < basic_eqns_count) && r[w])
+        do
         {
-            float bi0 = b[i][0][w];
+            float f0 = b[i][1][w];
+            float f1 = b[i][2][w];
+            float k;
+            bool c_body = (b[i][0][w] == 0.0);
+            bool c_f0z = c_body && (f0 == 0.0);
+            bool c_f0p = c_body && (f0 > 0.0);
+            bool c_f0n = c_body && (f0 < 0.0);
+            bool c_f1p = c_body && (f1 > 0.0);
 
-            if (bi0 != 0.0)
-            {
-                j = i + 1;
-
-                while ((j < basic_eqns_count) && r[w])
-                {
-                    if (bi0 * b[j][0][w] < 0.0)
-                    {
-                        float f0 = bi0 * b[j][1][w] - b[j][0][w] * b[i][1][w];
-                        float f1 = bi0 * b[j][2][w] - b[j][0][w] * b[i][2][w];
-
-                        if (bi0 < 0.0)
-                        {
-                            f0 = -f0;
-                            f1 = -f1;
-                        }
-
-                        r[w] = upgrade_solution_orig(&lo[w], &hi[w], f0, f1);
-                    }
-
-                    j++;
-                }
-            }
+            COND_EXE(lo[w] = hi[w] + 1.0, c_f0z && c_f1p);
+            COND_EXE(k = -f1 / f0, !c_f0z);
+            COND_EXE(hi[w] = Utils::Min(hi[w], k), c_f0p);
+            COND_EXE(lo[w] = Utils::Max(lo[w], k), c_f0n);
+            COND_EXE(r[w] = (lo[w] <= hi[w]), c_body);
 
             i++;
+            c_loop_i = (i < basic_eqns_count) && r[w];
         }
+        while (c_loop_i);
 
         i = 0;
 
-        while ((i < basic_eqns_count) && r[w])
+        do
         {
-            if (b[i][0][w] == 0.0)
+            float bi0 = b[i][0][w];
+            float abi0 = fabs(bi0);
+            bool c_bi0z = (bi0 == 0.0);
+
+            j = i + 1;
+            c_loop_j = !c_bi0z;
+
+            while (c_loop_j)
             {
-                r[w] = upgrade_solution_orig(&lo[w], &hi[w], b[i][1][w], b[i][2][w]);
+                float bj0 = b[j][0][w];
+                float abj0 = fabs(bj0);
+                float f0 = abi0 * b[j][1][w] + abj0 * b[i][1][w];
+                float f1 = abi0 * b[j][2][w] + abj0 * b[i][2][w];
+                float k;
+                bool c_body = (bi0 * bj0 < 0.0);
+                bool c_f0z = c_body && (f0 == 0.0);
+                bool c_f0p = c_body && (f0 > 0.0);
+                bool c_f0n = c_body && (f0 < 0.0);
+                bool c_f1p = c_body && (f1 > 0.0);
+
+                COND_EXE(lo[w] = hi[w] + 1.0, c_f0z && c_f1p);
+                COND_EXE(k = -f1 / f0, !c_f0z);
+                COND_EXE(hi[w] = Utils::Min(hi[w], k), c_f0p);
+                COND_EXE(lo[w] = Utils::Max(lo[w], k), c_f0n);
+                COND_EXE(r[w] = (lo[w] <= hi[w]), c_body);
+
+                j++;
+                c_loop_j = (j < basic_eqns_count) && r[w];
             }
 
             i++;
+            c_loop_i = (i < basic_eqns_count - 1) && r[w];
         }
+        while (c_loop_i);
     }
 }
 
@@ -375,16 +401,16 @@ tri_box_intersects_orig_16(float * __restrict__ xa,
 // RESUME : r = abs(bi0) * bj1 - abs(bj0) * bi1
 //
 // II).
-// do-while (first iteration is always to be done)
+// do-while (first iteration is always to be done).
+//
+// III).
+// preprocessor predicate code.
 //
 //
 //
 
-#define COND_EXE(command, pred) \
-if (pred) \
-{ \
-    command; \
-}
+__m512 z0 = SETZERO();
+__m512 z1 = SETONE();
 
 void
 tri_box_intersects_opt_16(float * __restrict__ xa,
@@ -412,36 +438,34 @@ tri_box_intersects_opt_16(float * __restrict__ xa,
     bool c_loop_i, c_loop_j;
 
     // Init.
-    for (int w = 0; w < VEC_WIDTH; w++)
-    {
-        lo[w] = 0.0;
-        hi[w] = 1.0;
-        b[0][0][w] = xb[w] - xa[w];
-        b[0][1][w] = xc[w] - xa[w];
-        b[0][2][w] = -(xh[w] - xa[w]);
-        b[1][0][w] = -(xb[w] - xa[w]);
-        b[1][1][w] = -(xc[w] - xa[w]);
-        b[1][2][w] = xl[w] - xa[w];
-        b[2][0][w] = yb[w] - ya[w];
-        b[2][1][w] = yc[w] - ya[w];
-        b[2][2][w] = -(yh[w] - ya[w]);
-        b[3][0][w] = -(yb[w] - ya[w]);
-        b[3][1][w] = -(yc[w] - ya[w]);
-        b[3][2][w] = yl[w] - ya[w];
-        b[4][0][w] = zb[w] - za[w];
-        b[4][1][w] = zc[w] - za[w];
-        b[4][2][w] = -(zh[w] - za[w]);
-        b[5][0][w] = -(zb[w] - za[w]);
-        b[5][1][w] = -(zc[w] - za[w]);
-        b[5][2][w] = zl[w] - za[w];
-        b[6][0][w] = 1.0;
-        b[6][1][w] = 0.0;
-        b[6][2][w] = -1.0;
-        b[7][0][w] = -1.0;
-        b[7][1][w] = 0.0;
-        b[7][2][w] = 0.0;
-    }
+    ST(&lo[0], z0);
+    ST(&hi[0], z1);
+    ST(&b[0][0][0], SUB(LD(xb), LD(xa)));
+    ST(&b[0][1][0], SUB(LD(xc), LD(xa)));
+    ST(&b[0][2][0], SUB(LD(xa), LD(xh)));
+    ST(&b[1][0][0], SUB(LD(xa), LD(xb)));
+    ST(&b[1][1][0], SUB(LD(xa), LD(xc)));
+    ST(&b[1][2][0], SUB(LD(xl), LD(xa)));
+    ST(&b[2][0][0], SUB(LD(yb), LD(ya)));
+    ST(&b[2][1][0], SUB(LD(yc), LD(ya)));
+    ST(&b[2][2][0], SUB(LD(ya), LD(yh)));
+    ST(&b[3][0][0], SUB(LD(ya), LD(yb)));
+    ST(&b[3][1][0], SUB(LD(ya), LD(yc)));
+    ST(&b[3][2][0], SUB(LD(yl), LD(ya)));
+    ST(&b[4][0][0], SUB(LD(zb), LD(za)));
+    ST(&b[4][1][0], SUB(LD(zc), LD(za)));
+    ST(&b[4][2][0], SUB(LD(za), LD(zh)));
+    ST(&b[5][0][0], SUB(LD(za), LD(zb)));
+    ST(&b[5][1][0], SUB(LD(za), LD(zc)));
+    ST(&b[5][2][0], SUB(LD(zl), LD(za)));
+    ST(&b[6][0][0], z1);
+    ST(&b[6][1][0], z0);
+    ST(&b[6][2][0], SET1(-1.0));
+    ST(&b[7][0][0], SET1(-1.0));
+    ST(&b[7][1][0], z0);
+    ST(&b[7][2][0], z0);
 
+    // Init result.
     for (int w = 0; w < VEC_WIDTH; w++)
     {
         r[w] = true;
