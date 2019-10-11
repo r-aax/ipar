@@ -8,6 +8,9 @@
 #define SETZERO()   _mm512_setzero_ps()
 #define SET1(v)     _mm512_set1_ps(v)
 #define SETONE(v)   SET1(1.0)
+#define CMPEQ(a, b) _mm512_cmpeq_ps(a, b)
+#define CMPLT(a, b) _mm512_cmplt_ps(a, b)
+#define CMPGT(a, b) _mm512_cmpgt_ps(a, b)
 
 #endif
 
