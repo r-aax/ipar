@@ -433,15 +433,12 @@ tri_box_intersects_opt_16(float * __restrict__ xa,
                           int * __restrict__ r)
 {
     const int basic_eqns_count = 8;
-    float lo[VEC_WIDTH];
-    float hi[VEC_WIDTH];
+    float lo, hi;
     float b[basic_eqns_count][3][VEC_WIDTH];
 
     // Init.
     for (int w = 0; w < VEC_WIDTH; w++)
     {
-        lo[w] = 0.0;
-        hi[w] = 1.0;
         b[0][0][w] = xb[w] - xa[w];
         b[0][1][w] = xc[w] - xa[w];
         b[0][2][w] = -(xh[w] - xa[w]);
@@ -477,71 +474,67 @@ tri_box_intersects_opt_16(float * __restrict__ xa,
     // Main loop.
     for (int w = 0; w < VEC_WIDTH; w++)
     {
+        lo = 0.0;
+        hi = 1.0;
+
         for (int i = 0; i < basic_eqns_count; i++)
         {
             float f0 = b[i][1][w];
             float f1 = b[i][2][w];
             float k;
-            bool c_bz = (b[i][0][w] == 0.0);
-            bool c_f0z = c_bz && (f0 == 0.0);
-            bool c_f0p = c_bz && (f0 > 0.0);
-            bool c_f0n = c_bz && (f0 < 0.0);
-            bool c_f1p = c_bz && (f1 > 0.0);
+            bool c_bi0z = (b[i][0][w] == 0.0);
+            bool c_f0z = c_bi0z && (f0 == 0.0);
+            bool c_f0p = c_bi0z && (f0 > 0.0);
+            bool c_f0n = c_bi0z && (f0 < 0.0);
+            bool c_f1p = c_bi0z && (f1 > 0.0);
 
-            COND_EXE(lo[w] = hi[w] + 1.0, c_f0z && c_f1p);
+            COND_EXE(lo = hi + 1.0, c_f0z && c_f1p);
             COND_EXE(k = -f1 / f0, !c_f0z);
-            COND_EXE(hi[w] = Utils::Min(hi[w], k), c_f0p);
-            COND_EXE(lo[w] = Utils::Max(lo[w], k), c_f0n);
-            COND_EXE(r[w] = 0, c_bz && (lo[w] > hi[w]));
+            COND_EXE(hi = Utils::Min(hi, k), c_f0p);
+            COND_EXE(lo = Utils::Max(lo, k), c_f0n);
 
-            if (!r[w])
+            if (lo > hi)
             {
                 break;
             }
         }
 
-        int i;
-        i = 0;
-        int j;
-
-        bool c_loop_i;
-
-        do
+        for (int i = 0; i < basic_eqns_count; i++)
         {
             float bi0 = b[i][0][w];
             float abi0 = fabs(bi0);
-            bool c_bi0z = (bi0 == 0.0);
 
-            j = i + 1;
-            bool c_loop_j = !c_bi0z;
-
-            while (c_loop_j)
+            for (int j = i + 1; j < basic_eqns_count; j++)
             {
                 float bj0 = b[j][0][w];
                 float abj0 = fabs(bj0);
                 float f0 = abi0 * b[j][1][w] + abj0 * b[i][1][w];
                 float f1 = abi0 * b[j][2][w] + abj0 * b[i][2][w];
                 float k;
-                bool c_body = (bi0 * bj0 < 0.0);
-                bool c_f0z = c_body && (f0 == 0.0);
-                bool c_f0p = c_body && (f0 > 0.0);
-                bool c_f0n = c_body && (f0 < 0.0);
-                bool c_f1p = c_body && (f1 > 0.0);
+                bool c_n = (bi0 * bj0 < 0.0);
+                bool c_f0z = c_n && (f0 == 0.0);
+                bool c_f0p = c_n && (f0 > 0.0);
+                bool c_f0n = c_n && (f0 < 0.0);
+                bool c_f1p = c_n && (f1 > 0.0);
 
-                COND_EXE(lo[w] = hi[w] + 1.0, c_f0z && c_f1p);
+                COND_EXE(lo = hi + 1.0, c_f0z && c_f1p);
                 COND_EXE(k = -f1 / f0, !c_f0z);
-                COND_EXE(hi[w] = Utils::Min(hi[w], k), c_f0p);
-                COND_EXE(lo[w] = Utils::Max(lo[w], k), c_f0n);
-                COND_EXE(r[w] = ((lo[w] <= hi[w]) ? 1 : 0), c_body);
+                COND_EXE(hi = Utils::Min(hi, k), c_f0p);
+                COND_EXE(lo = Utils::Max(lo, k), c_f0n);
 
-                j++;
-                c_loop_j = (j < basic_eqns_count) && r[w];
+                if (lo > hi)
+                {
+                    break;
+                }
             }
 
-            i++;
-            c_loop_i = (i < basic_eqns_count - 1) && r[w];
+            if (lo > hi)
+            {
+                break;
+            }
         }
-        while (c_loop_i);
+
+        COND_EXE(r[w] = 0, lo > hi);
     }
 }
 
