@@ -444,33 +444,33 @@ tri_box_intersects_opt_16(float * __restrict__ xa,
                           int * __restrict__ r)
 {
     const int basic_eqns_count = 8;
-    float b[basic_eqns_count][3][VEC_WIDTH];
+    __m512 b[basic_eqns_count][3];
 
     // Init.
-    ST(&b[0][0][0], SUB(LD(xb), LD(xa)));
-    ST(&b[0][1][0], SUB(LD(xc), LD(xa)));
-    ST(&b[0][2][0], SUB(LD(xa), LD(xh)));
-    ST(&b[1][0][0], SUB(LD(xa), LD(xb)));
-    ST(&b[1][1][0], SUB(LD(xa), LD(xc)));
-    ST(&b[1][2][0], SUB(LD(xl), LD(xa)));
-    ST(&b[2][0][0], SUB(LD(yb), LD(ya)));
-    ST(&b[2][1][0], SUB(LD(yc), LD(ya)));
-    ST(&b[2][2][0], SUB(LD(ya), LD(yh)));
-    ST(&b[3][0][0], SUB(LD(ya), LD(yb)));
-    ST(&b[3][1][0], SUB(LD(ya), LD(yc)));
-    ST(&b[3][2][0], SUB(LD(yl), LD(ya)));
-    ST(&b[4][0][0], SUB(LD(zb), LD(za)));
-    ST(&b[4][1][0], SUB(LD(zc), LD(za)));
-    ST(&b[4][2][0], SUB(LD(za), LD(zh)));
-    ST(&b[5][0][0], SUB(LD(za), LD(zb)));
-    ST(&b[5][1][0], SUB(LD(za), LD(zc)));
-    ST(&b[5][2][0], SUB(LD(zl), LD(za)));
-    ST(&b[6][0][0], z1);
-    ST(&b[6][1][0], z0);
-    ST(&b[6][2][0], SET1(-1.0));
-    ST(&b[7][0][0], SET1(-1.0));
-    ST(&b[7][1][0], z0);
-    ST(&b[7][2][0], z0);
+    b[0][0] = SUB(LD(xb), LD(xa));
+    b[0][1] = SUB(LD(xc), LD(xa));
+    b[0][2] = SUB(LD(xa), LD(xh));
+    b[1][0] = SUB(z0, b[0][0]);
+    b[1][1] = SUB(z0, b[0][1]);
+    b[1][2] = SUB(LD(xl), LD(xa));
+    b[2][0] = SUB(LD(yb), LD(ya));
+    b[2][1] = SUB(LD(yc), LD(ya));
+    b[2][2] = SUB(LD(ya), LD(yh));
+    b[3][0] = SUB(z0, b[2][0]);
+    b[3][1] = SUB(z0, b[2][1]);
+    b[3][2] = SUB(LD(yl), LD(ya));
+    b[4][0] = SUB(LD(zb), LD(za));
+    b[4][1] = SUB(LD(zc), LD(za));
+    b[4][2] = SUB(LD(za), LD(zh));
+    b[5][0] = SUB(z0, b[4][0]);
+    b[5][1] = SUB(z0, b[4][1]);
+    b[5][2] = SUB(LD(zl), LD(za));
+    b[6][0] = z1;
+    b[6][1] = z0;
+    b[6][2] = SET1(-1.0);
+    b[7][0] = SET1(-1.0);
+    b[7][1] = z0;
+    b[7][2] = z0;
 
     // Result init.
     _mm512_store_epi32(r, _mm512_set1_epi32(1));
@@ -484,10 +484,8 @@ tri_box_intersects_opt_16(float * __restrict__ xa,
 
     for (int i = 0; i < basic_eqns_count; i++)
     {
-        update_lo_hi_opt(_mm512_cmpeq_ps_mask(LD(&b[i][0][0]), z0),
-                         LD(&b[i][1][0]),
-                         LD(&b[i][2][0]),
-                         &lo, &hi);
+        update_lo_hi_opt(_mm512_cmpeq_ps_mask(b[i][0], z0),
+                         b[i][1], b[i][2], &lo, &hi);
 
         if (!_mm512_cmplt_ps_mask(lo, hi))
         {
@@ -497,17 +495,17 @@ tri_box_intersects_opt_16(float * __restrict__ xa,
 
     for (int i = 0; i < basic_eqns_count; i++)
     {
-        __m512 bi0 = LD(&b[i][0][0]);
+        __m512 bi0 = b[i][0];
         __m512 abi0 = ABS(bi0);
 
         for (int j = i + 1; j < basic_eqns_count; j++)
         {
-            __m512 bj0 = LD(&b[j][0][0]);
+            __m512 bj0 = b[j][0];
             __m512 abj0 = ABS(bj0);
 
             update_lo_hi_opt(_mm512_cmplt_ps_mask(MUL(bi0, bj0), z0),
-                             ADD(MUL(abi0, LD(&b[j][1][0])), MUL(abj0, LD(&b[i][1][0]))),
-                             ADD(MUL(abi0, LD(&b[j][2][0])), MUL(abj0, LD(&b[i][2][0]))),
+                             FMADD(abi0, b[j][1], MUL(abj0, b[i][1])),
+                             FMADD(abi0, b[j][2], MUL(abj0, b[i][2])),
                              &lo, &hi);
 
             if (!_mm512_cmplt_ps_mask(lo, hi))

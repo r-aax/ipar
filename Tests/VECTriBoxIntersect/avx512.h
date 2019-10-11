@@ -11,6 +11,9 @@
 #define CMPEQ(a, b) _mm512_cmpeq_ps(a, b)
 #define CMPLT(a, b) _mm512_cmplt_ps(a, b)
 #define CMPGT(a, b) _mm512_cmpgt_ps(a, b)
+#define ABS(a)      _mm512_abs_ps(a)
+#define MUL(a, b)   _mm512_mul_ps(a, b)
+#define FMADD(a, b, c) _mm512_fmadd_ps(a, b, c)
 
 #endif
 

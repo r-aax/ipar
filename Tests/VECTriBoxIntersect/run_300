@@ -1,0 +1,10 @@
+1
+n03p003
+================================================
+VECTriBoxIntersect : test begin 
+VECTriBoxIntersect : tests_count = 232384
+VECTriBoxIntersect : repeats_count = 300
+VECTriBoxIntersect : orig = 32.9567, opt = 5.11838
+VECTriBoxIntersect : speedup = 84.4694%
+VECTriBoxIntersect : fault_range = 0.000860644%
+------------------------------------------------
