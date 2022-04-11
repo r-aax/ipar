@@ -1,3 +1,6 @@
 *.out
 *.optrpt
 *.s
+*.gcda
+*.gcno
+*.gcov
