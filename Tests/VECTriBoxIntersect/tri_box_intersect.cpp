@@ -15,9 +15,9 @@
 
 using namespace std;
 
-//#ifdef INTEL
+#ifdef INTEL
 #include <immintrin.h>
-//#endif
+#endif
 
 /// @brief Upgrade interval.
 ///
@@ -402,9 +402,9 @@ tri_box_intersects_orig_16(float * __restrict__ xa,
 //
 
 #ifdef INTEL
+
 __m512 z0 = SETZERO();
 __m512 z1 = SETONE();
-#endif
 
 void
 update_lo_hi_opt(__mmask16 m,
@@ -525,6 +525,8 @@ tri_box_intersects_opt_16(float * __restrict__ xa,
                             _mm512_set1_epi32(0));
 }
 
+#endif
+
 /// @brief Original function.
 ///
 /// @param [in] ax-zh - Datas.
@@ -585,6 +587,9 @@ tri_box_intersects_opt(float * __restrict__ ax,
                        int c,
                        int * __restrict__ r)
 {
+
+#ifdef INTEL
+
     for (int i = 0; i < c; i += VEC_WIDTH)
     {
         tri_box_intersects_opt_16(&ax[i], &ay[i], &az[i],
@@ -595,4 +600,13 @@ tri_box_intersects_opt(float * __restrict__ ax,
                                    &zl[i], &zh[i],
                                    &r[i]);
     }
+
+#else
+
+    tri_box_intersects_orig(ax, ay, az, bx, by, bz, cx, cy, cz,
+                            xl, xh, yl, yh, zl, zh,
+                            c, r);
+
+#endif
+
 }
